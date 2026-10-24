@@ -21,7 +21,7 @@
   "id": "strikers-quest-mr",
   "n": "Quest 3 Strikers (Super Mario Strikers MR)",
   "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.1.12-alpha1",
+  "v": "v0.1.13-alpha1",
   "a": "LanceSweatpants",
   "i": 82,
   "t": [
@@ -33,14 +33,14 @@
    "ISO"
   ],
   "c": "covers/strikers-quest-mr.jpg",
-  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.12-alpha1/QuestStrikers-alpha1.12.apk",
+  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.13-alpha1/QuestStrikers-alpha1.13.apk",
   "rec": false
  },
  {
   "id": "astroquest",
   "n": "AstroQuest (ASTRO BOT Rescue Mission)",
   "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.22",
+  "v": "v0.23",
   "a": "bigmak94",
   "i": 78,
   "t": [
@@ -51,7 +51,7 @@
   ],
   "r": [],
   "c": "covers/astroquest.jpg",
-  "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.22/AstroQuest-0.22-Quest3.apk",
+  "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.23/AstroQuest-0.23-Quest3.apk",
   "rec": false
  },
  {
@@ -92,7 +92,7 @@
   "id": "sm64-coop-dx-vr",
   "n": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based)",
   "d": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.9.21",
+  "v": "v0.9.22",
   "a": "FullDiveGames",
   "i": 52,
   "t": [
@@ -104,7 +104,7 @@
    "ROM"
   ],
   "c": "covers/sm64-coop-dx-vr.png",
-  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.21/SM64-Co-Op-DX-VR-Quest-v0.9.21.apk",
+  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.22/SM64-Co-Op-DX-VR-Quest-v0.9.22.apk",
   "rec": true
  },
  {
@@ -166,7 +166,7 @@
   "id": "goldeneye-vr",
   "n": "GoldenEye VR (007)",
   "d": "GoldenEye VR (007) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.5.10",
+  "v": "v0.5.13",
   "a": "MrSco",
   "i": 38,
   "t": [
@@ -178,7 +178,7 @@
    "ROM"
   ],
   "c": "covers/goldeneye-vr.jpg",
-  "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.10/GoldenEye-VR-v0.5.10.apk",
+  "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.13/GoldenEye-VR-v0.5.13.apk",
   "rec": true
  },
  {
@@ -481,7 +481,7 @@
   "id": "crisis-zone-vr",
   "n": "Crisis Zone VR",
   "d": "Crisis Zone VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.1.4",
+  "v": "v0.1.7",
   "a": "DR-89",
   "i": 11,
   "t": [
@@ -490,7 +490,7 @@
   ],
   "r": [],
   "c": "covers/crisis-zone-vr.png",
-  "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.4/CrisisZoneVR-v0.1.4-quest3.apk",
+  "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.7/CrisisZoneVR-v0.1.7-quest3.apk",
   "rec": false
  },
  {
@@ -513,7 +513,7 @@
   "id": "time-crisis-2-vr",
   "n": "Time Crisis II VR",
   "d": "Time Crisis II VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.3.0",
+  "v": "v0.3.3",
   "a": "DR-89",
   "i": 10,
   "t": [
@@ -524,7 +524,7 @@
    "ROM"
   ],
   "c": "covers/time-crisis-2-vr.png",
-  "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.0/TimeCrisis2VR-v0.3.0-quest3.apk",
+  "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.3/TimeCrisis2VR-v0.3.3-quest3.apk",
   "rec": true
  },
  {
