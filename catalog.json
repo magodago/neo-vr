@@ -548,7 +548,7 @@
   "r": [
    "ROM"
   ],
-  "c": "",
+  "c": "covers/ut99-vr-quest.jpg",
   "u": "https://ut99vr.pages.dev/ut99quest.apk",
   "rec": false,
   "perf": {
@@ -926,5 +926,175 @@
    "tex": "Filtro on"
   },
   "ren": false
+ },
+ {
+  "id": "c-c-tiberian-dawn",
+  "n": "C&C Tiberian Dawn",
+  "a": "Cesarus85",
+  "v": "v0.2.3-preview.20",
+  "i": 0,
+  "t": [
+   "Estrategia"
+  ],
+  "r": [
+   "Datos del juego"
+  ],
+  "u": "https://github.com/Cesarus85/Tiberian-Dawn-for-Android-and-Meta-Quest/releases/download/v0.2.3-preview.20/Tiberian-Dawn-Meta-Quest-3-3S-Spatial-preview.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/c-c-tiberian-dawn.jpg"
+ },
+ {
+  "id": "time-crisis-vr",
+  "n": "Time Crisis VR",
+  "a": "DR-89",
+  "v": "v0.9.4",
+  "i": 0,
+  "t": [
+   "Light Gun",
+   "Arcade"
+  ],
+  "r": [],
+  "u": "https://github.com/DR-89/time-crisis-vr/releases/download/v0.9.4/TimeCrisisVR-v0.9.4-quest3.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": true,
+  "ror": 1,
+  "c": "covers/time-crisis-vr.jpg"
+ },
+ {
+  "id": "mario-strikers-charged",
+  "n": "Mario Strikers Charged",
+  "a": "LanceSweatpants",
+  "v": "v0.1.1-alpha1.1",
+  "i": 0,
+  "t": [
+   "Deportes"
+  ],
+  "r": [
+   "ROM de GameCube"
+  ],
+  "u": "https://github.com/LanceSweatpants/Quest-3-Strikers-CHARGED/releases/download/v0.1.1-alpha1.1/QuestStrikersCharged-alpha1.1.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/mario-strikers-charged.jpg"
+ },
+ {
+  "id": "nba-street-vol-2",
+  "n": "NBA Street Vol. 2",
+  "a": "LanceSweatpants",
+  "v": "v0.1.2-alpha1.2",
+  "i": 0,
+  "t": [
+   "Deportes"
+  ],
+  "r": [
+   "ROM de GameCube"
+  ],
+  "u": "https://github.com/LanceSweatpants/Quest-3-Streets/releases/download/v0.1.2-alpha1.2/quest3-streets-alpha1.2.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/nba-street-vol-2.jpg"
+ },
+ {
+  "id": "mystical-ninja-vr",
+  "n": "Mystical Ninja VR",
+  "a": "VistaLargaGames",
+  "v": "v0.1.20",
+  "i": 0,
+  "t": [
+   "Aventura"
+  ],
+  "r": [
+   "ROM de N64"
+  ],
+  "u": "https://github.com/VistaLargaGames/Mystical-Ninja-VR/releases/download/v0.1.20/MysticalNinjaVR-Quest-0.1.20.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/mystical-ninja-vr.jpg"
+ },
+ {
+  "id": "wwf-no-mercy-vr",
+  "n": "WWF No Mercy VR",
+  "a": "VistaLargaGames",
+  "v": "n64",
+  "i": 0,
+  "t": [
+   "Lucha"
+  ],
+  "r": [
+   "ROM de N64"
+  ],
+  "u": "https://github.com/VistaLargaGames/WWF-No-Mercy-Quest-3-Standalone-/releases/download/n64/WWFNoMercyVR-Quest.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/wwf-no-mercy-vr.jpg"
+ },
+ {
+  "id": "bomberman-hero-vr",
+  "n": "Bomberman Hero VR",
+  "a": "VistaLargaGames",
+  "v": "n64",
+  "i": 0,
+  "t": [
+   "Plataformas"
+  ],
+  "r": [
+   "ROM de N64"
+  ],
+  "u": "https://github.com/VistaLargaGames/Bomberman-Hero-Quest-3-VR-Standalone/releases/download/n64/BombermanHeroQuest3.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/bomberman-hero-vr.jpg"
+ },
+ {
+  "id": "mario-kart-wii-vr",
+  "n": "Mario Kart Wii VR",
+  "a": "heurazy",
+  "v": "v1.3.1",
+  "i": 0,
+  "t": [
+   "Carreras"
+  ],
+  "r": [
+   "ROM de Wii"
+  ],
+  "u": "https://github.com/heurazy/mario-kart-wii-VR-port/releases/download/v1.3.1/WiiCompiled-VR-Quest3-v1.3.1.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/mario-kart-wii-vr.jpg"
+ },
+ {
+  "id": "retrodepth-mame-vr",
+  "n": "RetroDepth MAME VR",
+  "a": "maranone",
+  "v": "side3",
+  "i": 0,
+  "t": [
+   "Recreativa"
+  ],
+  "r": [
+   "ROMs de MAME"
+  ],
+  "u": "https://github.com/maranone/RetroDepth/releases/download/side3/RDFUSED-Quest.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/retrodepth-mame-vr.jpg"
  }
 ]

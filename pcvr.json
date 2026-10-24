@@ -1,0 +1,149 @@
+{
+ "disponibles": [
+  {
+   "n": "Titanfall 2 VR",
+   "a": "CircuitLord",
+   "repo": "Titanfall 2 VR",
+   "req": "Necesitas Titanfall 2 en EA o Steam",
+   "por": "Movimiento con jetpack y paredes en VR. El mejor shooter de la lista.",
+   "url": "https://github.com/CircuitLord/Titanfall2VR",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Half-Life 2 VR",
+   "a": "SourceVR",
+   "repo": "HL2VR",
+   "req": "Necesitas Half-Life 2 en Steam",
+   "por": "El juego completo, con manos y armas reales. Referencia del modding.",
+   "url": "https://github.com/SourceVR/HL2VR",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Portal 2 VR",
+   "a": "Gistix",
+   "repo": "Portal2VR",
+   "req": "Necesitas Portal 2 en Steam",
+   "por": "Portales y puzles a escala real. Sorprende mas que cualquier nativo.",
+   "url": "https://github.com/Gistix/portal2vr",
+   "v": "v0.1.5",
+   "upd": "2023-09-18",
+   "pc": true,
+   "est": "activo"
+  },
+  {
+   "n": "Alien: Isolation VR",
+   "a": "Nibre",
+   "repo": "MotherVR",
+   "req": "Necesitas Alien: Isolation en Steam o Epic",
+   "por": "Terror puro. El juego entero en VR, con el Xenomorph encima.",
+   "url": "https://github.com/Nibre/MotherVR",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Outer Wilds VR",
+   "a": "Raicuparta",
+   "repo": "NomaiVR",
+   "req": "Necesitas Outer Wilds en Steam o Epic",
+   "por": "Espacio, relojes y planetas. Una experiencia unica en VR.",
+   "url": "https://github.com/Raicuparta/NomaiVR",
+   "v": "2.10.0",
+   "upd": "2025-03-02",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Subnautica VR",
+   "a": "SubmersedVR",
+   "repo": "SubmersedVR",
+   "req": "Necesitas Subnautica en Steam",
+   "por": "Buceo y bases submarinas con manos y controles modernos.",
+   "url": "https://github.com/Ok-Distribution3334/SubmersedVR",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Risk of Rain 2 VR",
+   "a": "DrBibop",
+   "repo": "RoR2VRMod",
+   "req": "Necesitas Risk of Rain 2 en Steam",
+   "por": "Roguelike cooperativo con visor. Adictivo en grupo.",
+   "url": "https://github.com/DrBibop/RoR2VRMod",
+   "v": "1.1.0",
+   "upd": "2022-06-15",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "Doom 3 BFG VR",
+   "a": "Fully Possessed",
+   "repo": "FullyPossessed",
+   "req": "Necesitas Doom 3 BFG Edition en Steam",
+   "por": "Doom 3 completo en VR. El clasico del terror con pistola.",
+   "url": "https://github.com/KozGit/FullyPossessed",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "estable"
+  },
+  {
+   "n": "UEVR",
+   "a": "Praydog",
+   "repo": "UEVR",
+   "req": "Necesitas cualquier juego Unreal Engine",
+   "por": "Inyector universal: convierte cientos de juegos planos en VR.",
+   "url": "https://github.com/praydog/UEVR",
+   "v": "1.05",
+   "upd": "2024-11-16",
+   "pc": true,
+   "est": "activo"
+  },
+  {
+   "n": "REFramework",
+   "a": "Praydog",
+   "repo": "REFramework",
+   "req": "Necesitas un juego de RE Engine",
+   "por": "Resident Evil 2, 3, 4, 7, 8 y Monster Hunter con VR real.",
+   "url": "https://github.com/praydog/REFramework",
+   "v": "v1.5.9.1",
+   "upd": "2025-03-05",
+   "pc": true,
+   "est": "activo"
+  },
+  {
+   "n": "Vivecraft",
+   "a": "Vivecraft",
+   "repo": "Vivecraft",
+   "req": "Necesitas Minecraft Java",
+   "por": "Minecraft en VR con brazos, escalada y servidores.",
+   "url": "https://github.com/Vivecraft/VivecraftMod",
+   "v": "26.3-1.3.17",
+   "upd": "2026-10-08",
+   "pc": true,
+   "est": "activo"
+  },
+  {
+   "n": "Luke Ross R.E.A.L.",
+   "a": "Luke Ross",
+   "repo": "REAL VR",
+   "req": "Suscripcion de pago del autor",
+   "por": "Cyberpunk 2077, Elden Ring y Red Dead 2 en VR. Calidad altisima.",
+   "url": "https://www.patreon.com/realvr",
+   "v": "",
+   "upd": "",
+   "pc": true,
+   "est": "pago"
+  }
+ ],
+ "prox": []
+}
