@@ -4,7 +4,7 @@
   "n": "Need for Speed: Underground VR",
   "d": "Need for Speed: Underground VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.3.0-preview.1",
-  "a": "DR-89EA's 2003 street race",
+  "a": "DR-89",
   "i": 82,
   "t": [
    "Beta",
@@ -22,7 +22,7 @@
   "n": "Quest 3 Strikers",
   "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.12-alpha1",
-  "a": "LanceSweatpantsSuper Mario",
+  "a": "LanceSweatpants",
   "i": 82,
   "t": [
    "Emulator",
@@ -40,7 +40,7 @@
   "n": "AstroQuest",
   "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.23",
-  "a": "bigmak94PlayStation VR mas",
+  "a": "bigmak94",
   "i": 78,
   "t": [
    "Emulator",
@@ -57,7 +57,7 @@
   "n": "Generals: Zero Hour XR",
   "d": "Generals: Zero Hour XR (C&C Generals Zero Hour) VR on Meta Quest. Install in one click from your browser.",
   "v": "v1.2.36-xr-preview",
-  "a": "Cesarus85Command & Conquer",
+  "a": "Cesarus85",
   "i": 60,
   "t": [
    "Beta",
@@ -74,7 +74,7 @@
   "n": "Metal Gear Solid VR Standalone",
   "d": "Metal Gear Solid VR Standalone on Meta Quest. Install in one click from your browser.",
   "v": "v0.1-beta",
-  "a": "Baywilly",
+  "a": "Baywilly (Virtual Bays)",
   "i": 52,
   "t": [
    "Beta",
@@ -89,7 +89,7 @@
   "n": "SM64 Co-Op DX VR Standalone",
   "d": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based) on Meta Quest. Install in one click from your browser.",
   "v": "v0.9.21",
-  "a": "FullDiveGamesSuper Mario 6",
+  "a": "FullDiveGames",
   "i": 52,
   "t": [
    "Beta",
@@ -107,7 +107,7 @@
   "n": "QuestCarNage",
   "d": "QuestCarNage (Carmageddon VR) on Meta Quest. Install in one click from your browser.",
   "v": "b003",
-  "a": "maranoneNative standalone ",
+  "a": "maranone",
   "i": 47,
   "t": [
    "Beta",
@@ -122,7 +122,7 @@
   "n": "Port0r: Cop VR",
   "d": "Port0r: Cop VR (Virtua Cop) on Meta Quest. Install in one click from your browser.",
   "v": "vcop-v0.2.2",
-  "a": "jacquesdupontd",
+  "a": "jacquesdupontd (Port0r)",
   "i": 40,
   "t": [
    "Light Gun",
@@ -141,7 +141,7 @@
   "n": "TPVR",
   "d": "TPVR (Zelda: Twilight Princess VR) on Meta Quest. Install in one click from your browser.",
   "v": "v2.4.0",
-  "a": "JoeyAWThe Legend of Zelda:",
+  "a": "JoeyAW",
   "i": 40,
   "t": [
    "Emulator",
@@ -159,7 +159,7 @@
   "n": "GoldenEye VR",
   "d": "GoldenEye VR (007) on Meta Quest. Install in one click from your browser.",
   "v": "v0.5.13",
-  "a": "MrScoNative standalone VR ",
+  "a": "MrSco",
   "i": 38,
   "t": [
    "Beta",
@@ -177,7 +177,7 @@
   "n": "Smash Remix VR",
   "d": "Smash Remix VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.8.5",
-  "a": "VistaLargaGamesNintendo's ",
+  "a": "VistaLargaGames",
   "i": 38,
   "t": [
    "Beta",
@@ -194,7 +194,7 @@
   "n": "OpenCMR2 VR",
   "d": "OpenCMR2 VR (Colin McRae Rally 2.0) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.0",
-  "a": "DR-89Codemasters' classic ",
+  "a": "DR-89",
   "i": 34,
   "t": [
    "Beta",
@@ -212,7 +212,7 @@
   "n": "Port0r: House of the Dead VR",
   "d": "Port0r: House of the Dead VR (The House of the Dead) on Meta Quest. Install in one click from your browser.",
   "v": "hotd-v0.1.1",
-  "a": "jacquesdupontd",
+  "a": "jacquesdupontd (Port0r)",
   "i": 34,
   "t": [
    "Light Gun",
@@ -231,7 +231,7 @@
   "n": "The House of the Dead 2 VR",
   "d": "The House of the Dead 2 VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.4-test1",
-  "a": "mikermakSega's 1999 light-",
+  "a": "mikermak",
   "i": 34,
   "t": [
    "Light Gun",
@@ -251,7 +251,7 @@
   "n": "F-Zero X VR",
   "d": "F-Zero X VR (Quest 3 standalone) on Meta Quest. Install in one click from your browser.",
   "v": "v1.0.1",
-  "a": "heurazyF-Zero X racing in ",
+  "a": "heurazy",
   "i": 33,
   "t": [
    "Emulator",
@@ -269,7 +269,7 @@
   "n": "Homeworld: Unbound",
   "d": "Homeworld: Unbound VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.14",
-  "a": "bearstonemHomeworld",
+  "a": "bearstonem",
   "i": 33,
   "t": [
    "Beta",
@@ -284,7 +284,7 @@
   "n": "Port0r: Rally VR",
   "d": "Port0r: Rally VR (Sega Rally Championship) on Meta Quest. Install in one click from your browser.",
   "v": "v0.2.6",
-  "a": "jacquesdupontd",
+  "a": "jacquesdupontd (Port0r)",
   "i": 29,
   "t": [
    "Emulator",
@@ -302,7 +302,7 @@
   "n": "Quest 3: OOT",
   "d": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.3",
-  "a": "ChocoTorpThe Legend of Zel",
+  "a": "ChocoTorp",
   "i": 23,
   "t": [
    "Multiplayer"
@@ -318,7 +318,7 @@
   "n": "Need for Speed: Underground 2 VR",
   "d": "Need for Speed: Underground 2 VR on Meta Quest. Install in one click from your browser.",
   "v": "dev-2026-10-17",
-  "a": "DR-89EA's 2004 open-world ",
+  "a": "DR-89",
   "i": 18,
   "t": [
    "Beta",
@@ -335,7 +335,7 @@
   "n": "Wave Race 64 VR",
   "d": "Wave Race 64 VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.5",
-  "a": "VistaLargaGamesNintendo's ",
+  "a": "VistaLargaGames",
   "i": 18,
   "t": [
    "Beta",
@@ -352,7 +352,7 @@
   "n": "Wiicompiled VR PLUS",
   "d": "Wiicompiled VR PLUS (Mario Kart Wii VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.3.1",
-  "a": "heurazyMario Kart Wii stat",
+  "a": "heurazy",
   "i": 17,
   "t": [
    "Emulator",
@@ -371,7 +371,7 @@
   "n": "Unreal Tournament '99 VR",
   "d": "Unreal Tournament '99 VR (UT99 Quest) on Meta Quest. Install in one click from your browser.",
   "v": "v1.1.0",
-  "a": "GHWSTUnreal Tournament 199",
+  "a": "GHWST",
   "i": 14,
   "t": [
    "Beta",
@@ -388,7 +388,7 @@
   "n": "GalaxyQuest",
   "d": "GalaxyQuest (Super Mario Galaxy VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.9",
-  "a": "bigmak94Native standalone ",
+  "a": "bigmak94",
   "i": 13,
   "t": [
    "Beta",
@@ -405,7 +405,7 @@
   "n": "Majora's Mask VR",
   "d": "Majora's Mask VR (2Ship2Harkinian VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.36",
-  "a": "FullDiveGamesThe Legend of",
+  "a": "FullDiveGames",
   "i": 13,
   "t": [
    "Emulator",
@@ -423,7 +423,7 @@
   "n": "AGE of Joy",
   "d": "AGE of Joy (VR Arcade Gallery) on Meta Quest. Install in one click from your browser.",
   "v": "v0.5.0-rc31",
-  "a": "curifA retro arcade galler",
+  "a": "curif",
   "i": 11,
   "t": [
    "Emulator",
@@ -441,7 +441,7 @@
   "n": "Animal Crossing VR",
   "d": "Animal Crossing VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.9.3-vr20",
-  "a": "LiquidAzirNintendo's 2002 ",
+  "a": "LiquidAzir",
   "i": 11,
   "t": [
    "Beta",
@@ -459,7 +459,7 @@
   "n": "Crisis Zone VR",
   "d": "Crisis Zone VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.4",
-  "a": "DR-89Standalone 6DoF VR po",
+  "a": "DR-89",
   "i": 11,
   "t": [
    "Beta",
@@ -474,7 +474,7 @@
   "n": "No One Lives ForeVR",
   "d": "No One Lives ForeVR on Meta Quest. Install in one click from your browser.",
   "v": "v0.4.0",
-  "a": "alex",
+  "a": "alex.nax",
   "i": 10,
   "t": [
    "Beta",
@@ -489,7 +489,7 @@
   "n": "Time Crisis II VR",
   "d": "Time Crisis II VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.3.0",
-  "a": "DR-89Standalone 6DoF VR po",
+  "a": "DR-89",
   "i": 10,
   "t": [
    "Beta",
@@ -507,7 +507,7 @@
   "n": "Wipeout Rewrite VR",
   "d": "Wipeout Rewrite VR (Quest port of wipEout Rewrite) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.0-beta1",
-  "a": "SgtBilko76The 1995 anti-gr",
+  "a": "SgtBilko76",
   "i": 10,
   "t": [
    "Beta",
@@ -522,7 +522,7 @@
   "n": "Magic Carpet VR",
   "d": "Magic Carpet VR (Magic Carpet 1, Hidden Worlds & 2) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.0",
-  "a": "NathanaelA",
+  "a": "NathanaelA (@Congocart)",
   "i": 9,
   "t": [
    "Beta",
@@ -537,7 +537,7 @@
   "n": "OpenMW VR",
   "d": "OpenMW VR (Morrowind) on Meta Quest. Install in one click from your browser.",
   "v": "v0.51",
-  "a": "tomupsBethesda's 2002 RPG ",
+  "a": "tomups",
   "i": 9,
   "t": [
    "Beta",
@@ -552,7 +552,7 @@
   "n": "Descent 3 VR",
   "d": "Descent 3 VR (Quest port of the open-source Descent 3) on Meta Quest. Install in one click from your browser.",
   "v": "quest-v0.3-beta",
-  "a": "SgtBilko76Descent 3 as a s",
+  "a": "SgtBilko76",
   "i": 6,
   "t": [
    "Beta",
@@ -567,7 +567,7 @@
   "n": "PPSSPP VR",
   "d": "PPSSPP VR on Meta Quest. Install in one click from your browser.",
   "v": "v1.20.4",
-  "a": "Henrik RydgårdLeading Sony",
+  "a": "Henrik Rydgård",
   "i": 6,
   "t": [
    "Emulator",
@@ -584,7 +584,7 @@
   "n": "PrimedGun",
   "d": "PrimedGun (Metroid Prime VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.1.7",
-  "a": "Nobbie248Standalone 6DoF V",
+  "a": "Nobbie248",
   "i": 6,
   "t": [
    "Emulator",
@@ -601,7 +601,7 @@
   "n": "DolphinXR",
   "d": "DolphinXR (Dolphin VR ReduX) on Meta Quest. Install in one click from your browser.",
   "v": "v0.4",
-  "a": "iChris4GameCube and Wii em",
+  "a": "iChris4",
   "i": 3,
   "t": [
    "Emulator",
@@ -617,7 +617,7 @@
   "n": "XRKart 64",
   "d": "XRKart 64 (Mario Kart 64 VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.2.0",
-  "a": "J4nky",
+  "a": "J4nky (ArtfulRascal8)",
   "i": 3,
   "t": [
    "Beta",
