@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>NEO VR — Catálogo Quest 3</title>
+<style>
+  :root{
+    --bg:#07070f; --card:#0f1020; --line:#20223a; --tx:#eef1ff; --dim:#8b90b5;
+    --azul:#3d9bff; --rosa:#ff4fd8; --naranja:#ff9f43;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  body{padding:22px 16px 60px;max-width:1180px;margin:0 auto}
+  header{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+  h1{margin:0;font-size:26px;letter-spacing:.14em;font-weight:800;
+     background:linear-gradient(92deg,var(--azul),var(--rosa) 55%,var(--naranja));
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);font-size:13px;letter-spacing:.02em}
+  .bar{display:flex;gap:10px;margin:16px 0 8px;flex-wrap:wrap;align-items:center}
+  input[type=search]{flex:1 1 240px;min-width:0;background:var(--card);border:1px solid var(--line);
+    color:var(--tx);border-radius:12px;padding:13px 16px;font-size:15px;outline:none}
+  input[type=search]:focus{border-color:var(--azul)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--dim);
+    border-radius:999px;padding:9px 15px;font-size:13px;cursor:pointer;transition:.15s}
+  .chip.on{color:#06101f;background:var(--azul);border-color:var(--azul);font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;transition:.18s}
+  .card:active{transform:scale(.99);border-color:var(--azul)}
+  .cover{position:relative;aspect-ratio:460/215;background:#141528;overflow:hidden}
+  .cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;letter-spacing:.1em;
+    background:linear-gradient(135deg,#1b1d36,#0d0e1c);color:#3a3f66}
+  .inst{position:absolute;right:8px;bottom:8px;background:rgba(6,7,16,.82);
+    border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:11px;color:#c9cdf0}
+  .body{padding:13px 14px 14px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .name{font-size:15.5px;font-weight:700;line-height:1.25;margin:0}
+  .meta{font-size:11.5px;color:var(--dim);display:flex;gap:8px;flex-wrap:wrap}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;
+    border-radius:6px;border:1px solid var(--line);color:#a9aede}
+  .tag.gun{color:var(--naranja);border-color:#4a2f14}
+  .tag.rom{color:var(--rosa);border-color:#4a1638}
+  .tag.ok{color:#43e08b;border-color:#14402a}
+  .btn{margin-top:auto;display:block;text-align:center;text-decoration:none;
+    background:linear-gradient(92deg,#1f6fe0,#3d9bff);color:#03101f;font-weight:800;
+    padding:13px;border-radius:11px;font-size:14px;letter-spacing:.04em}
+  .btn:active{filter:brightness(.9)}
+  .empty{color:var(--dim);text-align:center;padding:50px 10px;font-size:14px}
+  footer{margin-top:34px;color:#5d6188;font-size:11.5px;line-height:1.7;text-align:center}
+  @media(max-width:420px){.grid{grid-template-columns:1fr 1fr;gap:10px}
+    .name{font-size:12.5px}.body{padding:9px}.btn{padding:10px 6px;font-size:12px}
+    body{padding:16px 10px 40px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>NEO VR</h1>
+  <div class="sub">Ports y mods standalone para Quest 3. Pulsa instalar y el visor abre el instalador.</div>
+</header>
+
+<div class="bar"><input id="q" type="search" placeholder="Buscar juego o mod..."></div>
+<div class="chips" id="chips"></div>
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty" style="display:none">Nada con ese filtro.</div>
+<footer>
+  Catálogo de ports de la comunidad. Los que marcan ROM o BIOS necesitan que aportes tú el juego original.<br>
+  Los derechos son de sus autores. NEO VR solo enlaza sus descargas oficiales.
+</footer>
+
+<script>
+let DATA=[], filtro='todo', texto='';
+const CHIPS=[['todo','Todo'],['datos','Listo para jugar'],['rom','Necesita ROM/BIOS'],['gun','Pistola'],['emul','Emulador']];
+const chipsEl=document.getElementById('chips'), grid=document.getElementById('grid');
+
+CHIPS.forEach(([k,label])=>{
+  const b=document.createElement('button');
+  b.className='chip'+(k==='todo'?' on':''); b.textContent=label; b.dataset.k=k;
+  b.onclick=()=>{filtro=k;[...chipsEl.children].forEach(c=>c.classList.toggle('on',c.dataset.k===k));pintar()};
+  chipsEl.appendChild(b);
+});
+document.getElementById('q').addEventListener('input',e=>{texto=e.target.value.toLowerCase();pintar()});
+
+function pasa(it){
+  if(texto && !(it.n+' '+it.d+' '+it.a).toLowerCase().includes(texto)) return false;
+  if(filtro==='datos') return it.r.length===0;
+  if(filtro==='rom') return it.r.length>0;
+  if(filtro==='gun') return it.t.includes('Light Gun');
+  if(filtro==='emul') return it.t.includes('Emulator');
+  return true;
+}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+function pintar(){
+  const items=DATA.filter(pasa);
+  document.getElementById('empty').style.display=items.length?'none':'block';
+  grid.innerHTML=items.map(it=>{
+    const cov=it.c?`<img src="${it.c}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="ph" style="display:none">${esc(it.n.slice(0,2).toUpperCase())}</div>`
+      :`<div class="ph">${esc(it.n.slice(0,2).toUpperCase())}</div>`;
+    const tags=[
+      it.t.includes('Light Gun')?'<span class="tag gun">Pistola</span>':'',
+      it.r.length?'<span class="tag rom">Necesita '+it.r.join(' + ')+'</span>':'<span class="tag ok">Incluye el juego</span>',
+      it.t.includes('Multiplayer')?'<span class="tag">Multijugador</span>':''
+    ].join('');
+    return `<div class="card">
+      <div class="cover">${cov}<div class="inst">${it.i} instalaciones</div></div>
+      <div class="body">
+        <h2 class="name">${esc(it.n)}</h2>
+        <div class="meta"><span>${esc(it.v||'sin versión')}</span>${it.a?'<span>· '+esc(it.a)+'</span>':''}</div>
+        <div class="tags">${tags}</div>
+        <a class="btn" href="${it.u}" rel="noopener">INSTALAR</a>
+      </div></div>`;
+  }).join('');
+}
+
+fetch('catalog.json').then(r=>r.json()).then(d=>{DATA=d;pintar()})
+ .catch(e=>{document.getElementById('empty').textContent='No se pudo cargar el catálogo.';document.getElementById('empty').style.display='block'});
+</script>
+</body>
+</html>

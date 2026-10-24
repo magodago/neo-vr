@@ -1,0 +1,632 @@
+[
+ {
+  "id": "nfsu-vr",
+  "n": "Need for Speed: Underground VR",
+  "d": "Need for Speed: Underground VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.3.0-preview.1",
+  "a": "DR-89 Official Page ↗ EA's 2003 street racer Need for Speed:",
+  "i": 82,
+  "t": [
+   "Beta",
+   "Multiplayer",
+   "PCVR"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/nfsu-vr.png",
+  "u": "https://github.com/DR-89/nfsu-vr/releases/download/v0.3.0-preview.1/NFSU-VR-Quest3-v0.3.0-preview.1.apk"
+ },
+ {
+  "id": "strikers-quest-mr",
+  "n": "Quest 3 Strikers",
+  "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.12-alpha1",
+  "a": "LanceSweatpants Official Page ↗ Super Mario Strikers",
+  "i": 82,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/strikers-quest-mr.jpg",
+  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.12-alpha1/QuestStrikers-alpha1.12.apk"
+ },
+ {
+  "id": "astroquest",
+  "n": "AstroQuest",
+  "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.23",
+  "a": "bigmak94 Official Page ↗ PlayStation VR masterpiece ASTRO BO",
+  "i": 78,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Hand Tracking",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/astroquest.jpg",
+  "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.22/AstroQuest-0.22-Quest3.apk"
+ },
+ {
+  "id": "generals-zero-hour-xr",
+  "n": "Generals: Zero Hour XR",
+  "d": "Generals: Zero Hour XR (C&C Generals Zero Hour) VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.2.36-xr-preview",
+  "a": "Cesarus85 Official Page ↗ Command & Conquer: Generals – Zero",
+  "i": 60,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/generals-zero-hour-xr.png",
+  "u": "https://github.com/Cesarus85/Generals-Zero-Hour-XR/releases/download/v1.2.36-xr-preview/Generals-Zero-Hour-XR.apk"
+ },
+ {
+  "id": "metal-gear-solid-vr",
+  "n": "Metal Gear Solid VR Standalone",
+  "d": "Metal Gear Solid VR Standalone on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1-beta",
+  "a": "Baywilly",
+  "i": 52,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/metal-gear-solid-vr.jpg",
+  "u": "https://github.com/Baywilly/Metal-Gear-Solid-VR-Standalone/releases/download/V0.1-beta/MGSVR-Quest.apk"
+ },
+ {
+  "id": "sm64-coop-dx-vr",
+  "n": "SM64 Co-Op DX VR Standalone",
+  "d": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.9.21",
+  "a": "FullDiveGames Official Page ↗ Super Mario 64 in first person",
+  "i": 52,
+  "t": [
+   "Beta",
+   "Multiplayer",
+   "Co-op"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/sm64-coop-dx-vr.png",
+  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.21/SM64-Co-Op-DX-VR-Quest-v0.9.21.apk"
+ },
+ {
+  "id": "questcarnage",
+  "n": "QuestCarNage",
+  "d": "QuestCarNage (Carmageddon VR) on Meta Quest. Install in one click from your browser.",
+  "v": "b003",
+  "a": "maranone Official Page ↗ Native standalone OpenXR VR port of",
+  "i": 47,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/questcarnage.jpg",
+  "u": "https://github.com/maranone/carnage/releases/download/b003/QuestCarnage-Meta-Quest-release.apk"
+ },
+ {
+  "id": "virtua-cop-vr",
+  "n": "Port0r: Cop VR",
+  "d": "Port0r: Cop VR (Virtua Cop) on Meta Quest. Install in one click from your browser.",
+  "v": "vcop-v0.2.2",
+  "a": "jacquesdupontd",
+  "i": 40,
+  "t": [
+   "Light Gun",
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/virtua-cop-vr.png",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/vcop-v0.2.2/Port0r-CopVR-v0.2.2-quest3.apk"
+ },
+ {
+  "id": "twilight-princess-vr",
+  "n": "TPVR",
+  "d": "TPVR (Zelda: Twilight Princess VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v2.4.0",
+  "a": "JoeyAW Official Page ↗ The Legend of Zelda: Twilight Princes",
+  "i": 40,
+  "t": [
+   "Emulator",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM",
+   "ISO"
+  ],
+  "c": "covers/twilight-princess-vr.png",
+  "u": "https://github.com/JoeyAW/TPVR/releases/download/2.4.0/tpvr-quest-arm64.apk"
+ },
+ {
+  "id": "goldeneye-vr",
+  "n": "GoldenEye VR",
+  "d": "GoldenEye VR (007) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.5.13",
+  "a": "MrSco Official Page ↗ Native standalone VR port of GoldenEye",
+  "i": 38,
+  "t": [
+   "Beta",
+   "Multiplayer",
+   "Co-op"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/goldeneye-vr.jpg",
+  "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.10/GoldenEye-VR-v0.5.10.apk"
+ },
+ {
+  "id": "smash-remix-vr",
+  "n": "Smash Remix VR",
+  "d": "Smash Remix VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.8.5",
+  "a": "VistaLargaGames Official Page ↗ Nintendo's 1999 N64 fighter",
+  "i": 38,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/smash-remix-vr.png",
+  "u": "https://github.com/VistaLargaGames/Smash-Remix-VR/releases/download/v0.8.5/SmashRemixVR-Quest-0.8.5.apk"
+ },
+ {
+  "id": "opencmr2-vr",
+  "n": "OpenCMR2 VR",
+  "d": "OpenCMR2 VR (Colin McRae Rally 2.0) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0",
+  "a": "DR-89 Official Page ↗ Codemasters' classic Colin McRae Rally",
+  "i": 34,
+  "t": [
+   "Beta",
+   "Multiplayer",
+   "PCVR"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/opencmr2-vr.png",
+  "u": "https://github.com/DR-89/opencmr2-vr/releases/download/v0.1.0/OpenCMR2-VR-Quest-arm64-v0.1.0.apk"
+ },
+ {
+  "id": "hotd-vr",
+  "n": "Port0r: House of the Dead VR",
+  "d": "Port0r: House of the Dead VR (The House of the Dead) on Meta Quest. Install in one click from your browser.",
+  "v": "hotd-v0.1.1",
+  "a": "jacquesdupontd",
+  "i": 34,
+  "t": [
+   "Light Gun",
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/hotd-vr.png",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/hotd-v0.1.1/Port0r-HouseOfTheDeadVR-v0.1.1-quest3.apk"
+ },
+ {
+  "id": "hotd2-vr",
+  "n": "The House of the Dead 2 VR",
+  "d": "The House of the Dead 2 VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.4-test1",
+  "a": "mikermak Official Page ↗ Sega's 1999 light-gun rail shooter",
+  "i": 34,
+  "t": [
+   "Light Gun",
+   "Emulator",
+   "Beta",
+   "Multiplayer",
+   "PCVR"
+  ],
+  "r": [
+   "BIOS"
+  ],
+  "c": "covers/hotd2-vr.png",
+  "u": "https://github.com/mikermak/hotd2-vr/releases/download/v0.4-test1/hotd2-vr-quest.apk"
+ },
+ {
+  "id": "f-zero-x-vr",
+  "n": "F-Zero X VR",
+  "d": "F-Zero X VR (Quest 3 standalone) on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.1",
+  "a": "heurazy Official Page ↗ F-Zero X racing in true stereoscopic",
+  "i": 33,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/f-zero-x-vr.jpg",
+  "u": "https://github.com/heurazy/FzeroVR-Standalone/releases/download/v1.0.1/FzeroVR-Standalone-v1.0.1-Quest3.apk"
+ },
+ {
+  "id": "homeworld-unbound",
+  "n": "Homeworld: Unbound",
+  "d": "Homeworld: Unbound VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.14",
+  "a": "bearstonem Official Page ↗ Homeworld",
+  "i": 33,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/homeworld-unbound.jpg",
+  "u": "https://github.com/bearstonem/Homeworld/releases/download/unbound-0.14/homeworld-unbound-vr.apk"
+ },
+ {
+  "id": "sega-rally-vr",
+  "n": "Port0r: Rally VR",
+  "d": "Port0r: Rally VR (Sega Rally Championship) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.2.6",
+  "a": "jacquesdupontd",
+  "i": 29,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/sega-rally-vr.png",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/v0.2.6/Port0r-RallyVR-v0.2.6-quest3.apk"
+ },
+ {
+  "id": "ocarina-of-time-vr",
+  "n": "Quest 3: OOT",
+  "d": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v1.3",
+  "a": "ChocoTorp Official Page ↗ The Legend of Zelda: Ocarina of Ti",
+  "i": 23,
+  "t": [
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/ocarina-of-time-vr.png",
+  "u": "https://github.com/ChocoTorp/Shipwright-VR/releases/download/v1.3/Quest3-OOT-v1.3.apk"
+ },
+ {
+  "id": "nfsu2-vr",
+  "n": "Need for Speed: Underground 2 VR",
+  "d": "Need for Speed: Underground 2 VR on Meta Quest. Install in one click from your browser.",
+  "v": "dev-2026-10-17",
+  "a": "DR-89 Official Page ↗ EA's 2004 open-world street racer Need",
+  "i": 18,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/nfsu2-vr.png",
+  "u": "https://github.com/DR-89/nfsu2-vr/releases/download/dev-2026-10-17/NFSU2VR-Quest3-dev-2026-10-17.apk"
+ },
+ {
+  "id": "wave-race-64-vr",
+  "n": "Wave Race 64 VR",
+  "d": "Wave Race 64 VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.5",
+  "a": "VistaLargaGames Official Page ↗ Nintendo's 1996 jet ski race",
+  "i": 18,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/wave-race-64-vr.png",
+  "u": "https://github.com/VistaLargaGames/WaveRace64-QuestVR/releases/download/v0.1.5/WaveRace64VR-Quest-0.1.8.apk"
+ },
+ {
+  "id": "wiicompiled-vr-plus",
+  "n": "Wiicompiled VR PLUS",
+  "d": "Wiicompiled VR PLUS (Mario Kart Wii VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v1.3.1",
+  "a": "heurazy Official Page ↗ Mario Kart Wii statically recompiled",
+  "i": 17,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM",
+   "ISO"
+  ],
+  "c": "covers/wiicompiled-vr-plus.png",
+  "u": "https://github.com/heurazy/Wiicompiled_VR-PLUS/releases/download/v1.3.1/WiiCompiled-VR-Quest3-v1.3.1.apk"
+ },
+ {
+  "id": "ut99-vr-quest",
+  "n": "Unreal Tournament '99 VR",
+  "d": "Unreal Tournament '99 VR (UT99 Quest) on Meta Quest. Install in one click from your browser.",
+  "v": "v1.1.0",
+  "a": "GHWST Official Page ↗ Unreal Tournament 1999 running nativel",
+  "i": 14,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "",
+  "u": "https://ut99vr.pages.dev/ut99quest.apk"
+ },
+ {
+  "id": "galaxyquest",
+  "n": "GalaxyQuest",
+  "d": "GalaxyQuest (Super Mario Galaxy VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.9",
+  "a": "bigmak94 Official Page ↗ Native standalone VR port of Super",
+  "i": 13,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/galaxyquest.jpg",
+  "u": "https://github.com/bigmak94/GalaxyQuest/releases/latest/download/GalaxyQuest.apk"
+ },
+ {
+  "id": "majoras-mask-vr",
+  "n": "Majora's Mask VR",
+  "d": "Majora's Mask VR (2Ship2Harkinian VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.36",
+  "a": "FullDiveGames Official Page ↗ The Legend of Zelda: Majora's",
+  "i": 13,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/majoras-mask-vr.png",
+  "u": "https://github.com/fulldivegames/Majoras-Mask-VR/releases/download/v0.36/MMVR-Quest-0.36.apk"
+ },
+ {
+  "id": "age-of-joy",
+  "n": "AGE of Joy",
+  "d": "AGE of Joy (VR Arcade Gallery) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.5.0-rc31",
+  "a": "curif Official Page ↗ A retro arcade gallery recreated in 6D",
+  "i": 11,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/age-of-joy.png",
+  "u": "https://github.com/curif/AgeOfJoy-2022.1/releases/download/v0.5.0-rc31/AgeOfJoy.apk"
+ },
+ {
+  "id": "animal-crossing-vr",
+  "n": "Animal Crossing VR",
+  "d": "Animal Crossing VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.9.3-vr20",
+  "a": "LiquidAzir Official Page ↗ Nintendo's 2002 GameCube life sim",
+  "i": 11,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM",
+   "ISO"
+  ],
+  "c": "covers/animal-crossing-vr.png",
+  "u": "https://github.com/LiquidAzir/animal-crossing-vr/releases/download/v0.9.3-vr20/AnimalCrossing-Quest-v0.9.3-vr20.apk"
+ },
+ {
+  "id": "crisis-zone-vr",
+  "n": "Crisis Zone VR",
+  "d": "Crisis Zone VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.4",
+  "a": "DR-89 Official Page ↗ Standalone 6DoF VR port of Namco's 199",
+  "i": 11,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/crisis-zone-vr.png",
+  "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.4/CrisisZoneVR-v0.1.4-quest3.apk"
+ },
+ {
+  "id": "nolf-vr",
+  "n": "No One Lives ForeVR",
+  "d": "No One Lives ForeVR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.4.0",
+  "a": "alex",
+  "i": 10,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/nolf-vr.png",
+  "u": "https://github.com/alex-nax/relith/releases/download/v0.4.0/relith-nolf-quest-0.4.0.apk"
+ },
+ {
+  "id": "time-crisis-2-vr",
+  "n": "Time Crisis II VR",
+  "d": "Time Crisis II VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.3.0",
+  "a": "DR-89 Official Page ↗ Standalone 6DoF VR port of Namco's arc",
+  "i": 10,
+  "t": [
+   "Beta",
+   "Multiplayer",
+   "PCVR"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/time-crisis-2-vr.png",
+  "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.0/TimeCrisis2VR-v0.3.0-quest3.apk"
+ },
+ {
+  "id": "wipeout-rewrite-vr",
+  "n": "Wipeout Rewrite VR",
+  "d": "Wipeout Rewrite VR (Quest port of wipEout Rewrite) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0-beta1",
+  "a": "SgtBilko76 Official Page ↗ The 1995 anti-gravity racer wipEo",
+  "i": 10,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/wipeout-rewrite-vr.png",
+  "u": "https://github.com/SgtBilko76/Wipeout-Rewrite-VR/releases/download/v0.1.0-beta1/WipeoutRewriteVR-0.1.0-beta1-quest.apk"
+ },
+ {
+  "id": "magic-carpet-vr",
+  "n": "Magic Carpet VR",
+  "d": "Magic Carpet VR (Magic Carpet 1, Hidden Worlds & 2) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0",
+  "a": "NathanaelA",
+  "i": 9,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/magic-carpet-vr.jpg",
+  "u": "https://github.com/NathanaelA/mgcarpet-vr/releases/download/0.1.0/mgcarpet-vr.apk"
+ },
+ {
+  "id": "openmw-vr",
+  "n": "OpenMW VR",
+  "d": "OpenMW VR (Morrowind) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.51",
+  "a": "tomups Official Page ↗ Bethesda's 2002 RPG The Elder Scrolls",
+  "i": 9,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/openmw-vr.png",
+  "u": "https://github.com/tomups/openmw-vr-quest/releases/download/v0.51/com.openmw.vr-0-51-release.apk"
+ },
+ {
+  "id": "descent-3-vr",
+  "n": "Descent 3 VR",
+  "d": "Descent 3 VR (Quest port of the open-source Descent 3) on Meta Quest. Install in one click from your browser.",
+  "v": "quest-v0.3-beta",
+  "a": "SgtBilko76 Official Page ↗ Descent 3 as a standalone VR game",
+  "i": 6,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/descent-3-vr.jpg",
+  "u": "https://github.com/SgtBilko76/Descent3-VR/releases/download/quest-v0.3-beta/Descent3-VR-0.3-beta.apk"
+ },
+ {
+  "id": "ppsspp-vr",
+  "n": "PPSSPP VR",
+  "d": "PPSSPP VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.20.4",
+  "a": "Henrik Rydgård Official Page ↗ Leading Sony PlayStation Port",
+  "i": 6,
+  "t": [
+   "Emulator",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/ppsspp-vr.jpg",
+  "u": "https://www.ppsspp.org/files/1_20_4/ppsspp_vr.apk"
+ },
+ {
+  "id": "primedgun",
+  "n": "PrimedGun",
+  "d": "PrimedGun (Metroid Prime VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v1.1.7",
+  "a": "Nobbie248 Official Page ↗ Standalone 6DoF VR source injectio",
+  "i": 6,
+  "t": [
+   "Emulator",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "c": "covers/primedgun.jpg",
+  "u": "https://github.com/Nobbie248/PrimedGun/releases/download/v1.1.7/primedgun-quest-release.apk"
+ },
+ {
+  "id": "dolphinxr",
+  "n": "DolphinXR",
+  "d": "DolphinXR (Dolphin VR ReduX) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.4",
+  "a": "iChris4 Official Page ↗ GameCube and Wii emulator for VR, a",
+  "i": 3,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "c": "covers/dolphinxr.png",
+  "u": "https://github.com/iChris4/dolphinXR/releases/download/v0.4/Dolphin-VR-Redux-app-quest-debug.apk"
+ },
+ {
+  "id": "xrkart-64",
+  "n": "XRKart 64",
+  "d": "XRKart 64 (Mario Kart 64 VR) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.2.0",
+  "a": "J4nky",
+  "i": 3,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "c": "covers/xrkart-64.png",
+  "u": "https://github.com/ArtfulRascal8/XRKart-64/releases/download/v0.2.0/XRKart-64-v0.2.0-Quest.apk"
+ }
+]
