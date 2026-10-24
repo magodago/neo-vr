@@ -8,8 +8,7 @@
   "i": 82,
   "t": [
    "Beta",
-   "Multiplayer",
-   "PCVR"
+   "Multiplayer"
   ],
   "r": [
    "ISO"
@@ -20,7 +19,7 @@
  },
  {
   "id": "strikers-quest-mr",
-  "n": "Quest 3 Strikers",
+  "n": "Quest 3 Strikers (Super Mario Strikers MR)",
   "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.13-alpha1",
   "a": "LanceSweatpants",
@@ -34,12 +33,12 @@
    "ISO"
   ],
   "c": "covers/strikers-quest-mr.jpg",
-  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.13-alpha1/QuestStrikers-alpha1.13.apk",
+  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.12-alpha1/QuestStrikers-alpha1.12.apk",
   "rec": false
  },
  {
   "id": "astroquest",
-  "n": "AstroQuest",
+  "n": "AstroQuest (ASTRO BOT Rescue Mission)",
   "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.23",
   "a": "bigmak94",
@@ -52,12 +51,12 @@
   ],
   "r": [],
   "c": "covers/astroquest.jpg",
-  "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.23/AstroQuest-0.23-Quest3.apk",
+  "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.22/AstroQuest-0.22-Quest3.apk",
   "rec": false
  },
  {
   "id": "generals-zero-hour-xr",
-  "n": "Generals: Zero Hour XR",
+  "n": "Generals: Zero Hour XR (C&C Generals Zero Hour)",
   "d": "Generals: Zero Hour XR (C&C Generals Zero Hour) VR on Meta Quest. Install in one click from your browser.",
   "v": "v1.2.36-xr-preview",
   "a": "Cesarus85",
@@ -78,7 +77,7 @@
   "n": "Metal Gear Solid VR Standalone",
   "d": "Metal Gear Solid VR Standalone on Meta Quest. Install in one click from your browser.",
   "v": "v0.1-beta",
-  "a": "Baywilly (Virtual Bays)",
+  "a": "Baywilly",
   "i": 52,
   "t": [
    "Beta",
@@ -91,7 +90,7 @@
  },
  {
   "id": "sm64-coop-dx-vr",
-  "n": "SM64 Co-Op DX VR Standalone",
+  "n": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based)",
   "d": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based) on Meta Quest. Install in one click from your browser.",
   "v": "v0.9.22",
   "a": "FullDiveGames",
@@ -105,12 +104,12 @@
    "ROM"
   ],
   "c": "covers/sm64-coop-dx-vr.png",
-  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.22/SM64-Co-Op-DX-VR-Quest-v0.9.22.apk",
+  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.21/SM64-Co-Op-DX-VR-Quest-v0.9.21.apk",
   "rec": true
  },
  {
   "id": "questcarnage",
-  "n": "QuestCarNage",
+  "n": "QuestCarNage (Carmageddon VR)",
   "d": "QuestCarNage (Carmageddon VR) on Meta Quest. Install in one click from your browser.",
   "v": "pico-test",
   "a": "maranone",
@@ -121,15 +120,15 @@
   ],
   "r": [],
   "c": "covers/questcarnage.jpg",
-  "u": "https://github.com/maranone/carnage/releases/download/pico-test/QuestCarnage-PICO4-release.apk",
+  "u": "https://github.com/maranone/carnage/releases/download/b003/QuestCarnage-Meta-Quest-release.apk",
   "rec": false
  },
  {
   "id": "virtua-cop-vr",
-  "n": "Port0r: Cop VR",
+  "n": "Port0r: Cop VR (Virtua Cop)",
   "d": "Port0r: Cop VR (Virtua Cop) on Meta Quest. Install in one click from your browser.",
   "v": "dirtdash-v0.1.3",
-  "a": "jacquesdupontd (Port0r)",
+  "a": "jacquesdupontd",
   "i": 40,
   "t": [
    "Light Gun",
@@ -141,14 +140,14 @@
    "ROM"
   ],
   "c": "covers/virtua-cop-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/dirtdash-v0.1.3/Port0r-DirtDashVR-v0.1.3-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/vcop-v0.2.2/Port0r-CopVR-v0.2.2-quest3.apk",
   "rec": true
  },
  {
   "id": "twilight-princess-vr",
-  "n": "TPVR",
+  "n": "TPVR (Zelda: Twilight Princess VR)",
   "d": "TPVR (Zelda: Twilight Princess VR) on Meta Quest. Install in one click from your browser.",
-  "v": "v2.4.0",
+  "v": "2.4.0",
   "a": "JoeyAW",
   "i": 40,
   "t": [
@@ -165,7 +164,7 @@
  },
  {
   "id": "goldeneye-vr",
-  "n": "GoldenEye VR",
+  "n": "GoldenEye VR (007)",
   "d": "GoldenEye VR (007) on Meta Quest. Install in one click from your browser.",
   "v": "v0.5.13",
   "a": "MrSco",
@@ -179,7 +178,7 @@
    "ROM"
   ],
   "c": "covers/goldeneye-vr.jpg",
-  "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.13/GoldenEye-VR-v0.5.13.apk",
+  "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.10/GoldenEye-VR-v0.5.10.apk",
   "rec": true
  },
  {
@@ -202,15 +201,14 @@
  },
  {
   "id": "opencmr2-vr",
-  "n": "OpenCMR2 VR",
+  "n": "OpenCMR2 VR (Colin McRae Rally 2.0)",
   "d": "OpenCMR2 VR (Colin McRae Rally 2.0) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.0",
   "a": "DR-89",
   "i": 34,
   "t": [
    "Beta",
-   "Multiplayer",
-   "PCVR"
+   "Multiplayer"
   ],
   "r": [
    "ISO"
@@ -221,10 +219,10 @@
  },
  {
   "id": "hotd-vr",
-  "n": "Port0r: House of the Dead VR",
+  "n": "Port0r: House of the Dead VR (The House of the Dead)",
   "d": "Port0r: House of the Dead VR (The House of the Dead) on Meta Quest. Install in one click from your browser.",
   "v": "dirtdash-v0.1.3",
-  "a": "jacquesdupontd (Port0r)",
+  "a": "jacquesdupontd",
   "i": 34,
   "t": [
    "Light Gun",
@@ -236,7 +234,7 @@
    "ROM"
   ],
   "c": "covers/hotd-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/dirtdash-v0.1.3/Port0r-DirtDashVR-v0.1.3-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/hotd-v0.1.1/Port0r-HouseOfTheDeadVR-v0.1.1-quest3.apk",
   "rec": true
  },
  {
@@ -250,8 +248,7 @@
    "Light Gun",
    "Emulator",
    "Beta",
-   "Multiplayer",
-   "PCVR"
+   "Multiplayer"
   ],
   "r": [
    "BIOS"
@@ -262,7 +259,7 @@
  },
  {
   "id": "f-zero-x-vr",
-  "n": "F-Zero X VR",
+  "n": "F-Zero X VR (Quest 3 standalone)",
   "d": "F-Zero X VR (Quest 3 standalone) on Meta Quest. Install in one click from your browser.",
   "v": "v1.0.1",
   "a": "heurazy",
@@ -283,7 +280,7 @@
   "id": "homeworld-unbound",
   "n": "Homeworld: Unbound",
   "d": "Homeworld: Unbound VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.14",
+  "v": "unbound-0.14",
   "a": "bearstonem",
   "i": 33,
   "t": [
@@ -297,10 +294,10 @@
  },
  {
   "id": "sega-rally-vr",
-  "n": "Port0r: Rally VR",
+  "n": "Port0r: Rally VR (Sega Rally Championship)",
   "d": "Port0r: Rally VR (Sega Rally Championship) on Meta Quest. Install in one click from your browser.",
   "v": "dirtdash-v0.1.3",
-  "a": "jacquesdupontd (Port0r)",
+  "a": "jacquesdupontd",
   "i": 29,
   "t": [
    "Emulator",
@@ -311,12 +308,12 @@
    "ROM"
   ],
   "c": "covers/sega-rally-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/dirtdash-v0.1.3/Port0r-DirtDashVR-v0.1.3-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/v0.2.6/Port0r-RallyVR-v0.2.6-quest3.apk",
   "rec": false
  },
  {
   "id": "ocarina-of-time-vr",
-  "n": "Quest 3: OOT",
+  "n": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR)",
   "d": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.3",
   "a": "ChocoTorp",
@@ -369,7 +366,7 @@
  },
  {
   "id": "wiicompiled-vr-plus",
-  "n": "Wiicompiled VR PLUS",
+  "n": "Wiicompiled VR PLUS (Mario Kart Wii VR)",
   "d": "Wiicompiled VR PLUS (Mario Kart Wii VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.3.1",
   "a": "heurazy",
@@ -389,7 +386,7 @@
  },
  {
   "id": "ut99-vr-quest",
-  "n": "Unreal Tournament '99 VR",
+  "n": "Unreal Tournament '99 VR (UT99 Quest)",
   "d": "Unreal Tournament '99 VR (UT99 Quest) on Meta Quest. Install in one click from your browser.",
   "v": "v1.1.0",
   "a": "GHWST",
@@ -407,7 +404,7 @@
  },
  {
   "id": "galaxyquest",
-  "n": "GalaxyQuest",
+  "n": "GalaxyQuest (Super Mario Galaxy VR)",
   "d": "GalaxyQuest (Super Mario Galaxy VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.9",
   "a": "bigmak94",
@@ -425,7 +422,7 @@
  },
  {
   "id": "majoras-mask-vr",
-  "n": "Majora's Mask VR",
+  "n": "Majora's Mask VR (2Ship2Harkinian VR)",
   "d": "Majora's Mask VR (2Ship2Harkinian VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.36",
   "a": "FullDiveGames",
@@ -444,7 +441,7 @@
  },
  {
   "id": "age-of-joy",
-  "n": "AGE of Joy",
+  "n": "AGE of Joy (VR Arcade Gallery)",
   "d": "AGE of Joy (VR Arcade Gallery) on Meta Quest. Install in one click from your browser.",
   "v": "v0.5.0-rc32",
   "a": "curif",
@@ -493,7 +490,7 @@
   ],
   "r": [],
   "c": "covers/crisis-zone-vr.png",
-  "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.7/CrisisZoneVR-v0.1.7-quest3.apk",
+  "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.4/CrisisZoneVR-v0.1.4-quest3.apk",
   "rec": false
  },
  {
@@ -501,7 +498,7 @@
   "n": "No One Lives ForeVR",
   "d": "No One Lives ForeVR on Meta Quest. Install in one click from your browser.",
   "v": "v0.4.0",
-  "a": "alex.nax",
+  "a": "alex",
   "i": 10,
   "t": [
    "Beta",
@@ -521,19 +518,18 @@
   "i": 10,
   "t": [
    "Beta",
-   "Multiplayer",
-   "PCVR"
+   "Multiplayer"
   ],
   "r": [
    "ROM"
   ],
   "c": "covers/time-crisis-2-vr.png",
-  "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.3/TimeCrisis2VR-v0.3.3-quest3.apk",
+  "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.0/TimeCrisis2VR-v0.3.0-quest3.apk",
   "rec": true
  },
  {
   "id": "wipeout-rewrite-vr",
-  "n": "Wipeout Rewrite VR",
+  "n": "Wipeout Rewrite VR (Quest port of wipEout Rewrite)",
   "d": "Wipeout Rewrite VR (Quest port of wipEout Rewrite) on Meta Quest. Install in one click from your browser.",
   "v": "v0.1.0-beta1",
   "a": "SgtBilko76",
@@ -549,10 +545,10 @@
  },
  {
   "id": "magic-carpet-vr",
-  "n": "Magic Carpet VR",
+  "n": "Magic Carpet VR (Magic Carpet 1, Hidden Worlds & 2)",
   "d": "Magic Carpet VR (Magic Carpet 1, Hidden Worlds & 2) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.1.0",
-  "a": "NathanaelA (@Congocart)",
+  "v": "0.1.0",
+  "a": "NathanaelA",
   "i": 9,
   "t": [
    "Beta",
@@ -565,7 +561,7 @@
  },
  {
   "id": "openmw-vr",
-  "n": "OpenMW VR",
+  "n": "OpenMW VR (Morrowind)",
   "d": "OpenMW VR (Morrowind) on Meta Quest. Install in one click from your browser.",
   "v": "v0.51",
   "a": "tomups",
@@ -581,7 +577,7 @@
  },
  {
   "id": "descent-3-vr",
-  "n": "Descent 3 VR",
+  "n": "Descent 3 VR (Quest port of the open-source Descent 3)",
   "d": "Descent 3 VR (Quest port of the open-source Descent 3) on Meta Quest. Install in one click from your browser.",
   "v": "quest-v0.3-beta",
   "a": "SgtBilko76",
@@ -615,7 +611,7 @@
  },
  {
   "id": "primedgun",
-  "n": "PrimedGun",
+  "n": "PrimedGun (Metroid Prime VR)",
   "d": "PrimedGun (Metroid Prime VR) on Meta Quest. Install in one click from your browser.",
   "v": "v1.1.7",
   "a": "Nobbie248",
@@ -633,7 +629,7 @@
  },
  {
   "id": "dolphinxr",
-  "n": "DolphinXR",
+  "n": "DolphinXR (Dolphin VR ReduX)",
   "d": "DolphinXR (Dolphin VR ReduX) on Meta Quest. Install in one click from your browser.",
   "v": "v0.4",
   "a": "iChris4",
@@ -650,10 +646,10 @@
  },
  {
   "id": "xrkart-64",
-  "n": "XRKart 64",
+  "n": "XRKart 64 (Mario Kart 64 VR)",
   "d": "XRKart 64 (Mario Kart 64 VR) on Meta Quest. Install in one click from your browser.",
   "v": "v0.2.0",
-  "a": "J4nky (ArtfulRascal8)",
+  "a": "J4nky",
   "i": 3,
   "t": [
    "Beta",
