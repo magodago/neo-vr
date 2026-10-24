@@ -60,6 +60,17 @@
   @media(max-width:420px){.grid{grid-template-columns:1fr 1fr;gap:10px}
     .name{font-size:12.5px}.body{padding:9px}.btn{padding:10px 6px;font-size:12px}
     body{padding:16px 10px 40px}h1{font-size:20px}}
+  .recsec{margin:18px 0 6px}
+  .recsec h3{font-size:12px;letter-spacing:.18em;color:#3D9BFF;margin:0 0 10px;font-weight:700}
+  .recs{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+  .rec{flex:0 0 210px;background:linear-gradient(180deg,#12142a,#0d0e1d);border:1px solid #23264a;
+       border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .rec img{width:100%;height:96px;object-fit:cover;display:block}
+  .rec .rb{padding:10px 11px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .rec .rn{font-size:13px;font-weight:700;line-height:1.25}
+  .rec .rw{font-size:11px;color:#8B90B5;line-height:1.35;flex:1}
+  .rec .rb a{margin-top:4px;display:block;text-align:center;text-decoration:none;background:#3D9BFF;
+      color:#04060f;font-weight:800;font-size:11px;letter-spacing:.06em;padding:8px;border-radius:9px}
 </style>
 </head>
 <body>
@@ -70,6 +81,10 @@
 
 <a class="appbanner" href="NEO-VR.apk">Instalar NEO VR en el visor &rarr;</a>
 <div class="bar"><input id="q" type="search" placeholder="Buscar juego o mod..."></div>
+<div class="recsec">
+  <h3>RECOMENDADOS NEO</h3>
+  <div class="recs" id="recs"></div>
+</div>
 <div class="chips" id="chips"></div>
 <div class="grid" id="grid"></div>
 <div class="empty" id="empty" style="display:none">Nada con ese filtro.</div>
@@ -80,7 +95,7 @@
 
 <script>
 let DATA=[], filtro='todo', texto='';
-const CHIPS=[['todo','Todo'],['datos','Listo para jugar'],['rom','Necesita ROM/BIOS'],['gun','Pistola'],['emul','Emulador']];
+const CHIPS=[['rec','Destacados'],['todo','Todo'],['datos','Listo para jugar'],['rom','Necesita ROM/BIOS'],['gun','Pistola'],['emul','Emulador']];
 const chipsEl=document.getElementById('chips'), grid=document.getElementById('grid');
 
 CHIPS.forEach(([k,label])=>{
@@ -93,6 +108,7 @@ document.getElementById('q').addEventListener('input',e=>{texto=e.target.value.t
 
 function pasa(it){
   if(texto && !(it.n+' '+it.d+' '+it.a).toLowerCase().includes(texto)) return false;
+  if(filtro==='rec') return !!it.rec;
   if(filtro==='datos') return it.r.length===0;
   if(filtro==='rom') return it.r.length>0;
   if(filtro==='gun') return it.t.includes('Light Gun');
@@ -124,7 +140,31 @@ function pintar(){
   }).join('');
 }
 
-fetch('catalog.json').then(r=>r.json()).then(d=>{DATA=d;pintar()})
+
+const RAZONES={
+ 'time-crisis-2-vr':'Arcade nativo, pistola real y sin ROMs. Ya lo tienes instalado.',
+ 'time-crisis-vr':'El primero de la saga, mas pulido aun que el 2. 120 Hz.',
+ 'hotd2-vr':'El mejor light gun del catalogo. Pide BIOS de Naomi.',
+ 'virtua-cop-vr':'Pistola arcade pura, recreativa de 1994.',
+ 'hotd-vr':'El clasico de 1996, la mansion entera en VR.',
+ 'nfsu-vr':'El port mas instalado de la escena. Campana completa.',
+ 'metal-gear-solid-vr':'Conversion completa, no un mod. De los mejores del ano.',
+ 'ocarina-of-time-vr':'Ocarina en primera persona. Necesita tu ROM.',
+ 'twilight-princess-vr':'Twilight Princess entero, con escalado de mundo.',
+ 'openmw-vr':'Morrowind completo. Cientos de horas sin acabar.',
+ 'goldeneye-vr':'El multijugador de tu infancia, ahora con coop.',
+ 'sm64-coop-dx-vr':'Mario 64 a 60 fps y con coop hasta cuatro.'
+};
+function pintarRecs(){
+  const el=document.getElementById('recs');
+  const recs=DATA.filter(it=>it.rec).sort((a,b)=>b.i-a.i);
+  el.innerHTML=recs.map(it=>`<div class="rec">
+    ${it.c?`<img src="${it.c}" alt="" loading="lazy">`:''}
+    <div class="rb"><div class="rn">${esc(it.n)}</div>
+    <div class="rw">${esc(RAZONES[it.id]||it.d||'')}</div>
+    <a href="${it.u}" rel="noopener">INSTALAR</a></div></div>`).join('');
+}
+fetch('catalog.json').then(r=>r.json()).then(d=>{DATA=d;pintarRecs();pintar()})
  .catch(e=>{document.getElementById('empty').textContent='No se pudo cargar el catálogo.';document.getElementById('empty').style.display='block'});
 </script>
 </body>
