@@ -15,7 +15,14 @@
   ],
   "c": "covers/nfsu-vr.png",
   "u": "https://github.com/DR-89/nfsu-vr/releases/download/v0.3.0-preview.1/NFSU-VR-Quest3-v0.3.0-preview.1.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1440x1584",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "strikers-quest-mr",
@@ -34,7 +41,14 @@
   ],
   "c": "covers/strikers-quest-mr.jpg",
   "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.13-alpha1/QuestStrikers-alpha1.13.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "astroquest",
@@ -52,7 +66,14 @@
   "r": [],
   "c": "covers/astroquest.jpg",
   "u": "https://github.com/bigmak94/AstroQuest/releases/download/v0.23/AstroQuest-0.23-Quest3.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "generals-zero-hour-xr",
@@ -70,7 +91,14 @@
   ],
   "c": "covers/generals-zero-hour-xr.png",
   "u": "https://github.com/Cesarus85/Generals-Zero-Hour-XR/releases/download/v1.2.36-xr-preview/Generals-Zero-Hour-XR.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "metal-gear-solid-vr",
@@ -86,7 +114,14 @@
   "r": [],
   "c": "covers/metal-gear-solid-vr.jpg",
   "u": "https://github.com/Baywilly/Metal-Gear-Solid-VR-Standalone/releases/download/V0.1-beta/MGSVR-Quest.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "sm64-coop-dx-vr",
@@ -105,7 +140,14 @@
   ],
   "c": "covers/sm64-coop-dx-vr.png",
   "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.22/SM64-Co-Op-DX-VR-Quest-v0.9.22.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "questcarnage",
@@ -121,7 +163,14 @@
   "r": [],
   "c": "covers/questcarnage.jpg",
   "u": "https://github.com/maranone/carnage/releases/download/b003/QuestCarnage-Meta-Quest-release.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "virtua-cop-vr",
@@ -141,7 +190,15 @@
   ],
   "c": "covers/virtua-cop-vr.png",
   "u": "https://github.com/jacquesdupontd/port0r/releases/download/vcop-v0.2.2/Port0r-CopVR-v0.2.2-quest3.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 4
  },
  {
   "id": "twilight-princess-vr",
@@ -160,7 +217,14 @@
   ],
   "c": "covers/twilight-princess-vr.png",
   "u": "https://github.com/JoeyAW/TPVR/releases/download/2.4.0/tpvr-quest-arm64.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "goldeneye-vr",
@@ -179,7 +243,14 @@
   ],
   "c": "covers/goldeneye-vr.jpg",
   "u": "https://github.com/MrSco/goldeneye-vr/releases/download/v0.5.13/GoldenEye-VR-v0.5.13.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "smash-remix-vr",
@@ -197,7 +268,14 @@
   ],
   "c": "covers/smash-remix-vr.png",
   "u": "https://github.com/VistaLargaGames/Smash-Remix-VR/releases/download/v0.8.5/SmashRemixVR-Quest-0.8.5.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "opencmr2-vr",
@@ -215,7 +293,14 @@
   ],
   "c": "covers/opencmr2-vr.png",
   "u": "https://github.com/DR-89/opencmr2-vr/releases/download/v0.1.0/OpenCMR2-VR-Quest-arm64-v0.1.0.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "hotd-vr",
@@ -235,7 +320,15 @@
   ],
   "c": "covers/hotd-vr.png",
   "u": "https://github.com/jacquesdupontd/port0r/releases/download/hotd-v0.1.1/Port0r-HouseOfTheDeadVR-v0.1.1-quest3.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 2
  },
  {
   "id": "hotd2-vr",
@@ -255,7 +348,15 @@
   ],
   "c": "covers/hotd2-vr.png",
   "u": "https://github.com/mikermak/hotd2-vr/releases/download/v0.4-test1/hotd2-vr-quest.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 3
  },
  {
   "id": "f-zero-x-vr",
@@ -274,7 +375,14 @@
   ],
   "c": "covers/f-zero-x-vr.jpg",
   "u": "https://github.com/heurazy/FzeroVR-Standalone/releases/download/v1.0.1/FzeroVR-Standalone-v1.0.1-Quest3.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "homeworld-unbound",
@@ -290,7 +398,14 @@
   "r": [],
   "c": "covers/homeworld-unbound.jpg",
   "u": "https://github.com/bearstonem/Homeworld/releases/download/unbound-0.14/homeworld-unbound-vr.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "sega-rally-vr",
@@ -309,7 +424,14 @@
   ],
   "c": "covers/sega-rally-vr.png",
   "u": "https://github.com/jacquesdupontd/port0r/releases/download/v0.2.6/Port0r-RallyVR-v0.2.6-quest3.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "ocarina-of-time-vr",
@@ -326,7 +448,14 @@
   ],
   "c": "covers/ocarina-of-time-vr.png",
   "u": "https://github.com/ChocoTorp/Shipwright-VR/releases/download/v1.3/Quest3-OOT-v1.3.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "nfsu2-vr",
@@ -344,7 +473,14 @@
   ],
   "c": "covers/nfsu2-vr.png",
   "u": "https://github.com/DR-89/nfsu2-vr/releases/download/dev-2026-10-17/NFSU2VR-Quest3-dev-2026-10-17.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "wave-race-64-vr",
@@ -362,7 +498,14 @@
   ],
   "c": "covers/wave-race-64-vr.png",
   "u": "https://github.com/VistaLargaGames/WaveRace64-QuestVR/releases/download/v0.1.5/WaveRace64VR-Quest-0.1.8.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "wiicompiled-vr-plus",
@@ -382,7 +525,14 @@
   ],
   "c": "covers/wiicompiled-vr-plus.png",
   "u": "https://github.com/heurazy/Wiicompiled_VR-PLUS/releases/download/v1.3.1/WiiCompiled-VR-Quest3-v1.3.1.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "ut99-vr-quest",
@@ -400,7 +550,14 @@
   ],
   "c": "",
   "u": "https://ut99vr.pages.dev/ut99quest.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "galaxyquest",
@@ -418,7 +575,14 @@
   ],
   "c": "covers/galaxyquest.jpg",
   "u": "https://github.com/bigmak94/GalaxyQuest/releases/download/v0.1.9/GalaxyQuest.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "majoras-mask-vr",
@@ -437,7 +601,14 @@
   ],
   "c": "covers/majoras-mask-vr.png",
   "u": "https://github.com/fulldivegames/Majoras-Mask-VR/releases/download/v0.36/MMVR-Quest-0.36.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "age-of-joy",
@@ -456,7 +627,14 @@
   ],
   "c": "covers/age-of-joy.png",
   "u": "https://github.com/curif/AgeOfJoy-2022.1/releases/download/v0.5.0-rc32/AgeOfJoy.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "animal-crossing-vr",
@@ -475,7 +653,14 @@
   ],
   "c": "covers/animal-crossing-vr.png",
   "u": "https://github.com/LiquidAzir/animal-crossing-vr/releases/download/v0.9.3-vr20/AnimalCrossing-Quest-v0.9.3-vr20.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "crisis-zone-vr",
@@ -491,7 +676,15 @@
   "r": [],
   "c": "covers/crisis-zone-vr.png",
   "u": "https://github.com/DR-89/crisis-zone-vr/releases/download/v0.1.7/CrisisZoneVR-v0.1.7-quest3.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 6
  },
  {
   "id": "nolf-vr",
@@ -507,7 +700,14 @@
   "r": [],
   "c": "covers/nolf-vr.png",
   "u": "https://github.com/alex-nax/relith/releases/download/v0.4.0/relith-nolf-quest-0.4.0.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "time-crisis-2-vr",
@@ -525,7 +725,15 @@
   ],
   "c": "covers/time-crisis-2-vr.png",
   "u": "https://github.com/DR-89/time-crisis-2-vr/releases/download/v0.3.3/TimeCrisis2VR-v0.3.3-quest3.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 0
  },
  {
   "id": "wipeout-rewrite-vr",
@@ -541,7 +749,14 @@
   "r": [],
   "c": "covers/wipeout-rewrite-vr.png",
   "u": "https://github.com/SgtBilko76/Wipeout-Rewrite-VR/releases/download/v0.1.0-beta1/WipeoutRewriteVR-0.1.0-beta1-quest.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "magic-carpet-vr",
@@ -557,7 +772,14 @@
   "r": [],
   "c": "covers/magic-carpet-vr.jpg",
   "u": "https://github.com/NathanaelA/mgcarpet-vr/releases/download/0.1.0/mgcarpet-vr.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "openmw-vr",
@@ -573,7 +795,14 @@
   "r": [],
   "c": "covers/openmw-vr.png",
   "u": "https://github.com/tomups/openmw-vr-quest/releases/download/v0.51/com.openmw.vr-0-51-release.apk",
-  "rec": true
+  "rec": true,
+  "perf": {
+   "res": "1440x1584",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "descent-3-vr",
@@ -589,7 +818,14 @@
   "r": [],
   "c": "covers/descent-3-vr.jpg",
   "u": "https://github.com/SgtBilko76/Descent3-VR/releases/download/quest-v0.3-beta/Descent3-VR-0.3-beta.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "ppsspp-vr",
@@ -607,7 +843,14 @@
   ],
   "c": "covers/ppsspp-vr.jpg",
   "u": "https://www.ppsspp.org/files/1_20_4/ppsspp_vr.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "primedgun",
@@ -625,7 +868,15 @@
   ],
   "c": "covers/primedgun.jpg",
   "u": "https://github.com/Nobbie248/PrimedGun/releases/download/v1.1.7/primedgun-quest-release.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Baja",
+   "tex": "Sin filtro"
+  },
+  "ren": true,
+  "ror": 5
  },
  {
   "id": "dolphinxr",
@@ -642,7 +893,14 @@
   "r": [],
   "c": "covers/dolphinxr.png",
   "u": "https://github.com/iChris4/dolphinXR/releases/download/v0.4/Dolphin-VR-Redux-app-quest-debug.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  },
  {
   "id": "xrkart-64",
@@ -660,6 +918,13 @@
   ],
   "c": "covers/xrkart-64.png",
   "u": "https://github.com/ArtfulRascal8/XRKart-64/releases/download/v0.2.0/XRKart-64-v0.2.0-Quest.apk",
-  "rec": false
+  "rec": false,
+  "perf": {
+   "res": "1280x1344",
+   "hz": 72,
+   "q": "Media",
+   "tex": "Filtro on"
+  },
+  "ren": false
  }
 ]

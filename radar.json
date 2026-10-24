@@ -1,0 +1,282 @@
+[
+ {
+  "n": "mjolnir-vr",
+  "repo": "https://github.com/Cesarus85/mjolnir-vr",
+  "upd": "2026-10-24",
+  "d": "Ringfall: Mjolnir VR – an unofficial VR mod for Halo: Combat Evolved on Meta Quest 3/3S and Steam Frame. Bring",
+  "o": "Cesarus85"
+ },
+ {
+  "n": "d2r-pcvr",
+  "repo": "https://github.com/bearstonem/d2r-pcvr",
+  "upd": "2026-10-24",
+  "d": "Experimental first-person D2R PCVR: native OpenXR, Proton/SteamVR, Steam Frame and Quest 3 setup",
+  "o": "bearstonem"
+ },
+ {
+  "n": "portroyale-site",
+  "repo": "https://github.com/SgtBilko76/portroyale-site",
+  "upd": "2026-10-24",
+  "d": "Portroyale website: free open source VR ports for Meta Quest and PICO",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "FreeSpace2-VR",
+  "repo": "https://github.com/SgtBilko76/FreeSpace2-VR",
+  "upd": "2026-10-24",
+  "d": "FreeSpace 2 VR for Meta Quest 3 and PICO (FreeSpace Open + OpenXR, native APK; bring your own game files)",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "RVGL-VR",
+  "repo": "https://github.com/SgtBilko76/RVGL-VR",
+  "upd": "2026-10-23",
+  "d": "Re-Volt (RVGL) for Meta Quest and PICO (standalone, OpenXR; PICO untested): virtual screen menus, head-tracked",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Berry-Burry-Berry-VR",
+  "repo": "https://github.com/heurazy/Berry-Burry-Berry-VR",
+  "upd": "2026-10-22",
+  "d": "a vr mod for berry burry berry",
+  "o": "heurazy"
+ },
+ {
+  "n": "VPinball-VR",
+  "repo": "https://github.com/SgtBilko76/VPinball-VR",
+  "upd": "2026-10-22",
+  "d": "Visual Pinball X standalone for Meta Quest 3 (OpenXR) - based on vpinball/vpinball",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "time-crisis-vr",
+  "repo": "https://github.com/DR-89/time-crisis-vr",
+  "upd": "2026-10-20",
+  "d": "Experimental standalone Time Crisis VR port for Meta Quest 3, based on spacestate1/namco22-decompile. OpenXR, ",
+  "o": "DR-89"
+ },
+ {
+  "n": "Mystical-Ninja-VR",
+  "repo": "https://github.com/VistaLargaGames/Mystical-Ninja-VR",
+  "upd": "2026-10-20",
+  "d": "",
+  "o": "VistaLargaGames"
+ },
+ {
+  "n": "SpeedDreams-VR",
+  "repo": "https://github.com/SgtBilko76/SpeedDreams-VR",
+  "upd": "2026-10-20",
+  "d": "Speed Dreams VR for Meta Quest: Speed Dreams 2.4 motorsport simulator as a standalone OpenXR app with a curved",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Unreal-Gold-VR",
+  "repo": "https://github.com/SgtBilko76/Unreal-Gold-VR",
+  "upd": "2026-10-19",
+  "d": "Unreal Gold VR for Meta Quest: standalone OpenXR port on Surreal Engine with controller aiming and curved menu",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Unreal-Tournament-VR",
+  "repo": "https://github.com/SgtBilko76/Unreal-Tournament-VR",
+  "upd": "2026-10-19",
+  "d": "Unreal Tournament (UT99) VR for Meta Quest - standalone OpenXR port on Surreal Engine. No game content include",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "HTL-PC-VR",
+  "repo": "https://github.com/maranone/HTL-PC-VR",
+  "upd": "2026-10-18",
+  "d": "",
+  "o": "maranone"
+ },
+ {
+  "n": "QuestSam",
+  "repo": "https://github.com/maranone/QuestSam",
+  "upd": "2026-10-17",
+  "d": "Serious Sam Classic TFE & TSE VR Port for Meta Quest",
+  "o": "maranone"
+ },
+ {
+  "n": "goldeneye-vr-mods",
+  "repo": "https://github.com/MrSco/goldeneye-vr-mods",
+  "upd": "2026-10-17",
+  "d": "Extra mods for GoldenEye VR, installed from the launcher's Mods page",
+  "o": "MrSco"
+ },
+ {
+  "n": "WWF-No-Mercy-Quest-3-Standalone-",
+  "repo": "https://github.com/VistaLargaGames/WWF-No-Mercy-Quest-3-Standalone-",
+  "upd": "2026-10-17",
+  "d": "A standalone port of the WWF No Mercy N64 Recomp that runs natively on the MetaQuest 3.",
+  "o": "VistaLargaGames"
+ },
+ {
+  "n": "Bomberman-Hero-Quest-3-VR-Standalone",
+  "repo": "https://github.com/VistaLargaGames/Bomberman-Hero-Quest-3-VR-Standalone",
+  "upd": "2026-10-17",
+  "d": "A standalone port of PC Bomberman Hero Recomp that runs natively on the MetaQuest 3.",
+  "o": "VistaLargaGames"
+ },
+ {
+  "n": "csvr-site",
+  "repo": "https://github.com/SgtBilko76/csvr-site",
+  "upd": "2026-10-17",
+  "d": "csvr.online – CSVR (Counter Strike 1.6 VR) website",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Quest-3-Strikers-CHARGED",
+  "repo": "https://github.com/LanceSweatpants/Quest-3-Strikers-CHARGED",
+  "upd": "2026-10-16",
+  "d": "Mario Strikers Charged on Meta Quest 3: a native decomp port with Jumbotron mixed reality and VR stadium views",
+  "o": "LanceSweatpants"
+ },
+ {
+  "n": "Quest-3-Streets",
+  "repo": "https://github.com/LanceSweatpants/Quest-3-Streets",
+  "upd": "2026-10-15",
+  "d": "NBA Street Vol. 2 on Meta Quest 3: the big screen in your room or in a Las Vegas basketball stadium in VR (bui",
+  "o": "LanceSweatpants"
+ },
+ {
+  "n": "rage-wars-recompiled",
+  "repo": "https://github.com/ArtfulRascal8/rage-wars-recompiled",
+  "upd": "2026-10-15",
+  "d": "Rage Wars Recompiled by XR64 Studios. Windows PC, local multiplayer and experimental OpenXR PCVR.",
+  "o": "ArtfulRascal8"
+ },
+ {
+  "n": "Crazy-Taxi-VR-Standalone",
+  "repo": "https://github.com/Baywilly/Crazy-Taxi-VR-Standalone",
+  "upd": "2026-10-12",
+  "d": "Crazy Taxi VR Standalone for Meta Quest — Fan-made VR mod by Virtual Bays.",
+  "o": "Baywilly"
+ },
+ {
+  "n": "RetroDepth",
+  "repo": "https://github.com/maranone/RetroDepth",
+  "upd": "2026-10-06",
+  "d": "2.5d Emulator in VR (Mame fork)",
+  "o": "maranone"
+ },
+ {
+  "n": "Xonotic-VR",
+  "repo": "https://github.com/SgtBilko76/Xonotic-VR",
+  "upd": "2026-10-05",
+  "d": "Xonotic VR port for Meta Quest: the fast-paced open-source arena shooter, standalone in VR",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "PrimedGun-Quest3",
+  "repo": "https://github.com/LiquidAzir/PrimedGun-Quest3",
+  "upd": "2026-10-03",
+  "d": "Unofficial standalone Metroid Prime VR community port for Meta Quest 3. Bring your own compatible GameCube dis",
+  "o": "LiquidAzir"
+ },
+ {
+  "n": "mario-kart-wii-VR-port",
+  "repo": "https://github.com/heurazy/mario-kart-wii-VR-port",
+  "upd": "2026-10-02",
+  "d": "a mario kart wii vr port",
+  "o": "heurazy"
+ },
+ {
+  "n": "Crysis-VR-WinlatorXR",
+  "repo": "https://github.com/SgtBilko76/Crysis-VR-WinlatorXR",
+  "upd": "2026-09-29",
+  "d": "Crysis VR mod (based on fholger/crysis_vrmod) running standalone on Meta Quest via WinlatorXR, with 6DOF and m",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "CallOfDuty4_VR_WinlatorXR",
+  "repo": "https://github.com/SgtBilko76/CallOfDuty4_VR_WinlatorXR",
+  "upd": "2026-09-28",
+  "d": "KisakCOD VR with a WinlatorXR XrAPI backend: Call of Duty 4 in VR standalone on Meta Quest",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "ARMSX2-3D",
+  "repo": "https://github.com/SgtBilko76/ARMSX2-3D",
+  "upd": "2026-09-27",
+  "d": "ARMSX2 for Meta Quest: stereoscopic 3D virtual screen, Touch controller mapping and rumble (fork of ARMSX2/ARM",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Sauerbraten-VR",
+  "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
+  "upd": "2026-09-25",
+  "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "VDrift-QuestVR",
+  "repo": "https://github.com/SgtBilko76/VDrift-QuestVR",
+  "upd": "2026-09-25",
+  "d": "VDrift VR for Meta Quest: standalone OpenXR port of the open-source drift racing simulator",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "snes9x-3D",
+  "repo": "https://github.com/SgtBilko76/snes9x-3D",
+  "upd": "2026-09-25",
+  "d": "Snes9x 3D for Meta Quest: SNES on a curved screen with per-layer depth and true Mode 7 perspective",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "ReVoltVR-Standalone",
+  "repo": "https://github.com/Baywilly/ReVoltVR-Standalone",
+  "upd": "2026-09-20",
+  "d": "Re-Volt VR Standalone for Meta Quest 3 — Play the classic RC racing game in VR. No PC required.",
+  "o": "Baywilly"
+ },
+ {
+  "n": "south-park-quiz-arena",
+  "repo": "https://github.com/DR-89/south-park-quiz-arena",
+  "upd": "2026-09-16",
+  "d": "German and English South Park multiplayer quiz with persistent sessions, 4,455 questions and leaderboards",
+  "o": "DR-89"
+ },
+ {
+  "n": "elden-ring-quest-guide",
+  "repo": "https://github.com/LiquidAzir/elden-ring-quest-guide",
+  "upd": "2026-09-15",
+  "d": "Step-by-step Elden Ring questline checklist by region and NPC, including Shadow of the Erdtree",
+  "o": "LiquidAzir"
+ },
+ {
+  "n": "Tiberian-Dawn-for-Android-and-Meta-Quest",
+  "repo": "https://github.com/Cesarus85/Tiberian-Dawn-for-Android-and-Meta-Quest",
+  "upd": "2026-09-12",
+  "d": "Unofficial Android and Meta Quest 3 / 3S mixed-reality port of C&C: Tiberian Dawn (1995). No game data include",
+  "o": "Cesarus85"
+ },
+ {
+  "n": "Purgatory",
+  "repo": "https://github.com/Cesarus85/Purgatory",
+  "upd": "2026-09-12",
+  "d": "Purgatory — Meta Quest 3 mixed-reality shooter (Unity)",
+  "o": "Cesarus85"
+ },
+ {
+  "n": "QuestRetroDepth",
+  "repo": "https://github.com/maranone/QuestRetroDepth",
+  "upd": "2026-09-12",
+  "d": "RetroDepth for Quest",
+  "o": "maranone"
+ },
+ {
+  "n": "HytaleVRInjector-mod",
+  "repo": "https://github.com/heurazy/HytaleVRInjector-mod",
+  "upd": "2026-08-24",
+  "d": "An ai coded Hytale Vr mod",
+  "o": "heurazy"
+ },
+ {
+  "n": "AnimalCrossing-VR-MR-Standalone",
+  "repo": "https://github.com/heurazy/AnimalCrossing-VR-MR-Standalone",
+  "upd": "2026-08-11",
+  "d": "an animal crossing port for quest 3",
+  "o": "heurazy"
+ }
+]
