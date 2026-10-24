@@ -94,13 +94,13 @@
 </footer>
 
 <script>
-let DATA=[], filtro='todo', texto='';
+let DATA=[], filtro='rec', texto='';
 const CHIPS=[['rec','Destacados'],['todo','Todo'],['datos','Listo para jugar'],['rom','Necesita ROM/BIOS'],['gun','Pistola'],['emul','Emulador']];
 const chipsEl=document.getElementById('chips'), grid=document.getElementById('grid');
 
 CHIPS.forEach(([k,label])=>{
   const b=document.createElement('button');
-  b.className='chip'+(k==='todo'?' on':''); b.textContent=label; b.dataset.k=k;
+  b.className='chip'+(k==='rec'?' on':''); b.textContent=label; b.dataset.k=k;
   b.onclick=()=>{filtro=k;[...chipsEl.children].forEach(c=>c.classList.toggle('on',c.dataset.k===k));pintar()};
   chipsEl.appendChild(b);
 });
