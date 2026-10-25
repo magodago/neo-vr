@@ -262,7 +262,7 @@
  {
   "id": "astroquest",
   "n": "AstroQuest (ASTRO BOT Rescue Mission)",
-  "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
+  "d": "Emulador PS4+PSVR en las gafas. OJO: necesita los archivos del juego, 13 GB, metidos por adb en /data/local/tmp/astro/games/CUSA12392. Sin ellos no arranca.",
   "v": "v0.23",
   "a": "bigmak94",
   "i": 78,
