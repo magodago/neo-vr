@@ -26,7 +26,7 @@
  {
   "id": "disembodied",
   "n": "Disembodied",
-  "a": "MR platformer",
+  "a": "—",
   "d": "Plataformas MR con tus manos como personaje. Trae editor de niveles.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=Disembodied",
   "k": "Plataformas MR"
@@ -34,7 +34,7 @@
  {
   "id": "thrasher",
   "n": "Thrasher",
-  "a": "Arcade MR",
+  "a": "—",
   "d": "Ritmo y acción con las manos en tu habitación real. Brutal a 120 Hz.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=Thrasher",
   "k": "Arcade MR"
@@ -42,7 +42,7 @@
  {
   "id": "starship-home",
   "n": "Starship Home",
-  "a": "MR narrativo",
+  "a": "—",
   "d": "Una nave espacial dentro de tu casa, con ventanas al salón.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=Starship%20Home",
   "k": "Aventura MR"
@@ -50,7 +50,7 @@
  {
   "id": "laser-dance",
   "n": "Laser Dance",
-  "a": "MR arcade",
+  "a": "—",
   "d": "Esquivas láseres virtuales por tu pasillo. El que más impresiona.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=Laser%20Dance",
   "k": "Arcade MR"
@@ -58,7 +58,7 @@
  {
   "id": "miracle-pool",
   "n": "MiRacle Pool",
-  "a": "MR deporte",
+  "a": "—",
   "d": "Billar MR con física muy fina sobre tu mesa real.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=MiRacle%20Pool",
   "k": "Deporte MR"
@@ -74,7 +74,7 @@
  {
   "id": "lego-bricktales",
   "n": "LEGO Bricktales",
-  "a": "Modo MR",
+  "a": "—",
   "d": "Dioramas LEGO flotando en el salón, con puzzles de construcción.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=LEGO%20Bricktales",
   "k": "Diorama MR"
@@ -82,7 +82,7 @@
  {
   "id": "cubism",
   "n": "Cubism",
-  "a": "MR puzzle",
+  "a": "—",
   "d": "Piezas 3D flotando delante de ti. El MR más limpio del catálogo.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=Cubism",
   "k": "Puzzle MR"
@@ -90,7 +90,7 @@
  {
   "id": "pianovision",
   "n": "PianoVision",
-  "a": "MR música",
+  "a": "—",
   "d": "Teclas superpuestas a tu piano real para aprender a tocarlo.",
   "u": "https://www.meta.com/es-es/experiences/search/?q=PianoVision",
   "k": "Música MR"
