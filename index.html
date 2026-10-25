@@ -71,6 +71,10 @@
   .rec .rw{font-size:11px;color:#8B90B5;line-height:1.35;flex:1}
   .rec .rb a{margin-top:4px;display:block;text-align:center;text-decoration:none;background:#3D9BFF;
       color:#04060f;font-weight:800;font-size:11px;letter-spacing:.06em;padding:8px;border-radius:9px}
+  .mrcover{height:96px;display:flex;align-items:center;justify-content:center;
+      font-size:24px;font-weight:800;letter-spacing:.14em;
+      background:linear-gradient(135deg,#1a2340,#2b1533 60%,#3a1f18);color:#7f8cc4}
+  .rec .rk{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#FF9F43}
 </style>
 </head>
 <body>
@@ -84,6 +88,10 @@
 <div class="recsec">
   <h3>RECOMENDADOS NEO</h3>
   <div class="recs" id="recs"></div>
+</div>
+<div class="recsec">
+  <h3>REALIDAD MIXTA &middot; TOP DE LA COMUNIDAD</h3>
+  <div class="recs" id="recsmr"></div>
 </div>
 <div class="chips" id="chips"></div>
 <div class="grid" id="grid"></div>
@@ -166,6 +174,16 @@ function pintarRecs(){
 }
 fetch('catalog.json').then(r=>r.json()).then(d=>{DATA=d;pintarRecs();pintar()})
  .catch(e=>{document.getElementById('empty').textContent='No se pudo cargar el catálogo.';document.getElementById('empty').style.display='block'});
+
+fetch('mr.json').then(r=>r.json()).then(lista=>{
+  const el=document.getElementById('recsmr');
+  el.innerHTML=lista.map(it=>`<div class="rec">
+    <div class="mrcover">MR</div>
+    <div class="rb"><div class="rk">${esc(it.k)}</div>
+    <div class="rn">${esc(it.n)}</div>
+    <div class="rw">${esc(it.d)}</div>
+    <a href="${it.u}" target="_blank" rel="noopener">VER EN TIENDA</a></div></div>`).join('');
+}).catch(()=>{});
 </script>
 </body>
 </html>
