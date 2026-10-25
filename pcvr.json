@@ -97,6 +97,18 @@
    "est": "estable"
   },
   {
+   "n": "Resident Evil 7 VR",
+   "a": "Praydog",
+   "repo": "REFramework",
+   "req": "Necesitas RE7 en Steam (en PC no trae VR)",
+   "por": "El RE7 completo en VR con movimiento real. El modo VR oficial es solo de PSVR.",
+   "url": "https://github.com/praydog/REFramework/releases",
+   "v": "v1.5.9.1",
+   "upd": "2025-03-05",
+   "pc": true,
+   "est": "estable"
+  },
+  {
    "n": "UEVR",
    "a": "Praydog",
    "repo": "UEVR",

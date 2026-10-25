@@ -93,6 +93,10 @@
   <h3>REALIDAD MIXTA &middot; TOP DE LA COMUNIDAD</h3>
   <div class="recs" id="recsmr"></div>
 </div>
+<div class="recsec">
+  <h3>MODS PCVR &middot; JUEGOS PLANOS EN VR</h3>
+  <div class="recs" id="recspc"></div>
+</div>
 <div class="chips" id="chips"></div>
 <div class="grid" id="grid"></div>
 <div class="empty" id="empty" style="display:none">Nada con ese filtro.</div>
@@ -183,6 +187,16 @@ fetch('mr.json').then(r=>r.json()).then(lista=>{
     <div class="rn">${esc(it.n)}</div>
     <div class="rw">${esc(it.d)}</div>
     <a href="${it.u}" target="_blank" rel="noopener">VER EN TIENDA</a></div></div>`).join('');
+}).catch(()=>{});
+
+fetch('pcvr.json').then(r=>r.json()).then(o=>{
+  const el=document.getElementById('recspc');
+  el.innerHTML=(o.disponibles||[]).map(it=>`<div class="rec">
+    <div class="mrcover" style="font-size:15px">${esc(it.est.toUpperCase())}</div>
+    <div class="rb"><div class="rk">PCVR</div>
+    <div class="rn">${esc(it.n)}</div>
+    <div class="rw">${esc(it.por)}</div>
+    <a href="${it.url}" target="_blank" rel="noopener">VER MOD</a></div></div>`).join('');
 }).catch(()=>{});
 </script>
 </body>
