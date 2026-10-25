@@ -15,7 +15,8 @@
   "lbl": "Doom 3 con el motor idTech4 adaptado a VR",
   "c": "covers/doom3quest.jpg",
   "src": "sidequest",
-  "sq": 2651
+  "sq": 2651,
+  "rec": false
  },
  {
   "id": "questzdoom",
@@ -33,7 +34,8 @@
   "lbl": "Doom 1 y 2 con todos sus WADs y mods",
   "c": "covers/questzdoom.jpg",
   "src": "sidequest",
-  "sq": 796
+  "sq": 796,
+  "rec": false
  },
  {
   "id": "lambda1vr-half-life-vr",
@@ -51,7 +53,8 @@
   "lbl": "Half-Life completo, con tus propios archivos del juego",
   "c": "covers/lambda1vr-half-life-vr.jpg",
   "src": "sidequest",
-  "sq": 124
+  "sq": 124,
+  "rec": false
  },
  {
   "id": "super-mario-vr",
@@ -69,7 +72,8 @@
   "lbl": "El Mario 64 de N64 en VR, standalone",
   "c": "covers/super-mario-vr.jpg",
   "src": "sidequest",
-  "sq": 39463
+  "sq": 39463,
+  "rec": false
  },
  {
   "id": "return-to-castle-wolfenstein-vr",
@@ -87,7 +91,8 @@
   "lbl": "El shooter de 2001, entero y en VR",
   "c": "covers/return-to-castle-wolfenstein-vr.jpg",
   "src": "sidequest",
-  "sq": 1446
+  "sq": 1446,
+  "rec": false
  },
  {
   "id": "quake-2-vr",
@@ -105,7 +110,8 @@
   "lbl": "Quake 2 a 6DoF, con soporte de mods",
   "c": "covers/quake-2-vr.jpg",
   "src": "sidequest",
-  "sq": 353
+  "sq": 353,
+  "rec": false
  },
  {
   "id": "jk-xr-jedi-knight-vr",
@@ -123,7 +129,8 @@
   "lbl": "Jedi Knight: Dark Forces II con sable y fuerza",
   "c": "covers/jk-xr-jedi-knight-vr.jpg",
   "src": "sidequest",
-  "sq": 15472
+  "sq": 15472,
+  "rec": false
  },
  {
   "id": "quakequest",
@@ -141,7 +148,8 @@
   "lbl": "El Quake original con 6DoF real",
   "c": "covers/quakequest.jpg",
   "src": "sidequest",
-  "sq": 93
+  "sq": 93,
+  "rec": false
  },
  {
   "id": "quake3quest",
@@ -159,7 +167,8 @@
   "lbl": "Quake 3 Arena con armas 6DoF",
   "c": "covers/quake3quest.jpg",
   "src": "sidequest",
-  "sq": 8601
+  "sq": 8601,
+  "rec": false
  },
  {
   "id": "prey-vr",
@@ -177,7 +186,8 @@
   "lbl": "El Prey original (2006) en VR, motor completo",
   "c": "covers/prey-vr.jpg",
   "src": "sidequest",
-  "sq": 23478
+  "sq": 23478,
+  "rec": false
  },
  {
   "id": "razexr-duke-nukem-3d",
@@ -195,7 +205,8 @@
   "lbl": "Motor Build: Duke Nukem 3D, Blood, Shadow Warrior",
   "c": "covers/razexr-duke-nukem-3d.jpg",
   "src": "sidequest",
-  "sq": 24502
+  "sq": 24502,
+  "rec": false
  },
  {
   "id": "nfsu-vr",
@@ -325,7 +336,7 @@
   "id": "sm64-coop-dx-vr",
   "n": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based)",
   "d": "SM64 Co-Op DX VR Standalone (Super Mario 64 VR, physics-based) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.9.22",
+  "v": "v0.9.25",
   "a": "FullDiveGames",
   "i": 52,
   "t": [
@@ -337,7 +348,7 @@
    "ROM"
   ],
   "c": "covers/sm64-coop-dx-vr.png",
-  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.22/SM64-Co-Op-DX-VR-Quest-v0.9.22.apk",
+  "u": "https://github.com/fulldivegames/sm64coopdx-VR-Standalone-Physics-based/releases/download/v0.9.25/SM64-Co-Op-DX-VR-Quest-v0.9.25.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
@@ -1126,119 +1137,6 @@
   "ren": false
  },
  {
-  "id": "c-c-tiberian-dawn",
-  "n": "C&C Tiberian Dawn",
-  "a": "Cesarus85",
-  "v": "v0.2.3-preview.20",
-  "i": 0,
-  "t": [
-   "Estrategia"
-  ],
-  "r": [
-   "Datos del juego"
-  ],
-  "u": "https://github.com/Cesarus85/Tiberian-Dawn-for-Android-and-Meta-Quest/releases/download/v0.2.3-preview.20/Tiberian-Dawn-Meta-Quest-3-3S-Spatial-preview.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": false,
-  "ror": 0,
-  "c": "covers/c-c-tiberian-dawn.jpg"
- },
- {
-  "id": "time-crisis-vr",
-  "n": "Time Crisis VR",
-  "a": "DR-89",
-  "v": "v0.9.4",
-  "i": 0,
-  "t": [
-   "Light Gun",
-   "Arcade"
-  ],
-  "r": [],
-  "u": "https://github.com/DR-89/time-crisis-vr/releases/download/v0.9.4/TimeCrisisVR-v0.9.4-quest3.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": true,
-  "ror": 1,
-  "c": "covers/time-crisis-vr.jpg"
- },
- {
-  "id": "mario-strikers-charged",
-  "n": "Mario Strikers Charged",
-  "a": "LanceSweatpants",
-  "v": "v0.1.1-alpha1.1",
-  "i": 0,
-  "t": [
-   "Deportes"
-  ],
-  "r": [
-   "ROM de GameCube"
-  ],
-  "u": "https://github.com/LanceSweatpants/Quest-3-Strikers-CHARGED/releases/download/v0.1.1-alpha1.1/QuestStrikersCharged-alpha1.1.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": false,
-  "ror": 0,
-  "c": "covers/mario-strikers-charged.jpg"
- },
- {
-  "id": "nba-street-vol-2",
-  "n": "NBA Street Vol. 2",
-  "a": "LanceSweatpants",
-  "v": "v0.1.2-alpha1.2",
-  "i": 0,
-  "t": [
-   "Deportes"
-  ],
-  "r": [
-   "ROM de GameCube"
-  ],
-  "u": "https://github.com/LanceSweatpants/Quest-3-Streets/releases/download/v0.1.2-alpha1.2/quest3-streets-alpha1.2.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": false,
-  "ror": 0,
-  "c": "covers/nba-street-vol-2.jpg"
- },
- {
-  "id": "mystical-ninja-vr",
-  "n": "Mystical Ninja VR",
-  "a": "VistaLargaGames",
-  "v": "v0.1.20",
-  "i": 0,
-  "t": [
-   "Aventura"
-  ],
-  "r": [
-   "ROM de N64"
-  ],
-  "u": "https://github.com/VistaLargaGames/Mystical-Ninja-VR/releases/download/v0.1.20/MysticalNinjaVR-Quest-0.1.20.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": false,
-  "ror": 0,
-  "c": "covers/mystical-ninja-vr.jpg"
- },
- {
-  "id": "wwf-no-mercy-vr",
-  "n": "WWF No Mercy VR",
-  "a": "VistaLargaGames",
-  "v": "n64",
-  "i": 0,
-  "t": [
-   "Lucha"
-  ],
-  "r": [
-   "ROM de N64"
-  ],
-  "u": "https://github.com/VistaLargaGames/WWF-No-Mercy-Quest-3-Standalone-/releases/download/n64/WWFNoMercyVR-Quest.apk",
-  "lbl": "APK",
-  "src": "github",
-  "ren": false,
-  "ror": 0,
-  "c": "covers/wwf-no-mercy-vr.jpg"
- },
- {
   "id": "bomberman-hero-vr",
   "n": "Bomberman Hero VR",
   "a": "VistaLargaGames",
@@ -1255,7 +1153,28 @@
   "src": "github",
   "ren": false,
   "ror": 0,
-  "c": "covers/bomberman-hero-vr.jpg"
+  "c": "covers/bomberman-hero-vr.jpg",
+  "rec": false
+ },
+ {
+  "id": "c-c-tiberian-dawn",
+  "n": "C&C Tiberian Dawn",
+  "a": "Cesarus85",
+  "v": "v0.2.3-preview.20",
+  "i": 0,
+  "t": [
+   "Estrategia"
+  ],
+  "r": [
+   "Datos del juego"
+  ],
+  "u": "https://github.com/Cesarus85/Tiberian-Dawn-for-Android-and-Meta-Quest/releases/download/v0.2.3-preview.20/Tiberian-Dawn-Meta-Quest-3-3S-Spatial-preview.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/c-c-tiberian-dawn.jpg",
+  "rec": false
  },
  {
   "id": "mario-kart-wii-vr",
@@ -1274,7 +1193,68 @@
   "src": "github",
   "ren": false,
   "ror": 0,
-  "c": "covers/mario-kart-wii-vr.jpg"
+  "c": "covers/mario-kart-wii-vr.jpg",
+  "rec": false
+ },
+ {
+  "id": "mario-strikers-charged",
+  "n": "Mario Strikers Charged",
+  "a": "LanceSweatpants",
+  "v": "v0.1.1-alpha1.1",
+  "i": 0,
+  "t": [
+   "Deportes"
+  ],
+  "r": [
+   "ROM de GameCube"
+  ],
+  "u": "https://github.com/LanceSweatpants/Quest-3-Strikers-CHARGED/releases/download/v0.1.1-alpha1.1/QuestStrikersCharged-alpha1.1.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/mario-strikers-charged.jpg",
+  "rec": false
+ },
+ {
+  "id": "mystical-ninja-vr",
+  "n": "Mystical Ninja VR",
+  "a": "VistaLargaGames",
+  "v": "v0.1.20",
+  "i": 0,
+  "t": [
+   "Aventura"
+  ],
+  "r": [
+   "ROM de N64"
+  ],
+  "u": "https://github.com/VistaLargaGames/Mystical-Ninja-VR/releases/download/v0.1.20/MysticalNinjaVR-Quest-0.1.20.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/mystical-ninja-vr.jpg",
+  "rec": false
+ },
+ {
+  "id": "nba-street-vol-2",
+  "n": "NBA Street Vol. 2",
+  "a": "LanceSweatpants",
+  "v": "v0.1.2-alpha1.2",
+  "i": 0,
+  "t": [
+   "Deportes"
+  ],
+  "r": [
+   "ROM de GameCube"
+  ],
+  "u": "https://github.com/LanceSweatpants/Quest-3-Streets/releases/download/v0.1.2-alpha1.2/quest3-streets-alpha1.2.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/nba-street-vol-2.jpg",
+  "rec": false
  },
  {
   "id": "retrodepth-mame-vr",
@@ -1293,6 +1273,46 @@
   "src": "github",
   "ren": false,
   "ror": 0,
-  "c": "covers/retrodepth-mame-vr.jpg"
+  "c": "covers/retrodepth-mame-vr.jpg",
+  "rec": false
+ },
+ {
+  "id": "time-crisis-vr",
+  "n": "Time Crisis VR",
+  "a": "DR-89",
+  "v": "v0.9.4",
+  "i": 0,
+  "t": [
+   "Light Gun",
+   "Arcade"
+  ],
+  "r": [],
+  "u": "https://github.com/DR-89/time-crisis-vr/releases/download/v0.9.4/TimeCrisisVR-v0.9.4-quest3.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": true,
+  "ror": 1,
+  "c": "covers/time-crisis-vr.jpg",
+  "rec": true
+ },
+ {
+  "id": "wwf-no-mercy-vr",
+  "n": "WWF No Mercy VR",
+  "a": "VistaLargaGames",
+  "v": "n64",
+  "i": 0,
+  "t": [
+   "Lucha"
+  ],
+  "r": [
+   "ROM de N64"
+  ],
+  "u": "https://github.com/VistaLargaGames/WWF-No-Mercy-Quest-3-Standalone-/releases/download/n64/WWFNoMercyVR-Quest.apk",
+  "lbl": "APK",
+  "src": "github",
+  "ren": false,
+  "ror": 0,
+  "c": "covers/wwf-no-mercy-vr.jpg",
+  "rec": false
  }
 ]
