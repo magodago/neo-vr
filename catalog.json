@@ -237,7 +237,7 @@
   "id": "strikers-quest-mr",
   "n": "Quest 3 Strikers (Super Mario Strikers MR)",
   "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.1.13-alpha1",
+  "v": "v0.1.14-alpha1",
   "a": "LanceSweatpants",
   "i": 82,
   "t": [
@@ -249,7 +249,7 @@
    "ISO"
   ],
   "c": "covers/strikers-quest-mr.jpg",
-  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.13-alpha1/QuestStrikers-alpha1.13.apk",
+  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.14-alpha1/QuestStrikers-alpha1.14.apk",
   "rec": false,
   "perf": {
    "res": "1280x1344",
@@ -262,7 +262,7 @@
  {
   "id": "astroquest",
   "n": "AstroQuest (ASTRO BOT Rescue Mission)",
-  "d": "Emulador PS4+PSVR en las gafas. OJO: necesita los archivos del juego, 13 GB, metidos por adb en /data/local/tmp/astro/games/CUSA12392. Sin ellos no arranca.",
+  "d": "AstroQuest (ASTRO BOT Rescue Mission) VR on Meta Quest. Install in one click from your browser.",
   "v": "v0.23",
   "a": "bigmak94",
   "i": 78,
@@ -385,7 +385,7 @@
   "id": "virtua-cop-vr",
   "n": "Port0r: Cop VR (Virtua Cop)",
   "d": "Port0r: Cop VR (Virtua Cop) on Meta Quest. Install in one click from your browser.",
-  "v": "vcop-v0.2.2",
+  "v": "vcop-v0.2.3",
   "a": "jacquesdupontd",
   "i": 40,
   "t": [
@@ -398,7 +398,7 @@
    "ROM"
   ],
   "c": "covers/virtua-cop-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/vcop-v0.2.2/Port0r-CopVR-v0.2.2-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/vcop-v0.2.3/Port0r-CopVR-v0.2.3-quest3.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
@@ -515,7 +515,7 @@
   "id": "hotd-vr",
   "n": "Port0r: House of the Dead VR (The House of the Dead)",
   "d": "Port0r: House of the Dead VR (The House of the Dead) on Meta Quest. Install in one click from your browser.",
-  "v": "hotd-v0.1.1",
+  "v": "hotd-v0.1.2",
   "a": "jacquesdupontd",
   "i": 34,
   "t": [
@@ -528,7 +528,7 @@
    "ROM"
   ],
   "c": "covers/hotd-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/hotd-v0.1.1/Port0r-HouseOfTheDeadVR-v0.1.1-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/hotd-v0.1.2/Port0r-HouseOfTheDeadVR-v0.1.2-quest3.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
@@ -620,7 +620,7 @@
   "id": "sega-rally-vr",
   "n": "Port0r: Rally VR (Sega Rally Championship)",
   "d": "Port0r: Rally VR (Sega Rally Championship) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.2.6",
+  "v": "v0.2.7",
   "a": "jacquesdupontd",
   "i": 29,
   "t": [
@@ -632,7 +632,7 @@
    "ROM"
   ],
   "c": "covers/sega-rally-vr.png",
-  "u": "https://github.com/jacquesdupontd/port0r/releases/download/v0.2.6/Port0r-RallyVR-v0.2.6-quest3.apk",
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/v0.2.7/Port0r-RallyVR-v0.2.7-quest3.apk",
   "rec": false,
   "perf": {
    "res": "1280x1344",
@@ -644,19 +644,20 @@
  },
  {
   "id": "ocarina-of-time-vr",
-  "n": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR)",
-  "d": "Quest 3: OOT (Ocarina of Time VR, Shipwright-VR) on Meta Quest. Install in one click from your browser.",
-  "v": "v1.3",
-  "a": "ChocoTorp",
+  "n": "Ocarina of Time VR (oot-vr)",
+  "d": "Ocarina of Time VR (oot-vr) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.9.4-beta",
+  "a": "gibranfelix",
   "i": 23,
   "t": [
+   "Beta",
    "Multiplayer"
   ],
   "r": [
    "ROM"
   ],
   "c": "covers/ocarina-of-time-vr.png",
-  "u": "https://github.com/ChocoTorp/Shipwright-VR/releases/download/v1.3/Quest3-OOT-v1.3.apk",
+  "u": "https://github.com/gibranfelix/oot-vr/releases/download/v0.9.4-beta/oot-vr-v0.9.4-beta.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
@@ -1137,16 +1138,50 @@
   "ren": false
  },
  {
+  "id": "18-wheeler-vr",
+  "n": "18 Wheeler: American Pro Trucker VR",
+  "d": "18 Wheeler: American Pro Trucker VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0",
+  "a": "f1nal-b0ss",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/f1nal-b0ss/18-wheeler-decomp/releases/download/v0.1.0/18wheeler-vr.apk",
+  "rec": false
+ },
+ {
+  "id": "arx-libertatis-vr",
+  "n": "Arx Libertatis VR (Arx Fatalis)",
+  "d": "Arx Libertatis VR (Arx Fatalis) on Meta Quest. Install in one click from your browser.",
+  "v": "vr-v0.2.1",
+  "a": "cmpayc",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/cmpayc/ArxLibertatisVR/releases/download/vr-v0.2.1/ArxLibertatisVR-0.2.1-android-arm64.apk",
+  "rec": false
+ },
+ {
   "id": "bomberman-hero-vr",
   "n": "Bomberman Hero VR",
   "a": "VistaLargaGames",
   "v": "n64",
   "i": 0,
   "t": [
-   "Plataformas"
+   "Beta",
+   "Multiplayer"
   ],
   "r": [
-   "ROM de N64"
+   "ROM"
   ],
   "u": "https://github.com/VistaLargaGames/Bomberman-Hero-Quest-3-VR-Standalone/releases/download/n64/BombermanHeroQuest3.apk",
   "lbl": "APK",
@@ -1154,7 +1189,8 @@
   "ren": false,
   "ror": 0,
   "c": "covers/bomberman-hero-vr.jpg",
-  "rec": false
+  "rec": false,
+  "d": "Bomberman Hero VR on Meta Quest. Install in one click from your browser."
  },
  {
   "id": "c-c-tiberian-dawn",
@@ -1174,6 +1210,21 @@
   "ren": false,
   "ror": 0,
   "c": "covers/c-c-tiberian-dawn.jpg",
+  "rec": false
+ },
+ {
+  "id": "ctr-turbocharged-vr",
+  "n": "CTR Turbocharged VR (Crash Team Racing)",
+  "d": "CTR Turbocharged VR (Crash Team Racing) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0",
+  "a": "SgtBilko76",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/SgtBilko76/CTR-Turbocharged-VR/releases/download/v0.1.0/CTR-Turbocharged-VR-v0.1.0.apk",
   "rec": false
  },
  {
@@ -1197,6 +1248,24 @@
   "rec": false
  },
  {
+  "id": "mario-party-4-partyboard",
+  "n": "Mario Party 4 PartyBoard (Mario Party 4 MR)",
+  "d": "Mario Party 4 PartyBoard (Mario Party 4 MR) VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.20.0",
+  "a": "zeranemesis",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "u": "https://github.com/zeranemesis/Marioparty4/releases/download/v0.20.0/PartyBoard-v0.20.0-quest-arm64-v8a.apk",
+  "rec": false
+ },
+ {
   "id": "mario-strikers-charged",
   "n": "Mario Strikers Charged",
   "a": "LanceSweatpants",
@@ -1214,6 +1283,23 @@
   "ren": false,
   "ror": 0,
   "c": "covers/mario-strikers-charged.jpg",
+  "rec": false
+ },
+ {
+  "id": "mega-man-64-vr",
+  "n": "Mega Man 64 VR",
+  "d": "Mega Man 64 VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.9.1-vr1",
+  "a": "randygil",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/randygil/MegaMan64RecompiledVR/releases/download/v0.9.1-vr1/MegaMan64RecompiledVR-Quest.apk",
   "rec": false
  },
  {
@@ -1254,6 +1340,42 @@
   "ren": false,
   "ror": 0,
   "c": "covers/nba-street-vol-2.jpg",
+  "rec": false
+ },
+ {
+  "id": "daytona-usa-vr",
+  "n": "Port0r: Daytona USA VR (Daytona USA)",
+  "d": "Port0r: Daytona USA VR (Daytona USA) on Meta Quest. Install in one click from your browser.",
+  "v": "daytona-v0.1.8",
+  "a": "jacquesdupontd",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/daytona-v0.1.8/Port0r-DaytonaUSAVR-v0.1.8-quest3.apk",
+  "rec": false
+ },
+ {
+  "id": "dirt-dash-vr",
+  "n": "Port0r: Dirt Dash VR (Dirt Dash)",
+  "d": "Port0r: Dirt Dash VR (Dirt Dash) on Meta Quest. Install in one click from your browser.",
+  "v": "dirtdash-v0.1.4",
+  "a": "jacquesdupontd",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/jacquesdupontd/port0r/releases/download/dirtdash-v0.1.4/Port0r-DirtDashVR-v0.1.4-quest3.apk",
   "rec": false
  },
  {
@@ -1313,6 +1435,24 @@
   "ren": false,
   "ror": 0,
   "c": "covers/wwf-no-mercy-vr.jpg",
+  "rec": false
+ },
+ {
+  "id": "xelee",
+  "n": "Xelee (Super Smash Bros. Melee MR)",
+  "d": "Xelee (Super Smash Bros. Melee MR) VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.2.0-beta",
+  "a": "rhythmerc",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Hand Tracking",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "u": "https://github.com/rhythmerc/xelee/releases/download/v0.2.0-beta/Xelee-Quest-arm64.apk",
   "rec": false
  }
 ]
