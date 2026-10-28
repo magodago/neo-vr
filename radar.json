@@ -2,9 +2,58 @@
  {
   "n": "d2r-pcvr",
   "repo": "https://github.com/bearstonem/d2r-pcvr",
-  "upd": "2026-10-25",
+  "upd": "2026-10-27",
   "d": "Experimental first-person D2R PCVR: native OpenXR, Proton/SteamVR, Steam Frame and Quest 3 setup",
   "o": "bearstonem"
+ },
+ {
+  "n": "mjolnir-vr",
+  "repo": "https://github.com/Cesarus85/mjolnir-vr",
+  "upd": "2026-10-26",
+  "d": "Ringfall: Mjolnir VR – an unofficial VR mod for Halo: Combat Evolved on Meta Quest 3/3S and Steam Frame. Bring",
+  "o": "Cesarus85"
+ },
+ {
+  "n": "Sauerbraten-VR",
+  "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
+  "upd": "2026-10-26",
+  "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "VPinball-VR",
+  "repo": "https://github.com/SgtBilko76/VPinball-VR",
+  "upd": "2026-10-26",
+  "d": "Visual Pinball X standalone for Meta Quest 3 (OpenXR) - based on vpinball/vpinball",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "VDrift-QuestVR",
+  "repo": "https://github.com/SgtBilko76/VDrift-QuestVR",
+  "upd": "2026-10-26",
+  "d": "VDrift VR for Meta Quest: standalone OpenXR port of the open-source drift racing simulator",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "NoGravity-VR",
+  "repo": "https://github.com/SgtBilko76/NoGravity-VR",
+  "upd": "2026-10-26",
+  "d": "No Gravity (realtech VR, 1997) as a standalone VR game for Meta Quest 3 and PICO (OpenXR, full game in one APK",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "CallOfDuty4_VR_WinlatorXR",
+  "repo": "https://github.com/SgtBilko76/CallOfDuty4_VR_WinlatorXR",
+  "upd": "2026-10-26",
+  "d": "KisakCOD VR with a WinlatorXR XrAPI backend: Call of Duty 4 in VR standalone on Meta Quest",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "vr2xr-pc",
+  "repo": "https://github.com/f1nal-b0ss/vr2xr-pc",
+  "upd": "2026-10-26",
+  "d": "View VR Video on a PC using Xreal Glasses",
+  "o": "f1nal-b0ss"
  },
  {
   "n": "PrimedGun-Quest3",
@@ -19,13 +68,6 @@
   "upd": "2026-10-25",
   "d": "OpenArena 0.8.8 as a standalone 6DoF VR game for Meta Quest and PICO (OpenXR, full game in one APK, PICO untes",
   "o": "SgtBilko76"
- },
- {
-  "n": "mjolnir-vr",
-  "repo": "https://github.com/Cesarus85/mjolnir-vr",
-  "upd": "2026-10-24",
-  "d": "Ringfall: Mjolnir VR – an unofficial VR mod for Halo: Combat Evolved on Meta Quest 3/3S and Steam Frame. Bring",
-  "o": "Cesarus85"
  },
  {
   "n": "FreeSpace2-VR",
@@ -47,13 +89,6 @@
   "upd": "2026-10-22",
   "d": "a vr mod for berry burry berry",
   "o": "heurazy"
- },
- {
-  "n": "VPinball-VR",
-  "repo": "https://github.com/SgtBilko76/VPinball-VR",
-  "upd": "2026-10-22",
-  "d": "Visual Pinball X standalone for Meta Quest 3 (OpenXR) - based on vpinball/vpinball",
-  "o": "SgtBilko76"
  },
  {
   "n": "SpeedDreams-VR",
@@ -123,27 +158,6 @@
   "repo": "https://github.com/SgtBilko76/Crysis-VR-WinlatorXR",
   "upd": "2026-09-29",
   "d": "Crysis VR mod (based on fholger/crysis_vrmod) running standalone on Meta Quest via WinlatorXR, with 6DOF and m",
-  "o": "SgtBilko76"
- },
- {
-  "n": "CallOfDuty4_VR_WinlatorXR",
-  "repo": "https://github.com/SgtBilko76/CallOfDuty4_VR_WinlatorXR",
-  "upd": "2026-09-28",
-  "d": "KisakCOD VR with a WinlatorXR XrAPI backend: Call of Duty 4 in VR standalone on Meta Quest",
-  "o": "SgtBilko76"
- },
- {
-  "n": "Sauerbraten-VR",
-  "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
-  "upd": "2026-09-25",
-  "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
-  "o": "SgtBilko76"
- },
- {
-  "n": "VDrift-QuestVR",
-  "repo": "https://github.com/SgtBilko76/VDrift-QuestVR",
-  "upd": "2026-09-25",
-  "d": "VDrift VR for Meta Quest: standalone OpenXR port of the open-source drift racing simulator",
   "o": "SgtBilko76"
  },
  {

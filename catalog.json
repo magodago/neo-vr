@@ -237,7 +237,7 @@
   "id": "strikers-quest-mr",
   "n": "Quest 3 Strikers (Super Mario Strikers MR)",
   "d": "Quest 3 Strikers (Super Mario Strikers MR) VR on Meta Quest. Install in one click from your browser.",
-  "v": "v0.1.14-alpha1",
+  "v": "v0.1.15-alpha1",
   "a": "LanceSweatpants",
   "i": 82,
   "t": [
@@ -249,7 +249,7 @@
    "ISO"
   ],
   "c": "covers/strikers-quest-mr.jpg",
-  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.14-alpha1/QuestStrikers-alpha1.14.apk",
+  "u": "https://github.com/LanceSweatpants/Strikers-Quest-MR/releases/download/v0.1.15-alpha1/QuestStrikers-alpha1.15.apk",
   "rec": false,
   "perf": {
    "res": "1280x1344",
@@ -646,7 +646,7 @@
   "id": "ocarina-of-time-vr",
   "n": "Ocarina of Time VR (oot-vr)",
   "d": "Ocarina of Time VR (oot-vr) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.9.4-beta",
+  "v": "v0.9.5-beta",
   "a": "gibranfelix",
   "i": 23,
   "t": [
@@ -657,7 +657,7 @@
    "ROM"
   ],
   "c": "covers/ocarina-of-time-vr.png",
-  "u": "https://github.com/gibranfelix/oot-vr/releases/download/v0.9.4-beta/oot-vr-v0.9.4-beta.apk",
+  "u": "https://github.com/gibranfelix/oot-vr/releases/download/v0.9.5-beta/oot-vr-v0.9.5-beta.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
