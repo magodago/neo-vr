@@ -2,29 +2,36 @@
  {
   "n": "d2r-pcvr",
   "repo": "https://github.com/bearstonem/d2r-pcvr",
-  "upd": "2026-10-27",
+  "upd": "2026-10-28",
   "d": "Experimental first-person D2R PCVR: native OpenXR, Proton/SteamVR, Steam Frame and Quest 3 setup",
   "o": "bearstonem"
  },
  {
+  "n": "vr2xr-pc",
+  "repo": "https://github.com/f1nal-b0ss/vr2xr-pc",
+  "upd": "2026-10-28",
+  "d": "View VR Video on a PC using Xreal Glasses",
+  "o": "f1nal-b0ss"
+ },
+ {
   "n": "mjolnir-vr",
   "repo": "https://github.com/Cesarus85/mjolnir-vr",
-  "upd": "2026-10-26",
+  "upd": "2026-10-27",
   "d": "Ringfall: Mjolnir VR – an unofficial VR mod for Halo: Combat Evolved on Meta Quest 3/3S and Steam Frame. Bring",
   "o": "Cesarus85"
+ },
+ {
+  "n": "VPinball-VR",
+  "repo": "https://github.com/SgtBilko76/VPinball-VR",
+  "upd": "2026-10-27",
+  "d": "Visual Pinball X standalone for Meta Quest 3 and PICO (OpenXR, one APK for both, PICO untested) - based on vpi",
+  "o": "SgtBilko76"
  },
  {
   "n": "Sauerbraten-VR",
   "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
   "upd": "2026-10-26",
   "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
-  "o": "SgtBilko76"
- },
- {
-  "n": "VPinball-VR",
-  "repo": "https://github.com/SgtBilko76/VPinball-VR",
-  "upd": "2026-10-26",
-  "d": "Visual Pinball X standalone for Meta Quest 3 (OpenXR) - based on vpinball/vpinball",
   "o": "SgtBilko76"
  },
  {
@@ -47,13 +54,6 @@
   "upd": "2026-10-26",
   "d": "KisakCOD VR with a WinlatorXR XrAPI backend: Call of Duty 4 in VR standalone on Meta Quest",
   "o": "SgtBilko76"
- },
- {
-  "n": "vr2xr-pc",
-  "repo": "https://github.com/f1nal-b0ss/vr2xr-pc",
-  "upd": "2026-10-26",
-  "d": "View VR Video on a PC using Xreal Glasses",
-  "o": "f1nal-b0ss"
  },
  {
   "n": "PrimedGun-Quest3",

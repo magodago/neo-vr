@@ -1213,6 +1213,26 @@
   "rec": false
  },
  {
+  "id": "confidential-mission-vr",
+  "n": "Confidential Mission VR",
+  "d": "Confidential Mission VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.2.7",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Light Gun",
+   "Emulator",
+   "Beta",
+   "Multiplayer",
+   "Co-op"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/vr4all-standalone/confidential-mission-vr/releases/download/v1.2.7/confidential-mission-vr-quest.apk",
+  "rec": false
+ },
+ {
   "id": "ctr-turbocharged-vr",
   "n": "CTR Turbocharged VR (Crash Team Racing)",
   "d": "CTR Turbocharged VR (Crash Team Racing) on Meta Quest. Install in one click from your browser.",
@@ -1225,6 +1245,39 @@
   ],
   "r": [],
   "u": "https://github.com/SgtBilko76/CTR-Turbocharged-VR/releases/download/v0.1.0/CTR-Turbocharged-VR-v0.1.0.apk",
+  "rec": false
+ },
+ {
+  "id": "death-crimson-ox-vr",
+  "n": "Death Crimson OX VR",
+  "d": "Death Crimson OX VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.5",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/vr4all-standalone/death-crimson-ox-vr/releases/download/v1.0.5/death-crimson-ox-vr-quest.apk",
+  "rec": false
+ },
+ {
+  "id": "lupin-the-third-vr",
+  "n": "Lupin the Third: The Shooting VR",
+  "d": "Lupin the Third: The Shooting VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.6",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Light Gun",
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/vr4all-standalone/lupin-the-third-vr/releases/download/v1.0.6/lupin-the-third-vr-quest.apk",
   "rec": false
  },
  {
@@ -1343,6 +1396,24 @@
   "rec": false
  },
  {
+  "id": "ninja-assault-vr",
+  "n": "Ninja Assault VR",
+  "d": "Ninja Assault VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.6",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/vr4all-standalone/ninja-assault-vr/releases/download/v1.0.6/ninja-assault-vr-quest.apk",
+  "rec": false
+ },
+ {
   "id": "daytona-usa-vr",
   "n": "Port0r: Daytona USA VR (Daytona USA)",
   "d": "Port0r: Daytona USA VR (Daytona USA) on Meta Quest. Install in one click from your browser.",
@@ -1379,6 +1450,22 @@
   "rec": false
  },
  {
+  "id": "survivor2-code-veronica-vr",
+  "n": "Resident Evil Survivor 2: Code Veronica VR",
+  "d": "Resident Evil Survivor 2: Code Veronica VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.6",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/vr4all-standalone/survivor2-code-veronica-vr/releases/download/v1.0.6/survivor2-code-veronica-vr-quest.apk",
+  "rec": false
+ },
+ {
   "id": "retrodepth-mame-vr",
   "n": "RetroDepth MAME VR",
   "a": "maranone",
@@ -1399,6 +1486,22 @@
   "rec": false
  },
  {
+  "id": "mok-vr",
+  "n": "The Maze of the Kings VR",
+  "d": "The Maze of the Kings VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.6",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/vr4all-standalone/mok-vr/releases/download/v1.0.6/mok-vr-quest.apk",
+  "rec": false
+ },
+ {
   "id": "time-crisis-vr",
   "n": "Time Crisis VR",
   "a": "DR-89",
@@ -1416,6 +1519,23 @@
   "ror": 1,
   "c": "covers/time-crisis-vr.jpg",
   "rec": true
+ },
+ {
+  "id": "wakerquest",
+  "n": "WakerQuest",
+  "d": "WakerQuest VR on Meta Quest. Install in one click from your browser.",
+  "v": "v1.0.7",
+  "a": "Trastorillo",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "u": "https://github.com/Trastorillo/wakerquest/releases/download/v1.0.7/WakerQuest-1.0.7.apk",
+  "rec": false
  },
  {
   "id": "wwf-no-mercy-vr",
