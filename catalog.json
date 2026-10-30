@@ -646,7 +646,7 @@
   "id": "ocarina-of-time-vr",
   "n": "Ocarina of Time VR (oot-vr)",
   "d": "Ocarina of Time VR (oot-vr) on Meta Quest. Install in one click from your browser.",
-  "v": "v0.9.5-beta",
+  "v": "v0.9.6-beta",
   "a": "gibranfelix",
   "i": 23,
   "t": [
@@ -657,7 +657,7 @@
    "ROM"
   ],
   "c": "covers/ocarina-of-time-vr.png",
-  "u": "https://github.com/gibranfelix/oot-vr/releases/download/v0.9.5-beta/oot-vr-v0.9.5-beta.apk",
+  "u": "https://github.com/gibranfelix/oot-vr/releases/download/v0.9.6-beta/oot-vr-v0.9.6-beta.apk",
   "rec": true,
   "perf": {
    "res": "1280x1344",
@@ -1159,7 +1159,7 @@
   "id": "arx-libertatis-vr",
   "n": "Arx Libertatis VR (Arx Fatalis)",
   "d": "Arx Libertatis VR (Arx Fatalis) on Meta Quest. Install in one click from your browser.",
-  "v": "vr-v0.2.1",
+  "v": "vr-v0.3.0",
   "a": "cmpayc",
   "i": 0,
   "t": [
@@ -1167,7 +1167,7 @@
    "Multiplayer"
   ],
   "r": [],
-  "u": "https://github.com/cmpayc/ArxLibertatisVR/releases/download/vr-v0.2.1/ArxLibertatisVR-0.2.1-android-arm64.apk",
+  "u": "https://github.com/cmpayc/ArxLibertatisVR/releases/download/vr-v0.3.0/ArxLibertatisVR-0.3.0-android-arm64.apk",
   "rec": false
  },
  {
@@ -1216,7 +1216,7 @@
   "id": "confidential-mission-vr",
   "n": "Confidential Mission VR",
   "d": "Confidential Mission VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.2.7",
+  "v": "v1.2.8",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1229,7 +1229,7 @@
   "r": [
    "ROM"
   ],
-  "u": "https://github.com/vr4all-standalone/confidential-mission-vr/releases/download/v1.2.7/confidential-mission-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/confidential-mission-vr/releases/download/v1.2.8/confidential-mission-vr-quest.apk",
   "rec": false
  },
  {
@@ -1251,7 +1251,7 @@
   "id": "death-crimson-ox-vr",
   "n": "Death Crimson OX VR",
   "d": "Death Crimson OX VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.5",
+  "v": "v1.0.6",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1260,14 +1260,14 @@
    "Multiplayer"
   ],
   "r": [],
-  "u": "https://github.com/vr4all-standalone/death-crimson-ox-vr/releases/download/v1.0.5/death-crimson-ox-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/death-crimson-ox-vr/releases/download/v1.0.6/death-crimson-ox-vr-quest.apk",
   "rec": false
  },
  {
   "id": "lupin-the-third-vr",
   "n": "Lupin the Third: The Shooting VR",
   "d": "Lupin the Third: The Shooting VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.6",
+  "v": "v1.0.7",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1277,7 +1277,7 @@
    "Multiplayer"
   ],
   "r": [],
-  "u": "https://github.com/vr4all-standalone/lupin-the-third-vr/releases/download/v1.0.6/lupin-the-third-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/lupin-the-third-vr/releases/download/v1.0.7/lupin-the-third-vr-quest.apk",
   "rec": false
  },
  {
@@ -1399,7 +1399,7 @@
   "id": "ninja-assault-vr",
   "n": "Ninja Assault VR",
   "d": "Ninja Assault VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.6",
+  "v": "v1.0.7",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1410,7 +1410,7 @@
   "r": [
    "ROM"
   ],
-  "u": "https://github.com/vr4all-standalone/ninja-assault-vr/releases/download/v1.0.6/ninja-assault-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/ninja-assault-vr/releases/download/v1.0.7/ninja-assault-vr-quest.apk",
   "rec": false
  },
  {
@@ -1453,7 +1453,7 @@
   "id": "survivor2-code-veronica-vr",
   "n": "Resident Evil Survivor 2: Code Veronica VR",
   "d": "Resident Evil Survivor 2: Code Veronica VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.6",
+  "v": "v1.0.7",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1462,7 +1462,7 @@
    "Multiplayer"
   ],
   "r": [],
-  "u": "https://github.com/vr4all-standalone/survivor2-code-veronica-vr/releases/download/v1.0.6/survivor2-code-veronica-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/survivor2-code-veronica-vr/releases/download/v1.0.7/survivor2-code-veronica-vr-quest.apk",
   "rec": false
  },
  {
@@ -1489,7 +1489,7 @@
   "id": "mok-vr",
   "n": "The Maze of the Kings VR",
   "d": "The Maze of the Kings VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.6",
+  "v": "v1.0.7",
   "a": "vr4all-standalone",
   "i": 0,
   "t": [
@@ -1498,7 +1498,7 @@
    "Multiplayer"
   ],
   "r": [],
-  "u": "https://github.com/vr4all-standalone/mok-vr/releases/download/v1.0.6/mok-vr-quest.apk",
+  "u": "https://github.com/vr4all-standalone/mok-vr/releases/download/v1.0.7/mok-vr-quest.apk",
   "rec": false
  },
  {

@@ -2,9 +2,107 @@
  {
   "n": "d2r-pcvr",
   "repo": "https://github.com/bearstonem/d2r-pcvr",
-  "upd": "2026-10-28",
+  "upd": "2026-10-29",
   "d": "Experimental first-person D2R PCVR: native OpenXR, Proton/SteamVR, Steam Frame and Quest 3 setup",
   "o": "bearstonem"
+ },
+ {
+  "n": "vr4all-standalone",
+  "repo": "https://github.com/vr4all-standalone/vr4all-standalone",
+  "upd": "2026-10-29",
+  "d": "Discover standalone Quest ports. Keep your installed mods updated.",
+  "o": "vr4all-standalone"
+ },
+ {
+  "n": "NFL-Blitz-2000-Quest-VR",
+  "repo": "https://github.com/VistaLargaGames/NFL-Blitz-2000-Quest-VR",
+  "upd": "2026-10-28",
+  "d": "NFL Blitz 2000 in VR on Meta Quest 3 (standalone APK). Bring your own ROM.",
+  "o": "VistaLargaGames"
+ },
+ {
+  "n": "FreeSpace2-VR",
+  "repo": "https://github.com/SgtBilko76/FreeSpace2-VR",
+  "upd": "2026-10-28",
+  "d": "FreeSpace 2 VR for Meta Quest 3 and PICO (FreeSpace Open + OpenXR, native APK; bring your own game files)",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Unreal-Tournament-VR",
+  "repo": "https://github.com/SgtBilko76/Unreal-Tournament-VR",
+  "upd": "2026-10-28",
+  "d": "Unreal Tournament (UT99) VR for Meta Quest - standalone OpenXR port on Surreal Engine. No game content include",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Crysis-VR-WinlatorXR",
+  "repo": "https://github.com/SgtBilko76/Crysis-VR-WinlatorXR",
+  "upd": "2026-10-28",
+  "d": "Crysis VR mod (based on fholger/crysis_vrmod) running standalone on Meta Quest via WinlatorXR, with 6DOF and m",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "RVGL-VR",
+  "repo": "https://github.com/SgtBilko76/RVGL-VR",
+  "upd": "2026-10-28",
+  "d": "Re-Volt (RVGL) for Meta Quest and PICO (standalone, OpenXR; PICO untested): virtual screen menus, head-tracked",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Unreal-Gold-VR",
+  "repo": "https://github.com/SgtBilko76/Unreal-Gold-VR",
+  "upd": "2026-10-28",
+  "d": "Unreal Gold VR for Meta Quest: standalone OpenXR port on Surreal Engine with controller aiming and curved menu",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "VPinball-VR",
+  "repo": "https://github.com/SgtBilko76/VPinball-VR",
+  "upd": "2026-10-28",
+  "d": "Visual Pinball X standalone for Meta Quest 3 and PICO (OpenXR, one APK for both, PICO untested) - based on vpi",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "NoGravity-VR",
+  "repo": "https://github.com/SgtBilko76/NoGravity-VR",
+  "upd": "2026-10-28",
+  "d": "No Gravity (realtech VR, 1997) as a standalone VR game for Meta Quest 3 and PICO (OpenXR, full game in one APK",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Xonotic-VR",
+  "repo": "https://github.com/SgtBilko76/Xonotic-VR",
+  "upd": "2026-10-28",
+  "d": "Xonotic VR port for Meta Quest: the fast-paced open-source arena shooter, standalone in VR",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "SpeedDreams-VR",
+  "repo": "https://github.com/SgtBilko76/SpeedDreams-VR",
+  "upd": "2026-10-28",
+  "d": "Speed Dreams VR for Meta Quest: Speed Dreams 2.4 motorsport simulator as a standalone OpenXR app with a curved",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "VDrift-QuestVR",
+  "repo": "https://github.com/SgtBilko76/VDrift-QuestVR",
+  "upd": "2026-10-28",
+  "d": "VDrift VR for Meta Quest: standalone OpenXR port of the open-source drift racing simulator",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "Sauerbraten-VR",
+  "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
+  "upd": "2026-10-28",
+  "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
+  "o": "SgtBilko76"
+ },
+ {
+  "n": "OpenArena-VR",
+  "repo": "https://github.com/SgtBilko76/OpenArena-VR",
+  "upd": "2026-10-28",
+  "d": "OpenArena 0.8.8 as a standalone 6DoF VR game for Meta Quest and PICO (OpenXR, full game in one APK, PICO untes",
+  "o": "SgtBilko76"
  },
  {
   "n": "vr2xr-pc",
@@ -21,34 +119,6 @@
   "o": "Cesarus85"
  },
  {
-  "n": "VPinball-VR",
-  "repo": "https://github.com/SgtBilko76/VPinball-VR",
-  "upd": "2026-10-27",
-  "d": "Visual Pinball X standalone for Meta Quest 3 and PICO (OpenXR, one APK for both, PICO untested) - based on vpi",
-  "o": "SgtBilko76"
- },
- {
-  "n": "Sauerbraten-VR",
-  "repo": "https://github.com/SgtBilko76/Sauerbraten-VR",
-  "upd": "2026-10-26",
-  "d": "SauerQuest - Cube 2: Sauerbraten VR for Meta Quest: standalone OpenXR port with room-scale tracking and contro",
-  "o": "SgtBilko76"
- },
- {
-  "n": "VDrift-QuestVR",
-  "repo": "https://github.com/SgtBilko76/VDrift-QuestVR",
-  "upd": "2026-10-26",
-  "d": "VDrift VR for Meta Quest: standalone OpenXR port of the open-source drift racing simulator",
-  "o": "SgtBilko76"
- },
- {
-  "n": "NoGravity-VR",
-  "repo": "https://github.com/SgtBilko76/NoGravity-VR",
-  "upd": "2026-10-26",
-  "d": "No Gravity (realtech VR, 1997) as a standalone VR game for Meta Quest 3 and PICO (OpenXR, full game in one APK",
-  "o": "SgtBilko76"
- },
- {
   "n": "CallOfDuty4_VR_WinlatorXR",
   "repo": "https://github.com/SgtBilko76/CallOfDuty4_VR_WinlatorXR",
   "upd": "2026-10-26",
@@ -63,53 +133,11 @@
   "o": "LiquidAzir"
  },
  {
-  "n": "OpenArena-VR",
-  "repo": "https://github.com/SgtBilko76/OpenArena-VR",
-  "upd": "2026-10-25",
-  "d": "OpenArena 0.8.8 as a standalone 6DoF VR game for Meta Quest and PICO (OpenXR, full game in one APK, PICO untes",
-  "o": "SgtBilko76"
- },
- {
-  "n": "FreeSpace2-VR",
-  "repo": "https://github.com/SgtBilko76/FreeSpace2-VR",
-  "upd": "2026-10-24",
-  "d": "FreeSpace 2 VR for Meta Quest 3 and PICO (FreeSpace Open + OpenXR, native APK; bring your own game files)",
-  "o": "SgtBilko76"
- },
- {
-  "n": "RVGL-VR",
-  "repo": "https://github.com/SgtBilko76/RVGL-VR",
-  "upd": "2026-10-23",
-  "d": "Re-Volt (RVGL) for Meta Quest and PICO (standalone, OpenXR; PICO untested): virtual screen menus, head-tracked",
-  "o": "SgtBilko76"
- },
- {
   "n": "Berry-Burry-Berry-VR",
   "repo": "https://github.com/heurazy/Berry-Burry-Berry-VR",
   "upd": "2026-10-22",
   "d": "a vr mod for berry burry berry",
   "o": "heurazy"
- },
- {
-  "n": "SpeedDreams-VR",
-  "repo": "https://github.com/SgtBilko76/SpeedDreams-VR",
-  "upd": "2026-10-20",
-  "d": "Speed Dreams VR for Meta Quest: Speed Dreams 2.4 motorsport simulator as a standalone OpenXR app with a curved",
-  "o": "SgtBilko76"
- },
- {
-  "n": "Unreal-Gold-VR",
-  "repo": "https://github.com/SgtBilko76/Unreal-Gold-VR",
-  "upd": "2026-10-19",
-  "d": "Unreal Gold VR for Meta Quest: standalone OpenXR port on Surreal Engine with controller aiming and curved menu",
-  "o": "SgtBilko76"
- },
- {
-  "n": "Unreal-Tournament-VR",
-  "repo": "https://github.com/SgtBilko76/Unreal-Tournament-VR",
-  "upd": "2026-10-19",
-  "d": "Unreal Tournament (UT99) VR for Meta Quest - standalone OpenXR port on Surreal Engine. No game content include",
-  "o": "SgtBilko76"
  },
  {
   "n": "HTL-PC-VR",
@@ -133,13 +161,6 @@
   "o": "Baywilly"
  },
  {
-  "n": "Xonotic-VR",
-  "repo": "https://github.com/SgtBilko76/Xonotic-VR",
-  "upd": "2026-10-05",
-  "d": "Xonotic VR port for Meta Quest: the fast-paced open-source arena shooter, standalone in VR",
-  "o": "SgtBilko76"
- },
- {
   "n": "JKXR",
   "repo": "https://github.com/Team-Beef-Studios/JKXR",
   "upd": "2026-09-29",
@@ -152,13 +173,6 @@
   "upd": "2026-09-29",
   "d": "Port of the Xash3D-FWGS Half Life Engine to Oculus Quest",
   "o": "Team-Beef-Studios"
- },
- {
-  "n": "Crysis-VR-WinlatorXR",
-  "repo": "https://github.com/SgtBilko76/Crysis-VR-WinlatorXR",
-  "upd": "2026-09-29",
-  "d": "Crysis VR mod (based on fholger/crysis_vrmod) running standalone on Meta Quest via WinlatorXR, with 6DOF and m",
-  "o": "SgtBilko76"
  },
  {
   "n": "ReVoltVR-Standalone",
