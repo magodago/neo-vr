@@ -1,5 +1,19 @@
 [
  {
+  "n": "Sin-and-Punishment-Quest-VR",
+  "repo": "https://github.com/VistaLargaGames/Sin-and-Punishment-Quest-VR",
+  "upd": "2026-10-30",
+  "d": "Sin and Punishment in VR on Meta Quest 3 (standalone APK). Bring your own ROM.",
+  "o": "VistaLargaGames"
+ },
+ {
+  "n": "vr4all-standalone",
+  "repo": "https://github.com/vr4all-standalone/vr4all-standalone",
+  "upd": "2026-10-30",
+  "d": "Discover standalone Quest ports. Keep your installed mods updated.",
+  "o": "vr4all-standalone"
+ },
+ {
   "n": "d2r-pcvr",
   "repo": "https://github.com/bearstonem/d2r-pcvr",
   "upd": "2026-10-29",
@@ -7,18 +21,18 @@
   "o": "bearstonem"
  },
  {
-  "n": "vr4all-standalone",
-  "repo": "https://github.com/vr4all-standalone/vr4all-standalone",
-  "upd": "2026-10-29",
-  "d": "Discover standalone Quest ports. Keep your installed mods updated.",
-  "o": "vr4all-standalone"
- },
- {
   "n": "NFL-Blitz-2000-Quest-VR",
   "repo": "https://github.com/VistaLargaGames/NFL-Blitz-2000-Quest-VR",
   "upd": "2026-10-28",
   "d": "NFL Blitz 2000 in VR on Meta Quest 3 (standalone APK). Bring your own ROM.",
   "o": "VistaLargaGames"
+ },
+ {
+  "n": "VPinball-VR",
+  "repo": "https://github.com/SgtBilko76/VPinball-VR",
+  "upd": "2026-10-28",
+  "d": "Visual Pinball X standalone for Meta Quest 3 and PICO (OpenXR, one APK for both, PICO untested) - based on vpi",
+  "o": "SgtBilko76"
  },
  {
   "n": "FreeSpace2-VR",
@@ -53,13 +67,6 @@
   "repo": "https://github.com/SgtBilko76/Unreal-Gold-VR",
   "upd": "2026-10-28",
   "d": "Unreal Gold VR for Meta Quest: standalone OpenXR port on Surreal Engine with controller aiming and curved menu",
-  "o": "SgtBilko76"
- },
- {
-  "n": "VPinball-VR",
-  "repo": "https://github.com/SgtBilko76/VPinball-VR",
-  "upd": "2026-10-28",
-  "d": "Visual Pinball X standalone for Meta Quest 3 and PICO (OpenXR, one APK for both, PICO untested) - based on vpi",
   "o": "SgtBilko76"
  },
  {

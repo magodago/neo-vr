@@ -1213,6 +1213,25 @@
   "rec": false
  },
  {
+  "id": "carnevil-vr",
+  "n": "CarnEvil VR",
+  "d": "CarnEvil VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.4",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM",
+   "BIOS"
+  ],
+  "u": "https://github.com/vr4all-standalone/carnevil-vr/releases/download/v0.1.4/carnevil-vr-quest.apk",
+  "rec": false
+ },
+ {
   "id": "confidential-mission-vr",
   "n": "Confidential Mission VR",
   "d": "Confidential Mission VR on Meta Quest. Install in one click from your browser.",
@@ -1248,6 +1267,22 @@
   "rec": false
  },
  {
+  "id": "daggerfall-unity-vr",
+  "n": "Daggerfall Unity VR (Quest 3)",
+  "d": "Daggerfall Unity VR (Quest 3) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.0-beta3",
+  "a": "rwcrosk-arch",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/rwcrosk-arch/dfu-quest3/releases/download/v0.1.0-beta3/DFU-Quest3VR-beta3.apk",
+  "rec": false
+ },
+ {
   "id": "death-crimson-ox-vr",
   "n": "Death Crimson OX VR",
   "d": "Death Crimson OX VR on Meta Quest. Install in one click from your browser.",
@@ -1261,6 +1296,38 @@
   ],
   "r": [],
   "u": "https://github.com/vr4all-standalone/death-crimson-ox-vr/releases/download/v1.0.6/death-crimson-ox-vr-quest.apk",
+  "rec": false
+ },
+ {
+  "id": "ghost-squad-evolution-vr",
+  "n": "Ghost Squad Evolution VR",
+  "d": "Ghost Squad Evolution VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.2.5",
+  "a": "lialan",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/lialan/lindbergh-recomp-ports/releases/download/v0.2.5/GhostSquadEvolutionVR-v0.2.5-quest3.apk",
+  "rec": false
+ },
+ {
+  "id": "gran-turismo-3-vr",
+  "n": "Gran Turismo 3 VR (GT3 Revisited)",
+  "d": "Gran Turismo 3 VR (GT3 Revisited) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.4.2",
+  "a": "matt-pulsipher",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ISO"
+  ],
+  "u": "https://github.com/matt-pulsipher/GT3-revisited/releases/download/v0.4.2/gt3r-quest.apk",
   "rec": false
  },
  {
@@ -1362,10 +1429,11 @@
   "v": "v0.1.20",
   "i": 0,
   "t": [
-   "Aventura"
+   "Beta",
+   "Multiplayer"
   ],
   "r": [
-   "ROM de N64"
+   "ROM"
   ],
   "u": "https://github.com/VistaLargaGames/Mystical-Ninja-VR/releases/download/v0.1.20/MysticalNinjaVR-Quest-0.1.20.apk",
   "lbl": "APK",
@@ -1373,7 +1441,8 @@
   "ren": false,
   "ror": 0,
   "c": "covers/mystical-ninja-vr.jpg",
-  "rec": false
+  "rec": false,
+  "d": "Mystical Ninja VR on Meta Quest. Install in one click from your browser."
  },
  {
   "id": "nba-street-vol-2",
@@ -1411,6 +1480,21 @@
    "ROM"
   ],
   "u": "https://github.com/vr4all-standalone/ninja-assault-vr/releases/download/v1.0.7/ninja-assault-vr-quest.apk",
+  "rec": false
+ },
+ {
+  "id": "opentie-vr",
+  "n": "OpenTIE VR (Star Wars: TIE Fighter)",
+  "d": "OpenTIE VR (Star Wars: TIE Fighter) on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.8-beta",
+  "a": "SgtBilko76",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/SgtBilko76/OpenTIE-VR/releases/download/v0.1.8-beta/OpenTIE-VR-v0.1.8-beta.apk",
   "rec": false
  },
  {
@@ -1486,6 +1570,57 @@
   "rec": false
  },
  {
+  "id": "sin-and-punishment-vr",
+  "n": "Sin & Punishment VR",
+  "d": "Sin & Punishment VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.1",
+  "a": "VistaLargaGames",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "ROM"
+  ],
+  "u": "https://github.com/VistaLargaGames/Sin-and-Punishment-Quest-VR/releases/download/v0.1.1/Sin-and-Punishment-VR-0.1.1.apk",
+  "rec": false
+ },
+ {
+  "id": "teraburst-vr",
+  "n": "Teraburst VR",
+  "d": "Teraburst VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.1.2",
+  "a": "vr4all-standalone",
+  "i": 0,
+  "t": [
+   "Emulator",
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [
+   "BIOS"
+  ],
+  "u": "https://github.com/vr4all-standalone/teraburst-vr/releases/download/v0.1.2/teraburst-vr-quest.apk",
+  "rec": false
+ },
+ {
+  "id": "hotd4-vr",
+  "n": "The House of the Dead 4 VR",
+  "d": "The House of the Dead 4 VR on Meta Quest. Install in one click from your browser.",
+  "v": "v0.2.5",
+  "a": "lialan",
+  "i": 0,
+  "t": [
+   "Beta",
+   "Multiplayer"
+  ],
+  "r": [],
+  "u": "https://github.com/lialan/lindbergh-recomp-ports/releases/download/v0.2.5/HouseOfTheDead4VR-v0.2.5-quest3.apk",
+  "rec": false
+ },
+ {
   "id": "mok-vr",
   "n": "The Maze of the Kings VR",
   "d": "The Maze of the Kings VR on Meta Quest. Install in one click from your browser.",
@@ -1524,7 +1659,7 @@
   "id": "wakerquest",
   "n": "WakerQuest",
   "d": "WakerQuest VR on Meta Quest. Install in one click from your browser.",
-  "v": "v1.0.7",
+  "v": "v1.1",
   "a": "Trastorillo",
   "i": 0,
   "t": [
@@ -1534,7 +1669,7 @@
   "r": [
    "ISO"
   ],
-  "u": "https://github.com/Trastorillo/wakerquest/releases/download/v1.0.7/WakerQuest-1.0.7.apk",
+  "u": "https://github.com/Trastorillo/wakerquest/releases/download/v1.1/WakerQuest-1.1.apk",
   "rec": false
  },
  {
@@ -1544,10 +1679,12 @@
   "v": "n64",
   "i": 0,
   "t": [
-   "Lucha"
+   "Emulator",
+   "Beta",
+   "Multiplayer"
   ],
   "r": [
-   "ROM de N64"
+   "ROM"
   ],
   "u": "https://github.com/VistaLargaGames/WWF-No-Mercy-Quest-3-Standalone-/releases/download/n64/WWFNoMercyVR-Quest.apk",
   "lbl": "APK",
@@ -1555,7 +1692,8 @@
   "ren": false,
   "ror": 0,
   "c": "covers/wwf-no-mercy-vr.jpg",
-  "rec": false
+  "rec": false,
+  "d": "WWF No Mercy VR on Meta Quest. Install in one click from your browser."
  },
  {
   "id": "xelee",
