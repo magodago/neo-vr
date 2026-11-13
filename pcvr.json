@@ -10,7 +10,8 @@
    "v": "",
    "upd": "",
    "pc": true,
-   "est": "estable"
+   "est": "estable",
+   "lanzar": "tf2vr"
   },
   {
    "n": "Half-Life 2 VR",
@@ -46,7 +47,8 @@
    "v": "",
    "upd": "",
    "pc": true,
-   "est": "estable"
+   "est": "estable",
+   "lanzar": "alien"
   },
   {
    "n": "Outer Wilds VR",
@@ -157,5 +159,9 @@
    "est": "pago"
   }
  ],
- "prox": []
+ "prox": [],
+ "srv": {
+  "u": "http://192.168.0.18:8790",
+  "k": "99649f0285b87039"
+ }
 }

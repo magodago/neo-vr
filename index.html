@@ -75,6 +75,8 @@
       font-size:24px;font-weight:800;letter-spacing:.14em;
       background:linear-gradient(135deg,#1a2340,#2b1533 60%,#3a1f18);color:#7f8cc4}
   .rec .rk{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#FF9F43}
+  .rec .rb a.lz{background:#43E08B;color:#04140C;margin-top:0}
+  .rec .rb a.lz:active{background:#2fbf73}
 </style>
 </head>
 <body>
@@ -190,13 +192,16 @@ fetch('mr.json').then(r=>r.json()).then(lista=>{
 }).catch(()=>{});
 
 fetch('pcvr.json').then(r=>r.json()).then(o=>{
-  const el=document.getElementById('recspc');
-  el.innerHTML=(o.disponibles||[]).map(it=>`<div class="rec">
-    <div class="mrcover" style="font-size:15px">${esc(it.est.toUpperCase())}</div>
+  const el=document.getElementById('recspc'), srv=o.srv||{};
+  el.innerHTML=(o.disponibles||[]).map(it=>{
+    const lz=(it.lanzar&&srv.u)?`<a class="lz" href="${srv.u}/l/${encodeURIComponent(it.lanzar)}?k=${encodeURIComponent(srv.k||'')}" target="_blank" rel="noopener" onclick="this.textContent='LANZANDO...'">LANZAR EN EL PC</a>`:'';
+    return `<div class="rec">
+    <div class="mrcover" style="font-size:15px">${esc((it.est||'').toUpperCase())}</div>
     <div class="rb"><div class="rk">PCVR</div>
     <div class="rn">${esc(it.n)}</div>
     <div class="rw">${esc(it.por)}</div>
-    <a href="${it.url}" target="_blank" rel="noopener">VER MOD</a></div></div>`).join('');
+    ${lz}
+    <a href="${it.url}" target="_blank" rel="noopener">VER MOD</a></div></div>`;}).join('');
 }).catch(()=>{});
 </script>
 </body>
