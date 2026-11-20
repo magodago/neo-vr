@@ -59,6 +59,7 @@ export class Hud {
       const p = new THREE.Mesh(new THREE.PlaneGeometry(0.009, 0.038), new THREE.MeshBasicMaterial({ color: 0xffb066 }));
       p.position.set(0.20 + i * 0.014, -0.185, -0.52);
       p.rotation.z = -0.35 + i * 0.02;
+      p.visible = false;          // munición ilimitada: no hay pips que enseñar
       this.group.add(p);
       this.ammoPips.push(p);
     }
@@ -86,14 +87,15 @@ export class Hud {
     this.group.add(this.hitMark);
     this.hitT = 0;
 
-    // ---- panel de estado (izquierda) ----
-    const st = makeCanvas(512, 256);
+    // ---- panel de estado (abajo, centrado bajo la mirada) ----
+    // Antes vivía arriba a la izquierda (y=+0.125, x=-0.275): había que levantar
+    // la vista y estorbaba. Ahora va pegado al borde inferior del campo de visión.
+    const st = makeCanvas(640, 168);
     this.statCanvas = st;
-    this.statPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.30, 0.15),
-      new THREE.MeshBasicMaterial({ map: st.tex, transparent: true, opacity: 0.9, depthWrite: false }));
-    this.statPlane.position.set(-0.275, 0.125, -0.72);
-    this.statPlane.rotation.y = 0.34;
-    this.statPlane.scale.setScalar(0.92);
+    // punto 7: agrandado y acercado — entra en el campo de visión sin mover la cabeza
+    this.statPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.1155),
+      new THREE.MeshBasicMaterial({ map: st.tex, transparent: true, opacity: 0.96, depthWrite: false }));
+    this.statPlane.position.set(0, -0.235, -0.46);
     this.group.add(this.statPlane);
     this._statKey = '';
 
@@ -123,7 +125,58 @@ export class Hud {
     this.group.add(this.reloadPlane);
     this.reloadT = 0;
 
+    // ---- arsenal (justo encima del marcador, sin subir la vista) ----
+    const wq = makeCanvas(640, 96);
+    this.weapCanvas = wq;
+    this.weapPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.063),
+      new THREE.MeshBasicMaterial({ map: wq.tex, transparent: true, opacity: 0, depthWrite: false }));
+    this.weapPlane.position.set(0, -0.145, -0.46);
+    this.group.add(this.weapPlane);
+    this._weapKey = '';
+
     this._drawStat(1, 6, 1, 0);
+  }
+
+  // name: 'RÁFAGA'… · tier 1..3 · frac 1→0 tiempo restante
+  setWeapon(name, tier, frac) {
+    const key = `${name}|${tier}|${Math.round(frac * 40)}`;
+    if (key === this._weapKey) return;
+    this._weapKey = key;
+    const { ctx, tex, c } = this.weapCanvas;
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    if (!tier) { tex.needsUpdate = true; this.weapPlane.material.opacity = 0; return; }
+
+    const cols = ['#49e6ff', '#5cff9d', '#ff9f43', '#ff4fd8'];
+    const col = cols[Math.min(3, tier)];
+
+    ctx.textAlign = 'center';
+    ctx.font = '800 34px "Helvetica Neue",Arial,sans-serif';
+    ctx.fillStyle = col;
+    ctx.shadowColor = col; ctx.shadowBlur = 16;
+    ctx.fillText(name, W / 2, 40);
+    ctx.shadowBlur = 0;
+
+    // barra de duración
+    const bw = 300, bx = (W - bw) / 2, by = 56;
+    ctx.fillStyle = 'rgba(12,20,30,0.72)';
+    ctx.fillRect(bx, by, bw, 10);
+    ctx.fillStyle = col;
+    ctx.fillRect(bx, by, bw * Math.max(0, Math.min(1, frac)), 10);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bx, by, bw, 10);
+
+    // nivel
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(W / 2 - 44 + i * 44, 84, 6, 0, Math.PI * 2);
+      ctx.fillStyle = i < tier ? col : 'rgba(120,150,180,0.30)';
+      ctx.fill();
+    }
+    ctx.textAlign = 'left';
+    tex.needsUpdate = true;
+    this.weapPlane.material.opacity = 0.98;
   }
 
   setHealth(hp, max = 5) {
@@ -133,38 +186,51 @@ export class Hud {
     });
   }
 
-  setAmmo(n, spent) {
-    this.ammoPips.forEach((p, i) => {
-      p.visible = true;
-      p.material.color.setHex(i < n ? 0xffb066 : (spent ? 0x40222a : 0x2a3441));
-      p.scale.y = i < n ? 1 : 0.62;
-    });
-  }
+  setAmmo() { /* munición ilimitada: sin pips ni estado que actualizar */ }
 
   _drawStat(hp, ammo, wave, score) {
     const key = `${hp}|${ammo}|${wave}|${score}`;
     if (key === this._statKey) return;
     this._statKey = key;
     const { ctx, tex, c } = this.statCanvas;
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = '600 30px "Helvetica Neue",Arial,sans-serif';
-    ctx.fillStyle = 'rgba(143,166,190,0.95)';
-    lsText(ctx, 'OLEADA', 8, 46, 4);
-    ctx.font = '800 92px "Helvetica Neue",Arial,sans-serif';
-    ctx.fillStyle = '#eaf4ff';
-    ctx.fillText(String(wave).padStart(2, '0'), 6, 140);
-    ctx.font = '600 26px "Helvetica Neue",Arial,sans-serif';
-    ctx.fillStyle = 'rgba(255,159,67,0.95)';
-    lsText(ctx, 'PUNTOS', 210, 96, 3);
-    ctx.font = '700 44px "Helvetica Neue",Arial,sans-serif';
-    ctx.fillStyle = '#ffd9a8';
-    ctx.fillText(String(score), 208, 142);
-    ctx.strokeStyle = 'rgba(61,155,255,0.5)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, 178); ctx.lineTo(330, 178); ctx.stroke();
-    ctx.font = '500 22px "Helvetica Neue",Arial,sans-serif';
-    ctx.fillStyle = 'rgba(120,144,168,0.95)';
-    lsText(ctx, 'SECTOR 07', 8, 216, 4);
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // banda con degradado: se apoya en el borde inferior y no tapa la acción
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, 'rgba(8,14,22,0)');
+    bg.addColorStop(0.45, 'rgba(8,14,22,0.42)');
+    bg.addColorStop(1, 'rgba(8,14,22,0.72)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // piezas tipográficas en una sola línea, centradas
+    const parts = [
+      { t: 'OLEADA', font: '700 30px "Helvetica Neue",Arial,sans-serif', col: 'rgba(150,178,205,0.95)', ls: 6, gap: 8 },
+      { t: String(wave).padStart(2, '0'), font: '800 54px "Helvetica Neue",Arial,sans-serif', col: '#eaf4ff', ls: 0, gap: 30 },
+      { t: '·', font: '700 40px "Helvetica Neue",Arial,sans-serif', col: 'rgba(61,155,255,0.85)', ls: 0, gap: 16 },
+      { t: String(score).replace(/\B(?=(\d{3})+(?!\d))/g, ' '), font: '800 54px "Helvetica Neue",Arial,sans-serif', col: '#ffd9a8', ls: 0, gap: 10 },
+      { t: 'PTS', font: '700 26px "Helvetica Neue",Arial,sans-serif', col: 'rgba(255,159,67,0.9)', ls: 5, gap: 0 }
+    ];
+    let total = 0;
+    for (const p of parts) {
+      ctx.font = p.font;
+      let w = 0;
+      for (const ch of p.t) w += ctx.measureText(ch).width + p.ls;
+      p.w = Math.max(0, w - p.ls);
+      total += p.w + p.gap;
+    }
+    let x = (W - total) / 2;
+    ctx.textBaseline = 'middle';
+    let maxAsc = 0;
+    for (const p of parts) {
+      ctx.font = p.font;
+      ctx.fillStyle = p.col;
+      let cx = x;
+      for (const ch of p.t) { ctx.fillText(ch, cx, H * 0.58); cx += ctx.measureText(ch).width + p.ls; }
+      maxAsc = Math.max(maxAsc, p.w);
+      x += p.w + p.gap;
+    }
     tex.needsUpdate = true;
   }
 

@@ -6,6 +6,7 @@ import { buildRail } from './rail.js';
 import { GameAudio } from './audio.js';
 import { Weapon } from './weapon.js';
 import { Hud } from './hud.js';
+import { HeldNade } from './nade.js';
 import { Game } from './game.js';
 import { glowSprite } from './textures.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -112,7 +113,7 @@ const shared = { glow: glowSprite() };
 function setup() {
   arena = buildArena(world);
   arena.group.visible = false;   // el combate ocurre en el corredor en riel
-  rail = buildRail(world);
+  rail = buildRail(world, { aniso: renderer.capabilities.getMaxAnisotropy() });
   audio = new GameAudio();
   weapon = new Weapon(camera, audio, shared);
   hud = new Hud(camera);
@@ -219,6 +220,7 @@ bracer.group.position.set(0, -0.01, -0.02);
 // ---------------------------------------------------------------- mando / entrada
 let gunGrip = null;
 let whipGrip = null;
+const heldNade = new HeldNade();
 let gunSource = null;
 let rightSource = null;
 let leftSource = null;
@@ -261,12 +263,14 @@ function bindHands() {
     // el arma va en el espacio de puntería (ray): el cañón queda alineado con el rayo
     if (isGun) { gunGrip = ray; gunSource = src; } else whipGrip = grip;
     ray.addEventListener('selectstart', isGun ? onFire : onWhip);
-    ray.addEventListener('squeezestart', isGun ? () => game.reload() : onNade);
+    // gatillo: el arma dispara infinito (sin recarga); la mano libre lanza granada
+    ray.addEventListener('squeezestart', isGun ? () => {} : onNade);
     ray.addEventListener('connected', () => { if (ray.children.length === 0) ray.add(makeRay(isGun ? 0.55 : 0.45, isGun ? 0x9fe0ff : 0xff9f43, 0.26)); });
   });
   if (!gunGrip) gunGrip = renderer.xr.getController(gunHand === 'left' ? leftIdx : rightIdx);
   if (!whipGrip) whipGrip = renderer.xr.getControllerGrip(gunHand === 'left' ? rightIdx : leftIdx);
   if (bracer.group.parent !== whipGrip) whipGrip.add(bracer.group);
+  if (heldNade && heldNade.group.parent !== whipGrip) heldNade.mount(whipGrip);
   mountGun();
 }
 
@@ -295,7 +299,9 @@ let fireCd = 0;
 function onFire() {
   if (!game || game.state === 'dead') { if (game) { game.reset(); game.begin(); } return; }
   const now = performance.now();
-  if (now - fireCd < 90) return;
+  // cadencia: sube con el arsenal temporal (arma de nivel 3 dispara ~2x)
+  const cd = 96 / (1 + (game.weaponTier || 0) * 0.34);
+  if (now - fireCd < cd) return;
   fireCd = now;
   if (desktop) {
     // en escritorio la mira es el centro de la pantalla: el rayo sale de la cámara.
@@ -312,7 +318,7 @@ function onFire() {
   if (gunSource && gunSource.gamepad && gunSource.gamepad.hapticActuators && gunSource.gamepad.hapticActuators[0]) {
     gunSource.gamepad.hapticActuators[0].pulse(0.35, 45);
   }
-  if (game.ammo <= 0) hud.reloadHint(true);
+  // munición ilimitada: nunca hay aviso de recarga
 }
 
 const _hp = new THREE.Vector3();
@@ -334,7 +340,8 @@ function onNade() {
   h.getWorldPosition(_hp);
   h.getWorldDirection(_hd);
   const p = toPlayPos(_hp), d = toPlayDir(_hd);
-  if (!game.throwGrenade(p, d)) game.tryWhip(p, d);
+  if (game.throwGrenade(p, d)) { heldNade.kick(); heldNade.update(0, 0, 0); }
+  else game.tryWhip(p, d);
 }
 
 // ---------------------------------------------------------------- escritorio
@@ -424,6 +431,7 @@ function tick() {
   }
   if (hud) hud.update(dt, t);
   if (weapon) weapon.update(dt, t, ZERO3, ZERO3);
+  if (heldNade && game) heldNade.update(dt, t, game.grenades);
 
   const bs = bracer.ring.scale.x;
   if (bs > 1.002) {

@@ -56,7 +56,10 @@ export class GroundBot {
     this.deathT = 0;
     this.flashT = 0;
     this.phase = Math.random() * 6.28;
-    this.hold = 5.0 + Math.random() * 2.5;
+    // Punto 5: ya no se queda plantado a media distancia. Viene, te atraviesa,
+    // te quita vida al pasar y sigue de largo hasta salir del corredor.
+    this.passed = false;
+    this.struck = false;
     this.fireT = 0.75 + Math.random() * 0.8;
     this.chargeT = 0;
     this.lane = (Math.random() * 2 - 1) * 1.15;
@@ -292,29 +295,40 @@ export class GroundBot {
     const dist = Math.hypot(dx, dz);
     const facing = Math.atan2(dx, dz);
 
-    // giro suave hacia el jugador
-    let da = facing - this.root.rotation.y;
-    while (da > Math.PI) da -= Math.PI * 2;
-    while (da < -Math.PI) da += Math.PI * 2;
-    this.root.rotation.y += da * Math.min(1, dt * 3.2);
-
-    // avance decidido (nunca se queda atrás)
-    const speed = 1.55 + Math.min(1.1, (this.hp < this.maxHp ? 0.5 : 0));
-    let moving = 0;
-    if (dist > this.hold) {
-      const step = Math.min(speed * dt, dist - this.hold);
-      this.root.position.x += (dx / dist) * step * 0.85 + (this.lane - this.root.position.x) * dt * 0.6;
-      this.root.position.z += (dz / dist) * step;
-      moving = 1;
-    } else if (dist < this.hold - 1.4) {
-      // retrocede un paso si se le echa encima
-      this.root.position.x -= (dx / dist) * speed * dt * 0.5;
-      this.root.position.z -= (dz / dist) * speed * dt * 0.5;
-      moving = 1;
+    // giro suave hacia el jugador (sólo mientras viene de frente)
+    if (!this.passed) {
+      let da = facing - this.root.rotation.y;
+      while (da > Math.PI) da -= Math.PI * 2;
+      while (da < -Math.PI) da += Math.PI * 2;
+      this.root.rotation.y += da * Math.min(1, dt * 3.2);
     }
-    // nunca por detrás del jugador
-    this.root.position.z = Math.min(this.root.position.z, pz - 2.2);
-    this.root.position.x = Math.max(-3.0, Math.min(3.0, this.root.position.x));
+
+    // AVANCE SIN FRENO. Nunca se para: te embiste, te quita vida al cruzarse
+    // y sigue de largo hasta perderse por detrás.
+    const speed = 1.8 + (this.hp < this.maxHp ? 0.35 : 0);
+    let moving = 1;
+    if (!this.passed) {
+      const inv = 1 / Math.max(0.001, dist);
+      this.root.position.x += dx * inv * speed * dt + (this.lane - this.root.position.x) * dt * 0.5;
+      this.root.position.z += dz * inv * speed * dt;
+      // golpe al atravesarte (una vez)
+      if (!this.struck && dist < 1.15) {
+        this.struck = true;
+        evs.push({ type: 'melee', dmg: 2, pos: this.root.position.clone() });
+      }
+      // ha cruzado el plano del jugador: sigue de largo sin girarse
+      if (dz < -0.05) this.passed = true;
+    } else {
+      this.root.position.z += 2.6 * dt;
+      this.root.position.x += Math.sign(this.root.position.x - px || 1) * 0.6 * dt;
+      if (this.root.position.z > pz + 7.5) {
+        evs.push({ type: 'gone' });
+        this.dead = true;
+        this.scene.remove(this.root);
+        return evs;
+      }
+    }
+    this.root.position.x = Math.max(-4.4, Math.min(4.4, this.root.position.x));
     this.root.position.y = 1.42;
 
     // animación de marcha

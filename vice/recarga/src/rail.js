@@ -191,10 +191,12 @@ function grateTexture() {
 }
 
 // ---------------------------------------------------------------- materiales
-function buildMaterials() {
+function buildMaterials(aniso = 1) {
   const panelMap = panelTexture();
   const panelDark = panelMap.clone();
   panelDark.needsUpdate = true;
+  panelMap.anisotropy = aniso;
+  panelDark.anisotropy = aniso;
 
   const floorMap = canvasTex(512, 512, (ctx, w, h) => {
     ctx.fillStyle = '#0b0f14';
@@ -209,6 +211,7 @@ function buildMaterials() {
     for (let y = 0; y <= h; y += 128) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
   }, [4, 8]);
 
+  floorMap.anisotropy = aniso;
   return {
     panel: new THREE.MeshStandardMaterial({ map: panelMap, color: 0xffffff, metalness: 0.92, roughness: 0.42 }),
     panelDark: new THREE.MeshStandardMaterial({ map: panelDark, color: 0x8b98a6, metalness: 0.95, roughness: 0.55 }),
@@ -225,12 +228,12 @@ function buildMaterials() {
   };
 }
 
-export function buildRail(world) {
+export function buildRail(world, opts = {}) {
   const group = new THREE.Group();
   group.name = 'rail';
   world.add(group);
 
-  const M = buildMaterials();
+  const M = buildMaterials(opts.aniso || 1);
   const segments = [];
   const anim = { fans: [], holos: [], arches: [], glowMats: [M.cyan, M.warm, M.white] };
 
@@ -522,6 +525,81 @@ export function buildRail(world) {
       seg.add(bg2);
     }
 
+    // ================= capa de detalle orgánico (curvas reales) =================
+    // tuberías serpenteantes pegadas al muro + abrazaderas
+    for (let pI = 0; pI < 2; pI++) {
+      const sgn = pI ? 1 : -1;
+      const y0 = 0.95 + pI * 1.2;
+      const pts = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        pts.push(new THREE.Vector3(
+          sgn * (HALF_W - 0.44 - 0.07 * Math.sin(t * Math.PI)),
+          y0 + 0.14 * Math.sin(t * Math.PI * 1.5),
+          -SEG_LEN / 2 + t * SEG_LEN
+        ));
+      }
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 42, pI ? 0.052 : 0.072, 12, false),
+        pI ? M.panelDark : M.trim
+      );
+      seg.add(tube);
+      for (let k = 1; k < 6; k++) {
+        const c = curve.getPoint(k / 6);
+        const clamp = new THREE.Mesh(new THREE.TorusGeometry(pI ? 0.074 : 0.096, 0.021, 8, 14), M.trim);
+        clamp.position.copy(c);
+        clamp.rotation.y = Math.PI / 2;
+        seg.add(clamp);
+      }
+    }
+    // conducto de ventilación curvo bajo el techo
+    const ductPts = [];
+    for (let k = 0; k <= 5; k++) {
+      const t = k / 5;
+      ductPts.push(new THREE.Vector3(
+        -1.2 + 0.32 * Math.cos(t * Math.PI * 1.15),
+        HEIGHT - 0.66 - 0.09 * Math.sin(t * Math.PI),
+        -SEG_LEN / 2 + t * (SEG_LEN - 0.4)
+      ));
+    }
+    const ductCurve = new THREE.CatmullRomCurve3(ductPts);
+    seg.add(new THREE.Mesh(new THREE.TubeGeometry(ductCurve, 30, 0.185, 14, false), M.panelDark));
+    for (let k = 1; k < 4; k++) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.205, 0.028, 8, 16), M.trim);
+      ring.position.copy(ductCurve.getPoint(k / 4));
+      ring.rotation.x = Math.PI / 2;
+      seg.add(ring);
+    }
+    // remaches instanciados sobre los paneles (rompe la lectura de caja plana)
+    {
+      const N_RIV = 48;
+      const rivets = new THREE.InstancedMesh(new THREE.SphereGeometry(0.027, 8, 6), M.trim, N_RIV);
+      const mat4 = new THREE.Matrix4();
+      for (let r = 0; r < N_RIV; r++) {
+        const side = r < N_RIV / 2 ? -1 : 1;
+        const idx = r % (N_RIV / 2);
+        const row = Math.floor(idx / 4), col = idx % 4;
+        mat4.makeTranslation(side * (HALF_W - 0.40), 0.38 + col * 0.5, -SEG_LEN / 2 + 1.0 + row * (SEG_LEN / 6));
+        rivets.setMatrixAt(r, mat4);
+      }
+      rivets.instanceMatrix.needsUpdate = true;
+      seg.add(rivets);
+    }
+    // charcos pulidos: reflejan el entorno HDR como espejo
+    {
+      const puddleMat = new THREE.MeshStandardMaterial({
+        color: 0x05080c, metalness: 1.0, roughness: 0.05, transparent: true, opacity: 0.9
+      });
+      for (let p2 = 0; p2 < 3; p2++) {
+        const pud = new THREE.Mesh(new THREE.CircleGeometry(0.55 + (p2 % 2) * 0.35, 22), puddleMat);
+        pud.rotation.x = -Math.PI / 2;
+        pud.scale.set(1, 0.5 + ((p2 * 37) % 10) / 22, 1);
+        pud.position.set(((p2 * 71) % 100 / 100 - 0.5) * (HALF_W * 2 - 2.4), 0.013, -SEG_LEN / 2 + 1.6 + p2 * 4.2);
+        seg.add(pud);
+      }
+    }
+
     group.add(seg);
     segments.push({ group: seg, index: i });
   }
@@ -541,6 +619,34 @@ export function buildRail(world) {
     blending: THREE.AdditiveBlending, depthWrite: false, map: null
   }));
   group.add(dust);
+
+  // ---- niebla baja volumétrica (planos de humo a la deriva)
+  const fogTex = canvasTex(256, 256, (ctx, w, h) => {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < 26; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h, rr = 30 + Math.random() * 70;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      g.addColorStop(0, 'rgba(150,200,235,0.13)');
+      g.addColorStop(1, 'rgba(150,200,235,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }, [2, 4]);
+  const lowFog = new THREE.Group();
+  const fogMat = new THREE.MeshBasicMaterial({
+    map: fogTex, transparent: true, opacity: 0.30, depthWrite: false,
+    blending: THREE.NormalBlending, side: THREE.DoubleSide
+  });
+  for (let i = 0; i < 10; i++) {
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 9.5), fogMat);
+    q.rotation.x = -Math.PI / 2;
+    q.rotation.z = Math.random() * Math.PI;
+    q.position.set((Math.random() - 0.5) * 3, 0.28 + Math.random() * 0.5, -i * (TOTAL / 10) + 6);
+    lowFog.add(q);
+  }
+  group.add(lowFog);
 
   let phase = 0;
   return {
@@ -571,6 +677,14 @@ export function buildRail(world) {
       }
       // polvo a la deriva
       dust.position.z = ((dust.position.z + v * 0.55 + 30) % 30) - 30;
+      // niebla baja: deriva + giro lento
+      for (let i = 0; i < lowFog.children.length; i++) {
+        const q = lowFog.children[i];
+        q.position.z += v * 0.9;
+        if (q.position.z > 16) q.position.z -= TOTAL;
+        q.rotation.z += dt * (0.02 + (i % 3) * 0.012);
+      }
+      fogMat.opacity = 0.26 + Math.sin(phase * 0.7) * 0.05;
       dust.rotation.y = Math.sin(phase * 0.2) * 0.03;
     }
   };

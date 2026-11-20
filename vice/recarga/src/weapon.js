@@ -49,6 +49,8 @@ export class Weapon {
     this._buildGun();
     this._buildHand();
     this._buildFx();
+    this._buildTiers();
+    this.tier = 0;
 
     this.root.traverse(o => {
       if (o.isMesh) { o.frustumCulled = false; o.castShadow = false; o.receiveShadow = false; }
@@ -207,6 +209,79 @@ export class Weapon {
     this.gun.add(this.laser);
   }
 
+  // ---------------------------------------------------------------- mejoras
+  // Arsenal temporal: el arma sube de nivel al coger una caja de armas.
+  // Cada nivel añade piezas REALES al modelo (no sólo cambia el daño) y se
+  // apaga solo cuando expira el tiempo.
+  _buildTiers() {
+    const M = this.mats;
+    const mk = (parent) => {
+      const g = new THREE.Group();
+      g.visible = false;
+      parent.add(g);
+      return g;
+    };
+    this.tierGroups = [];
+    this.tierCores = [];
+
+    // Nivel 1 · RÁFAGA: cañón extendido y cargador lumínico
+    const t1 = mk(this.gun);
+    const b1 = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.019, 0.16, 18), M.chrome);
+    b1.rotation.x = Math.PI / 2; b1.position.set(0, 0.048, -0.345); t1.add(b1);
+    const shroud = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.11, 18, 1, true), M.bodyDark);
+    shroud.rotation.x = Math.PI / 2; shroud.position.set(0, 0.048, -0.31); t1.add(shroud);
+    for (let i = 0; i < 4; i++) {
+      const slot = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.006, 0.008), M.accent);
+      slot.position.set(0, 0.048 + Math.cos(i * 1.57) * 0.026, -0.31 + Math.sin(i * 1.57) * 0.0);
+      slot.position.y = 0.048; slot.position.z = -0.305;
+      slot.rotation.x = Math.PI / 2; slot.rotation.z = i * 1.57;
+      slot.position.x = Math.cos(i * 1.57) * 0.026;
+      t1.add(slot);
+    }
+    const mag = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.075, 0.036), M.body);
+    mag.position.set(0, -0.012, -0.055); mag.rotation.x = 0.12; t1.add(mag);
+    this.tierGroups.push(t1);
+
+    // Nivel 2 · PLASMA: doble cañón + aletas y núcleo cian
+    const t2 = mk(this.gun);
+    for (const sx of [-1, 1]) {
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.13, 14), M.chrome);
+      barrel.rotation.x = Math.PI / 2;
+      barrel.position.set(sx * 0.024, 0.052, -0.30); t2.add(barrel);
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.032, 0.10), M.bodyDark);
+      fin.position.set(sx * 0.042, 0.052, -0.26); t2.add(fin);
+    }
+    const core2 = new THREE.Mesh(new THREE.SphereGeometry(0.014, 16, 12), M.accent);
+    core2.position.set(0, 0.052, -0.14); t2.add(core2);
+    this.tierCores.push(core2);
+    this.tierGroups.push(t2);
+
+    // Nivel 3 · ANIHILADOR: triple cañón, corona y núcleo blanco
+    const t3 = mk(this.gun);
+    for (const sx of [-1, 0, 1]) {
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.010, 0.011, 0.15, 12), M.chrome);
+      barrel.rotation.x = Math.PI / 2;
+      barrel.position.set(sx * 0.022, 0.05 + (sx === 0 ? 0.012 : 0), -0.33); t3.add(barrel);
+    }
+    const crown = new THREE.Mesh(new THREE.TorusGeometry(0.036, 0.005, 8, 24), M.warning);
+    crown.position.set(0, 0.052, -0.235); t3.add(crown);
+    const core3 = new THREE.Mesh(new THREE.SphereGeometry(0.02, 20, 14), new THREE.MeshBasicMaterial({ color: 0xfff3d0 }));
+    core3.position.set(0, 0.052, -0.16); t3.add(core3);
+    this.tierCores.push(core3);
+    this.tierGroups.push(t3);
+  }
+
+  // n = 0 pistola base · 1..3 niveles de arsenal
+  setTier(n) {
+    this.tier = Math.max(0, Math.min(3, n | 0));
+    this.tierGroups.forEach((g, i) => { g.visible = i < this.tier; });
+    const cols = [0x49e6ff, 0x5cff9d, 0xff9f43, 0xff4fd8];
+    const c = cols[this.tier];
+    if (this.cells) this.cells.forEach(mesh => mesh.material.emissive.setHex(c));
+    if (this.laser) this.laser.material.color.setHex(this.tier > 1 ? 0xff7a2a : 0xff3b30);
+    if (this.mats && this.mats.accent && this.tier === 0) this.mats.accent.emissive.setHex(0x49e6ff);
+  }
+
   // ---------------------------------------------------------------- API
   mount(parent, pos, rot) {
     if (this.root.parent) this.root.parent.remove(this.root);
@@ -285,5 +360,17 @@ export class Weapon {
     // pulso del láser
     this.laser.material.opacity = (this.spent ? 0.06 : 0.2) + Math.sin(t * 9) * 0.05;
     this.laserDot.material.emissiveIntensity = 1.2 + Math.sin(t * 7) * 0.5;
+
+    // núcleos del arsenal girando
+    if (this.tier > 0) {
+      for (const c of this.tierCores) {
+        if (!c.parent.visible) continue;
+        c.rotation.y += dt * 4.5;
+        c.scale.setScalar(1 + Math.sin(t * 8) * 0.12);
+      }
+      if (this.tierGroups[2] && this.tierGroups[2].visible) {
+        this.tierGroups[2].rotation.z = Math.sin(t * 2.2) * 0.02;
+      }
+    }
   }
 }

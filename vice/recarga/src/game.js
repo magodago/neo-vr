@@ -9,6 +9,8 @@ const _v3 = new THREE.Vector3();
 
 const ARENA = 6.35;          // media anchura jugable
 const OVER_TIME = 12;        // segundos de sobrecarga
+const TIER_TIME = 26;        // segundos que dura un arma del arsenal
+const TIER_NAMES = ['PISTOLA BASE', 'RÁFAGA', 'PLASMA DOBLE', 'ANIHILADOR'];
 const AMMO = 6;
 const PLAYER_HP = 5;
 
@@ -40,6 +42,8 @@ export class Game {
     this.comboT = 0;
     this.kills = 0;
     this.overT = 0;
+    this.weaponTier = 0;
+    this.tierT = 0;
     this.railSpeed = 3.0;
     this._pv = new THREE.Vector3();
     this.loot = new Loot(this.scene, this.audio, this.shared);
@@ -48,27 +52,57 @@ export class Game {
   }
 
   _initTracers() {
-    for (let i = 0; i < 6; i++) {
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-      const m = new THREE.LineBasicMaterial({ color: 0xd8f0ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
-      const line = new THREE.Line(g, m);
-      line.frustumCulled = false;
-      this.scene.add(line);
-      this.tracers.push({ line, life: 0, max: 0.07 });
+    // El rayo de la pistola. Antes era un THREE.Line: en WebGL una línea mide
+    // siempre 1 px, así que a 2 m de distancia era prácticamente invisible.
+    // Ahora es un cilindro con núcleo brillante + halo aditivo: se lee como un
+    // disparo de energía y crece en pantalla como debe.
+    const CORE_COL = 0xffffff, HALO_COL = 0x6ec8ff;
+    for (let i = 0; i < 10; i++) {
+      const grp = new THREE.Group();
+      grp.frustumCulled = false;
+      grp.visible = false;
+
+      const coreGeo = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
+      const core = new THREE.Mesh(coreGeo, new THREE.MeshBasicMaterial({
+        color: CORE_COL, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+      }));
+      grp.add(core);
+
+      const haloGeo = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
+      const halo = new THREE.Mesh(haloGeo, new THREE.MeshBasicMaterial({
+        color: HALO_COL, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+      }));
+      grp.add(halo);
+
+      this.scene.add(grp);
+      this.tracers.push({ grp, core, halo, life: 0, max: 0.34 });
     }
     this.tracerIdx = 0;
+    this._trUp = new THREE.Vector3(0, 1, 0);
+    this._trDir = new THREE.Vector3();
+    this._trQ = new THREE.Quaternion();
   }
 
   spawnTracer(from, to) {
     const tr = this.tracers[this.tracerIdx++ % this.tracers.length];
-    const p = tr.line.geometry.attributes.position;
-    p.setXYZ(0, from.x, from.y, from.z);
-    p.setXYZ(1, to.x, to.y, to.z);
-    p.needsUpdate = true;
-    tr.line.geometry.computeBoundingSphere();
+    const dir = this._trDir.subVectors(to, from);
+    const len = Math.max(0.05, dir.length());
+    dir.normalize();
+    this._trQ.setFromUnitVectors(this._trUp, dir);
+    tr.grp.position.copy(from).addScaledVector(dir, len * 0.5);
+    tr.grp.quaternion.copy(this._trQ);
+    tr.grp.visible = true;
+    tr.len = len;
     tr.life = tr.max;
-    tr.line.material.opacity = 0.85;
+    // núcleo grueso y muy brillante + halo ancho: el disparo tiene que LEERSE
+    tr.core.material.opacity = 1.0;
+    tr.halo.material.opacity = 0.72;
+    tr.core.scale.set(0.030, len, 0.030);
+    tr.halo.scale.set(0.105, len, 0.105);
+    // fogonazo en la boca del arma, proporcional al largo del tiro
+    this.spark(from, 0xdff4ff, 6, 2.2);
   }
 
   // ---------- ciclo ----------
@@ -90,6 +124,8 @@ export class Game {
     this.enemies.forEach(e => { e.dispose(); });
     if (this.loot) this.loot.disposeAll();
     this.overT = 0;
+    this.weaponTier = 0;
+    this.tierT = 0;
     this.enemies.length = 0;
     for (const p of this.projectiles) this.scene.remove(p.mesh, p.glow, p.core);
     this.projectiles.length = 0;
@@ -128,7 +164,7 @@ export class Game {
 
     // --- jefe de oleada: dron pesado acorazado
     if (boss) {
-      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 1.0 });
+      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 0.82 });
       d.root.scale.setScalar(0.02);
       d.isBoss = true;
       d.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
@@ -140,33 +176,30 @@ export class Game {
       return;
     }
 
-    // --- reparto de tipos: androides desde la oleada 2, cámaras desde la 3
+    // --- reparto de tipos: androides desde la oleada 2.
+    // Las cámaras fijas de los muros (LaserCam) quedan fuera: son los
+    // "enemigos plantados" que había que quitar.
     const r = Math.random();
     let type = 'drone';
-    if (wave >= 2 && r < 0.36) type = 'bot';
-    else if (wave >= 3 && r < 0.55) type = 'cam';
+    if (wave >= 2 && r < 0.45) type = 'bot';
 
     if (type === 'bot') {
       const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 5 + Math.floor(wave * 0.35) });
       b.kind = 'bot';
       b.root.position.z = -19 - Math.random() * 7;
       b.root.position.x = (Math.random() * 2 - 1) * 1.5;
-      b.hold = 4.6 + Math.random() * 2.4;
+      // punto 5: sin distancia de parada (atraviesa y sigue)
       this.enemies.push(b);
       return;
     }
     if (type === 'cam') {
-      const c = new LaserCam(this.scene, this.audio, this.shared, {
-        hp: 2, side: Math.random() < 0.5 ? -1 : 1, z: -21 - Math.random() * 7
-      });
-      c.kind = 'cam';
-      c.radius = 999; c.railHold = 999;
-      this.enemies.push(c);
-      return;
+      // punto 3: fuera las cámaras fijas. El reparto nunca las elige; este
+      // bloque queda como salvaguarda y deriva a dron.
+      type = 'drone';
     }
 
     const hp = Math.min(6, 2 + Math.floor(wave / 3));
-    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 0.78 });
+    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 0.46 });
     d.kind = 'drone';
     // modo riel: entra por el fondo del corredor y avanza hacia el jugador
     d.angle = (Math.random() * 2 - 1) * 0.22;
@@ -184,20 +217,8 @@ export class Game {
   // ---------- disparo ----------
   tryFire(origin, dir) {
     if (this.state === 'dead') return false;
-    if (this.ammo <= 0) {
-      this.weapon.dryFire();
-      this.hud.reloadHint(true);
-      return false;
-    }
-    this.ammo--;
+    // Munición ILIMITADA: nunca hay recarga, nunca hay golpe seco.
     this.weapon.fire();
-    this.hud.setAmmo(this.ammo, this.ammo === 0);
-    this.hud.setState(this.hp, this.ammo, this.wave, this.score);
-    if (this.ammo === 0) {
-      this.weapon.setSpent(true);
-      this.hud.reloadHint(true);
-      this.reloadT = 1.5; // recarga automática de cortesía
-    }
 
     // cajas de suministros (antes que los enemigos: están pegadas a las paredes)
     const crateHit = this.loot.shoot(new THREE.Ray(origin.clone(), dir.clone()));
@@ -238,7 +259,7 @@ export class Game {
       const along = _v2.dot(dir);
       const perp = Math.sqrt(Math.max(0, _v2.lengthSq() - along * along));
       const crit = perp < rad * 0.45;
-      const dmg = (crit ? 3 : 2) + (this.overT > 0 ? 2 : 0);
+      const dmg = (crit ? 3 : 2) + (this.overT > 0 ? 2 : 0) + this.weaponTier;
       const killed = best.hit(dmg, dir);
       const p = bestPoint;
       this.spark(p, killed ? 0xfff0c4 : 0xffd9a0, killed ? 18 : 10, killed ? 3.4 : 2.6);
@@ -277,6 +298,7 @@ export class Game {
 
   throwGrenade(handPos, handDir) {
     if (this.grenades <= 0 || this.state === 'dead') return false;
+    if (!handPos || !handDir) return false;   // sin mano válida no se lanza ni se gasta
     this.grenades--;
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.075, 16, 12),
@@ -314,10 +336,9 @@ export class Game {
 
   applyPickup(kind, pos) {
     if (kind === 'ammo') {
-      this.ammo = AMMO;
-      this.weapon.setSpent(false);
-      this.hud.setAmmo(this.ammo, false);
-      this.hud.banner('MUNICIÓN', 'CARGADOR LLENO', 1.0);
+      // la munición ya es infinita: esta caja pasa a ser granada extra
+      this.grenades += 1;
+      this.hud.banner('GRANADA', '+1 · MANO LIBRE', 1.2);
     } else if (kind === 'hp') {
       this.hp = Math.min(PLAYER_HP, this.hp + 1);
       this.hud.setHealth(this.hp, PLAYER_HP);
@@ -329,8 +350,12 @@ export class Game {
       this.grenades += 2;
       this.hud.banner('GRANADAS x2', 'AGARRA CON FUERZA PARA LANZAR', 1.6);
     } else if (kind === 'weapon') {
-      this.overT = OVER_TIME;
-      this.hud.banner('SOBRECARGA', 'DAÑO +2 · 12 s', 1.4);
+      // arsenal: cada caja sube un nivel (hasta III) y reinicia el reloj
+      this.weaponTier = Math.min(3, this.weaponTier + 1);
+      this.tierT = TIER_TIME;
+      this.weapon.setTier(this.weaponTier);
+      this.hud.banner(TIER_NAMES[this.weaponTier], `ARMA ${this.weaponTier}/3 · ${TIER_TIME} s`, 1.5);
+      this.hud.setWeapon(TIER_NAMES[this.weaponTier], this.weaponTier, TIER_TIME);
     }
     this.spark(pos, 0x9fffe0, 14, 3.0);
     if (this.audio) this.audio.reload();
@@ -339,30 +364,16 @@ export class Game {
 
   // ---------- golpe / recarga ----------
   reload() {
-    if (this.ammo >= AMMO || this.state === 'dead') return;
-    this.reloadT = 0;
-    this.ammo = AMMO;
+    // Ya no existe la recarga: la munición es infinita. Se conserva el método
+    // porque el arma y el audio lo llaman desde otros sitios.
     this.weapon.setSpent(false);
-    this.hud.setAmmo(this.ammo, false);
     this.hud.reloadHint(false);
-    if (this.audio) this.audio.reload();
-    this.hud.setState(this.hp, this.ammo, this.wave, this.score);
   }
 
   tryWhip(handPos, handDir) {
     if (this.state === 'dead') return;
     let acted = false;
 
-    // recargar: la pistola solo se recarga golpeando
-    if (this.ammo < AMMO) {
-      this.ammo = AMMO;
-      this.weapon.setSpent(false);
-      this.hud.setAmmo(this.ammo, false);
-      this.hud.reloadHint(false);
-      if (this.audio) this.audio.reload();
-      this.hud.setState(this.hp, this.ammo, this.wave, this.score);
-      acted = true;
-    }
 
     // desviar proyectiles
     for (const p of this.projectiles) {
@@ -487,17 +498,20 @@ export class Game {
   update(dt, t, head) {
     this.time = t;
 
-    // recarga: manual (squeeze) o automática al quedarse sin balas
-    if (this.reloadT > 0 && this.state === 'playing') {
-      this.reloadT -= dt;
-      if (this.reloadT <= 0) this.reload();
-    }
 
-    // trazadoras
+    // trazadoras: se desvanecen y adelgazan a la vez
     for (const tr of this.tracers) {
       if (tr.life > 0) {
         tr.life -= dt;
-        tr.line.material.opacity = Math.max(0, tr.life / tr.max) * 0.85;
+        const k = Math.max(0, tr.life / tr.max);
+        if (k <= 0) { tr.grp.visible = false; continue; }
+        const e = k * k;
+        tr.core.material.opacity = 0.95 * e;
+        tr.halo.material.opacity = 0.55 * e;
+        const w = 0.013 * (0.45 + 0.55 * k);
+        tr.core.scale.set(w, tr.len, w);
+        const hw = 0.055 * (0.45 + 0.55 * k);
+        tr.halo.scale.set(hw, tr.len, hw);
       }
     }
 
@@ -570,15 +584,20 @@ export class Game {
         e.root.position.z += scroll;
       }
       const evs = e.update(dt, t, playerPos) || [];
-      // candado de riel: siempre dentro del corredor y por delante del jugador
+      // candado de riel: dentro del corredor. Los androides SÍ pueden pasarse
+      // de largo (nos atraviesan); drones y cámaras no.
       const ex = e.root.position.x, ez = e.root.position.z;
       const halfW = e.kind === 'cam' ? 3.35 : 2.05;
       e.root.position.x = Math.max(-halfW, Math.min(halfW, ex));
-      const minZ = playerPos.z - 3.4;
-      if (e.root.position.z > minZ) e.root.position.z = minZ;
+      if (e.kind !== 'bot') {
+        const minZ = playerPos.z - 3.4;
+        if (e.root.position.z > minZ) e.root.position.z = minZ;
+      }
       for (const ev of evs) {
         if (ev.type === 'shoot') this.spawnProjectile(ev.from, ev.dir);
         else if (ev.type === 'kill') this.killEnemy(e, ev.pos);
+        else if (ev.type === 'melee') this.hitPlayer(ev.dmg);
+        else if (ev.type === 'gone') this.killEnemy(e, ev.pos, true);
       }
       if (e.dead) {
         if (this.enemies[i] === e) this.enemies.splice(i, 1);
@@ -588,6 +607,17 @@ export class Game {
     // cajas y objetos recogibles
     const lootEvs = this.loot.update(dt, this.railSpeed, this._pv.set(head.x, 1.15, head.z));
     for (const ev of lootEvs) this.applyPickup(ev.kind, ev.pos);
+    if (this.tierT > 0) {
+      this.tierT -= dt;
+      this.hud.setWeapon(TIER_NAMES[this.weaponTier], this.weaponTier, Math.max(0, this.tierT) / TIER_TIME);
+      if (this.tierT <= 0) {
+        this.tierT = 0;
+        this.weaponTier = 0;
+        this.weapon.setTier(0);
+        this.hud.banner('ARSENAL', 'VUELTA A LA PISTOLA', 1.0);
+        this.hud.setWeapon('', 0, 0);
+      }
+    }
     if (this.overT > 0) {
       this.overT -= dt;
       if (this.overT <= 0) this.hud.banner('SOBRECARGA', 'ENERGÍA AGOTADA', 1.0);
@@ -652,7 +682,7 @@ export class Game {
     }
 
     // aviso de recarga
-    this.hud.reloadHint(this.ammo === 0 && this.state !== 'dead');
+    this.hud.reloadHint(false);
     this.hud.update(dt);
   }
 
@@ -665,7 +695,12 @@ export class Game {
     }
   }
 
-  killEnemy(e, pos) {
+  killEnemy(e, pos, escaped = false) {
+    if (escaped) {
+      // se ha ido de largo: no da puntos ni revienta, sólo limpia
+      if (e.hum) { try { e.hum.stop(); } catch (err) {} e.hum = null; }
+      return;
+    }
     this.kills++;
     const pts = (e.isBoss ? 600 : 120) * Math.max(1, Math.floor(this.wave / 2) + 1);
     this.score += pts;

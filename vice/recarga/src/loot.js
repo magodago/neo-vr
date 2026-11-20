@@ -4,12 +4,19 @@ import * as THREE from 'three';
 const _CRATE_SIZE = new THREE.Vector3(0.86, 0.86, 0.86);
 
 const KINDS = [
-  { kind: 'ammo', color: 0x49e6ff, weight: 34, label: 'MUNICIÓN' },
-  { kind: 'hp', color: 0x63ff9d, weight: 24, label: 'VIDA' },
-  { kind: 'score', color: 0xffc247, weight: 30, label: 'PUNTOS' },
-  { kind: 'weapon', color: 0xff4fd8, weight: 12, label: 'SOBRECARGA' },
-  { kind: 'grenade', color: 0xff7a2a, weight: 16, label: 'GRANADAS' }
+  { kind: 'ammo', color: 0x49e6ff, weight: 18, label: 'MUNICIÓN' },
+  { kind: 'hp', color: 0x63ff9d, weight: 20, label: 'VIDA' },
+  { kind: 'score', color: 0xffc247, weight: 24, label: 'PUNTOS' },
+  { kind: 'weapon', color: 0xff4fd8, weight: 18, label: 'SOBRECARGA' },
+  { kind: 'grenade', color: 0xff7a2a, weight: 20, label: 'GRANADAS' }
 ];
+
+function rollKind() {
+  let acc = 0;
+  const r = Math.random() * 100;
+  for (const k of KINDS) { acc += k.weight; if (r <= acc) return k.kind; }
+  return KINDS[0].kind;
+}
 
 function crateTexture() {
   const c = document.createElement('canvas');
@@ -107,7 +114,7 @@ export class Loot {
     ring.rotation.x = Math.PI / 2;
     g.add(ring);
     this.scene.add(g);
-    this.pickups.push({ root: g, kind: def.kind, color: def.color, t: 0, life: 14, vel: new THREE.Vector3(0, 1.4, 0) });
+    this.pickups.push({ root: g, kind: def.kind, color: def.color, t: 0, life: 30, vel: new THREE.Vector3(0, 1.4, 0) });
   }
 
   // devuelve eventos de recogida
@@ -125,6 +132,29 @@ export class Loot {
         c.hitT -= dt;
         c.root.scale.setScalar(1 + Math.sin(c.hitT * 60) * 0.05);
       }
+      // punto 4 · IMÁN DE CAJAS: si una caja pasa cerca sin romperse, vuela
+      // sola al jugador y suelta su mejora. Antes se perdían al fondo y el
+      // jugador se quedaba sin premio.
+      const cdx = playerPos.x - c.root.position.x;
+      const cdz = playerPos.z - c.root.position.z;
+      const cd = Math.hypot(cdx, cdz);
+      if (cd < 4.4) {
+        const k = Math.min(1, (4.4 - cd) / 3.4);
+        c.root.position.x += cdx * dt * (1.6 + k * 4.6);
+        c.root.position.z += cdz * dt * (1.6 + k * 4.6);
+        c.root.position.y += (playerPos.y - 0.25 - c.root.position.y) * dt * (1.2 + k * 3.0);
+        c.root.rotation.y += dt * 7;
+        c.root.rotation.z = Math.sin(this.time * 9 + i) * 0.22;
+        if (cd < 0.95) {
+          this.scene.remove(c.root);
+          this.crates.splice(i, 1);
+          this._spawnPickup(new THREE.Vector3(
+            playerPos.x + 0.34, playerPos.y - 0.28, playerPos.z - 1.15
+          ), rollKind());
+          if (this.audio) { try { this.audio.pickup && this.audio.pickup(); } catch (e) {} }
+          continue;
+        }
+      }
       if (c.root.position.z > 7) {
         this.scene.remove(c.root); this.crates.splice(i, 1);
       }
@@ -135,14 +165,18 @@ export class Loot {
       p.t += dt; p.life -= dt;
       p.root.children[1].scale.setScalar(1 + Math.sin(this.time * 8) * 0.16);
       // imán: en cuanto la mejora está suelta vuela al jugador, sin gravedad
+      // IMÁN TOTAL: la mejora siempre viene al jugador. Antes sólo se
+      // activaba a 6,5 m y muchas cajas se quedaban atrás sin llegar.
       const dh = Math.hypot(playerPos.x - p.root.position.x, playerPos.z - p.root.position.z);
-      if (dh < 6.5) p.pulling = true;
+      p.pulling = true;
       if (p.pulling) {
         const dir = new THREE.Vector3().subVectors(playerPos, p.root.position);
         const dd = dir.length();
         if (dd > 1e-4) {
           dir.multiplyScalar(1 / dd);
-          p.root.position.addScaledVector(dir, dt * (5.5 + Math.max(0, 6.5 - dh) * 2.4));
+          // velocidad mínima alta + acelerón al acercarse (sensación de imán)
+          const speed = 6 + railSpeed * 1.25 + Math.max(0, 26 - dh) * 1.9;
+          p.root.position.addScaledVector(dir, dt * speed);
         }
         p.root.rotation.y += dt * 11;
         p.root.rotation.x += dt * 6;
