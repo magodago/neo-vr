@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RECARGA — VR</title>
+<style>
+  :root{--cy:#3d9bff;--am:#ff9f43;--mg:#ff4fd8;--bg:#05070b}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:#e8eef7;font-family:"Helvetica Neue",Arial,sans-serif;overflow:hidden}
+  #boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:18px;z-index:10;background:
+        radial-gradient(circle at 50% 38%,rgba(61,155,255,.14),transparent 58%),
+        linear-gradient(180deg,#070910,#04060a 70%)}
+  #boot.hide{opacity:0;pointer-events:none;transition:opacity .7s ease}
+  .kicker{font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:#7f93ad}
+  h1{margin:0;font-size:clamp(46px,13vw,104px);line-height:.86;letter-spacing:-.02em;font-weight:800;
+     background:linear-gradient(180deg,#fff 12%,#9ec9ff 58%,#3d9bff 100%);
+     -webkit-background-clip:text;background-clip:text;color:transparent;
+     filter:drop-shadow(0 0 26px rgba(61,155,255,.45))}
+  .sub{margin:0;max-width:32ch;text-align:center;font-size:14px;line-height:1.5;color:#93a5bb}
+  .rule{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--am),transparent);opacity:.85}
+  button.enter{appearance:none;cursor:pointer;margin-top:6px;padding:16px 34px;border-radius:2px;
+     border:1px solid rgba(61,155,255,.55);background:rgba(61,155,255,.08);color:#eaf3ff;
+     font-size:13px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;
+     box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 10px 40px -12px rgba(61,155,255,.7);
+     transition:.25s}
+  button.enter:hover{background:rgba(61,155,255,.18);border-color:var(--cy);transform:translateY(-1px)}
+  button.enter[disabled]{opacity:.4;cursor:default;transform:none}
+  .ctrl{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:8px;font-size:11px;
+        letter-spacing:.13em;text-transform:uppercase;color:#6f8299}
+  .ctrl b{color:#b9cbe1;font-weight:600}
+  #bar{width:min(300px,64vw);height:2px;background:rgba(255,255,255,.09);overflow:hidden;border-radius:2px}
+  #bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,var(--cy),var(--mg));transition:width .3s}
+  #msg{min-height:16px;font-size:12px;color:#7f93ad;letter-spacing:.06em}
+  #msg.bad{color:#ff6b81}
+  .foot{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.3em;
+        text-transform:uppercase;color:#42536a;pointer-events:none}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<div id="boot">
+  <div class="kicker">Sector 07 · Turno de noche</div>
+  <h1>RECARGA</h1>
+  <div class="rule"></div>
+  <p class="sub">La pistola no tiene botón de recarga. Se recarga golpeando.</p>
+  <div id="bar"><i></i></div>
+  <button class="enter" id="go" disabled>Preparando</button>
+  <div class="ctrl">
+    <span><b>Gatillo</b> disparar</span>
+    <span><b>Golpe seco</b> recargar</span>
+    <span><b>Stick izq.</b> moverte</span>
+    <span><b>Stick der.</b> girar</span>
+  </div>
+  <div id="msg"></div>
+</div>
+<div class="foot">Quest 3 · WebXR · standalone</div>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/jsm/" } }
+</script>
+<script type="module">
+  const bar = document.querySelector('#bar i');
+  const msg = document.getElementById('msg');
+  window.__boot = {
+    prog(p, t){ bar.style.width = Math.max(4, Math.min(100, p*100)) + '%'; if(t) msg.textContent = t; },
+    ready(label){ const b = document.getElementById('go'); b.disabled = false; b.textContent = label; this.prog(1,''); },
+    fail(t){ msg.textContent = t; msg.className = 'bad'; }
+  };
+  window.addEventListener('error', e => window.__boot.fail('Error: ' + (e.message||'desconocido')));
+  window.addEventListener('unhandledrejection', e => window.__boot.fail('Error: ' + (e.reason && e.reason.message || 'desconocido')));
+  import('./src/main.js').catch(e => window.__boot.fail('No se pudo cargar el juego: ' + e.message));
+</script>
+</body>
+</html>
