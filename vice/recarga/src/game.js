@@ -24,6 +24,8 @@ export class Game {
     this.enemies = [];
     this.projectiles = [];
     this.debris = [];
+    this.grenades = 0;
+    this.nades = [];
     this.tracers = [];
     this.state = 'idle';
     this.hp = PLAYER_HP;
@@ -106,9 +108,9 @@ export class Game {
     this.wave++;
     this.state = 'playing';
     const boss = this.wave % 3 === 0;
-    const n = Math.min(2 + Math.floor(this.wave * 0.8), 6);
+    const n = Math.min(3 + Math.floor(this.wave * 1.1), 12);
     this.spawnQueue = [];
-    for (let i = 0; i < n; i++) this.spawnQueue.push({ t: i * 0.45, boss: false });
+    for (let i = 0; i < n; i++) this.spawnQueue.push({ t: i * 0.34, boss: false });
     if (boss) this.spawnQueue.push({ t: 0.9, boss: true });
     this.pendingSpawn = 0;
 
@@ -126,7 +128,7 @@ export class Game {
 
     // --- jefe de oleada: dron pesado acorazado
     if (boss) {
-      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 1.15 });
+      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 1.0 });
       d.root.scale.setScalar(0.02);
       d.isBoss = true;
       d.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
@@ -145,7 +147,8 @@ export class Game {
     else if (wave >= 3 && r < 0.55) type = 'cam';
 
     if (type === 'bot') {
-      const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 4 + Math.floor(wave / 3) });
+      const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 5 + Math.floor(wave * 0.35) });
+      b.kind = 'bot';
       b.root.position.z = -19 - Math.random() * 7;
       b.root.position.x = (Math.random() * 2 - 1) * 1.5;
       b.hold = 4.6 + Math.random() * 2.4;
@@ -163,7 +166,8 @@ export class Game {
     }
 
     const hp = Math.min(6, 2 + Math.floor(wave / 3));
-    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 1.15 });
+    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 0.78 });
+    d.kind = 'drone';
     // modo riel: entra por el fondo del corredor y avanza hacia el jugador
     d.angle = (Math.random() * 2 - 1) * 0.22;
     d.radius = 13 + Math.random() * 9;
@@ -271,6 +275,43 @@ export class Game {
     return true;
   }
 
+  throwGrenade(handPos, handDir) {
+    if (this.grenades <= 0 || this.state === 'dead') return false;
+    this.grenades--;
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.075, 16, 12),
+      new THREE.MeshStandardMaterial({ color: 0x23282f, roughness: 0.42, metalness: 0.65, emissive: 0xff5a1e, emissiveIntensity: 1.6 })
+    );
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(0.17, 12, 10),
+      new THREE.MeshBasicMaterial({ color: 0xff8a3a, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })
+    );
+    mesh.add(glow);
+    mesh.position.copy(handPos);
+    this.scene.add(mesh);
+    this.nades.push({ mesh, glow, vel: handDir.clone().multiplyScalar(9.5).add(new THREE.Vector3(0, 2.1, 0)), t: 0, dead: false });
+    this.hud.banner('GRANADA', `${this.grenades} EN EL CUERPO`, 0.9);
+    if (this.audio) { try { this.audio.impact(); } catch (e) {} }
+    return true;
+  }
+
+  explodeNade(g) {
+    if (g.dead) return;
+    g.dead = true;
+    const pos = g.mesh.position.clone();
+    this.spark(pos, 0xffe0a0, 40, 7.5);
+    this.spark(pos, 0xff7a2a, 30, 5.5);
+    this.burst(pos, 16);
+    if (this.audio) { try { this.audio.impact(); } catch (e) {} }
+    for (const e of this.enemies) {
+      if (!e.root) continue;
+      const d = e.root.position.distanceTo(pos);
+      if (d > 5.8) continue;
+      const dir = new THREE.Vector3().subVectors(e.root.position, pos).normalize();
+      e.hit(9, dir);
+    }
+  }
+
   applyPickup(kind, pos) {
     if (kind === 'ammo') {
       this.ammo = AMMO;
@@ -284,6 +325,9 @@ export class Game {
     } else if (kind === 'score') {
       this.score += 250;
       this.hud.banner('PUNTOS', '+250', 1.0);
+    } else if (kind === 'grenade') {
+      this.grenades += 2;
+      this.hud.banner('GRANADAS x2', 'AGARRA CON FUERZA PARA LANZAR', 1.6);
     } else if (kind === 'weapon') {
       this.overT = OVER_TIME;
       this.hud.banner('SOBRECARGA', 'DAÑO +2 · 12 s', 1.4);
@@ -484,15 +528,41 @@ export class Game {
       if (d.life <= 0) { this.scene.remove(d.mesh); this.debris.splice(i, 1); }
     }
 
+    // granadas de la mano libre
+    for (let i = this.nades.length - 1; i >= 0; i--) {
+      const g = this.nades[i];
+      g.t += dt;
+      g.vel.y -= dt * 12;
+      g.mesh.position.addScaledVector(g.vel, dt);
+      g.mesh.rotation.x += dt * 7; g.mesh.rotation.z += dt * 5;
+      if (g.mesh.position.y < 0.08) {
+        g.mesh.position.y = 0.08;
+        g.vel.y = Math.abs(g.vel.y) * 0.4;
+        g.vel.x *= 0.68; g.vel.z *= 0.68;
+      }
+      g.glow.material.opacity = 0.45 + Math.sin(g.t * 30) * 0.3;
+      if (g.t > 1.25) this.explodeNade(g);
+      if (g.dead) { this.scene.remove(g.mesh); this.nades.splice(i, 1); }
+    }
+
     // enemigos
     this.railSpeed = 2.7 + Math.min(3.4, this.wave * 0.32);
     const playerPos = { x: this.rig.position.x, z: this.rig.position.z };
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
-      // avance en riel: el enemigo se acerca hasta su distancia de combate
-      const hold = e.railHold != null ? e.railHold : 4.5;
-      if (e.radius > hold) {
-        e.radius = Math.max(hold, e.radius - dt * (this.railSpeed * 0.7 + 1.4));
+      // arrastre del riel: el escenario avanza y se lleva a los enemigos con él
+      const scroll = this.railSpeed * dt;
+      if (e.kind === 'cam') {
+        // la cámara va pegada al muro hasta plantarse delante del jugador
+        e.root.position.z += scroll;
+        const stopZ = playerPos.z - 8.6;
+        if (e.root.position.z > stopZ) e.root.position.z = stopZ;
+      } else if (e.kind === 'drone' || e.isBoss) {
+        // el dron cierra distancia de verdad: el riel le come el radio de vuelo
+        e.radius = Math.max(e.isBoss ? 3.6 : 2.35, e.radius - scroll * (e.isBoss ? 0.3 : 0.55));
+      } else {
+        // los de tierra cabalgan el corredor además de caminar
+        e.root.position.z += scroll;
       }
       const evs = e.update(dt, t, playerPos) || [];
       // candado de riel: siempre dentro del corredor y por delante del jugador
@@ -581,6 +651,15 @@ export class Game {
     this.hud.update(dt);
   }
 
+  burst(pos, n = 14) {
+    for (const d of makeDebris(this.shared, pos, n)) {
+      if (!d.kind) d.kind = 'frag';
+      d.max = d.life;
+      this.scene.add(d.mesh);
+      this.debris.push(d);
+    }
+  }
+
   killEnemy(e, pos) {
     this.kills++;
     const pts = (e.isBoss ? 600 : 120) * Math.max(1, Math.floor(this.wave / 2) + 1);
@@ -588,6 +667,8 @@ export class Game {
     this.hud.setState(this.hp, this.ammo, this.wave, this.score);
     this.spark(pos, 0x9fe0ff, 26, 4.2);
     this.spark(pos, 0xffb066, 18, 3.2);
+    this.burst(pos, e.isBoss ? 30 : 15);
+    this.spark(pos, 0xffffff, e.isBoss ? 34 : 16, 6.0);
     if (this.audio) this.audio.explode();
     if (e.isBoss && this.hp < PLAYER_HP) {
       this.hp++;

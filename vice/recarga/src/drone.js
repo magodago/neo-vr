@@ -221,10 +221,13 @@ export class Drone {
     let moving = 0;
     if (this.state === 'approach' || this.state === 'recover') {
       // riel: deriva lateral acotada, nunca orbita alrededor del jugador
-      this.angle += this.strafeDir * dt * 0.06;
-      if (this.angle > 0.22) { this.angle = 0.22; this.strafeDir = -1; }
-      if (this.angle < -0.22) { this.angle = -0.22; this.strafeDir = 1; }
-      // avanza siempre hacia el jugador: nunca se queda acumulado al fondo
+      this.angle += this.strafeDir * dt * 0.34;
+      if (this.angle > 0.5) { this.angle = 0.5; this.strafeDir = -1; }
+      if (this.angle < -0.5) { this.angle = -0.5; this.strafeDir = 1; }
+      // cierra distancia de forma continua: nunca se queda flotando al fondo
+      if (this.state === 'approach') {
+        this.radius = Math.max(this.isBoss ? 3.4 : 2.3, this.radius - dt * 0.55);
+      }
       const targetR = Math.min(this.radius, 3.3);
       if (dist > targetR + 0.4) moving = this.speed;
       else if (dist < targetR - 0.9) moving = -this.speed * 0.7;
@@ -252,7 +255,7 @@ export class Drone {
     if (this.state === 'stunned' && this.stateT > 0.85) { this.state = 'approach'; this.stateT = 0; }
 
     // altura
-    const hoverY = this.baseY + Math.sin(t * 2.4 + this.phase) * 0.07;
+    const hoverY = this.baseY + Math.sin(t * 1.9 + this.phase) * 0.15 + Math.sin(t * 4.3 + this.phase * 2) * 0.05;
     pos.y += (hoverY - pos.y) * Math.min(1, dt * 3.2);
     // empuje residual
     if (this.wobble.lengthSq() > 1e-5) {

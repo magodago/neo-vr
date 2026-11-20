@@ -31,6 +31,16 @@ function cylMesh(rt, rb, h, mat, seg = 12) {
   return new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
 }
 
+// halo aditivo: sin post-proceso, el emisivo necesita un sprite para "florecer"
+function halo(tex, color, scale) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, color, transparent: true, opacity: 0.9,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  s.scale.setScalar(scale);
+  return s;
+}
+
 // ------------------------------------------------------------ androide
 export class GroundBot {
   constructor(scene, audio, shared, opts = {}) {
@@ -47,7 +57,7 @@ export class GroundBot {
     this.flashT = 0;
     this.phase = Math.random() * 6.28;
     this.hold = 5.0 + Math.random() * 2.5;
-    this.fireT = 1.2 + Math.random() * 1.4;
+    this.fireT = 0.75 + Math.random() * 0.8;
     this.chargeT = 0;
     this.lane = (Math.random() * 2 - 1) * 1.15;
     this.hitR = 0.62;   // esfera de impacto a la altura del torso
@@ -250,11 +260,15 @@ export class GroundBot {
     const evs = [];
     if (this.state === 'dying') {
       this.deathT += dt;
-      const k = Math.min(1, this.deathT / 1.0);
-      this.root.rotation.x = k * (Math.PI / 2) * 0.92;
-      this.root.position.y = 1.42 - k * 0.55;
-      this.mats.eye.emissiveIntensity = Math.max(0, 3.4 * (1 - k * 1.6));
-      this.mats.core.emissiveIntensity = Math.max(0, 2.4 * (1 - k * 1.8));
+      // muerte explosiva: sacudida, sobreiluminación y reventón (nada de volcar despacio)
+      const k = Math.min(1, this.deathT / 0.24);
+      const j = 1 - k;
+      this.root.position.x += (Math.random() - 0.5) * 0.10 * j;
+      this.root.position.z += (Math.random() - 0.5) * 0.10 * j;
+      this.root.rotation.z = (Math.random() - 0.5) * 0.4 * j;
+      this.root.scale.setScalar(1 + k * 0.4);
+      this.mats.eye.emissiveIntensity = 3.4 + k * 30;
+      this.mats.core.emissiveIntensity = 2.4 + k * 26;
       if (k >= 1) {
         evs.push({ type: 'kill', pos: this.root.position.clone().setY(0.6) });
         this.scene.remove(this.root);
@@ -328,9 +342,11 @@ export class GroundBot {
     if (this.fireT <= 0 && dist < 18) {
       this.chargeT += dt;
       this.mats.eye.emissiveIntensity = 4 + Math.sin(t * 40) * 1.2;
+      if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.55 + this.chargeT * 1.5);
       if (this.chargeT > 0.5) {
         this.chargeT = 0;
-        this.fireT = 1.7 + Math.random() * 1.0;
+        if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.55);
+        this.fireT = 1.0 + Math.random() * 0.6;
         // ráfaga de 2
         const from = _v.setFromMatrixPosition(this.muzzle.matrixWorld).clone();
         const target = _v2.set(px + (Math.random() - 0.5) * 0.5, 1.35 + (Math.random() - 0.5) * 0.35, pz + 1.0);
@@ -354,12 +370,13 @@ export class LaserCam {
     this.audio = audio;
     this.maxHp = this.hp = opts.hp || 2;
     this.isBoss = false;
+    this.shared = shared;
     this.state = 'idle';
     this.dead = false;
     this.deathT = 0;
     this.flashT = 0;
     this.side = opts.side || (Math.random() < 0.5 ? -1 : 1);
-    this.fireT = 2.0 + Math.random() * 1.2;
+    this.fireT = 1.3 + Math.random() * 0.7;
     this.chargeT = 0;
     this.hitR = 0.46;
     this.root = new THREE.Group();
@@ -396,6 +413,11 @@ export class LaserCam {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.135, 0.012, 8, 20), this.eyeMat);
     ring.position.set(0, 0, 0.36);
     g.add(ring);
+    // halo del ojo: crece al cargar el disparo
+    const eyeGlow = halo(this.shared && this.shared.glow, 0xff2a3a, 0.55);
+    eyeGlow.position.set(0, 0, 0.44);
+    g.add(eyeGlow);
+    this.eyeGlow = eyeGlow;
     // antena y LED de estado
     g.add(boxMesh(0.02, 0.16, 0.02, m.chrome, 0.16, 0.24, -0.1));
     const led = boxMesh(0.04, 0.04, 0.04, m.core, -0.16, 0.19, 0.1);
@@ -468,7 +490,7 @@ export class LaserCam {
     this.fireT -= dt;
     if (this.fireT <= 0.55) this.chargeT += dt;
     if (this.fireT <= 0) {
-      this.fireT = 2.4 + Math.random() * 1.1;
+      this.fireT = 1.4 + Math.random() * 0.6;
       this.chargeT = 0;
       this.root.updateMatrixWorld(true);
       const from = new THREE.Vector3(0, 0, 0.42).applyMatrix4(this.root.matrixWorld);

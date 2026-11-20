@@ -228,12 +228,13 @@ function bindHands() {
     const isGun = src.handedness === gunHand;
     if (src.handedness === 'right') { rightIdx = i; rightSource = src; }
     else if (src.handedness === 'left') { leftIdx = i; leftSource = src; }
-    if (isGun) { gunGrip = grip; gunSource = src; } else whipGrip = grip;
+    // el arma va en el espacio de puntería (ray): el cañón queda alineado con el rayo
+    if (isGun) { gunGrip = ray; gunSource = src; } else whipGrip = grip;
     ray.addEventListener('selectstart', isGun ? onFire : onWhip);
-    ray.addEventListener('squeezestart', isGun ? () => game.reload() : onWhip);
+    ray.addEventListener('squeezestart', isGun ? () => game.reload() : onNade);
     ray.addEventListener('connected', () => { if (ray.children.length === 0) ray.add(makeRay(isGun ? 0.55 : 0.45, isGun ? 0x9fe0ff : 0xff9f43, 0.26)); });
   });
-  if (!gunGrip) gunGrip = renderer.xr.getControllerGrip(gunHand === 'left' ? leftIdx : rightIdx);
+  if (!gunGrip) gunGrip = renderer.xr.getController(gunHand === 'left' ? leftIdx : rightIdx);
   if (!whipGrip) whipGrip = renderer.xr.getControllerGrip(gunHand === 'left' ? rightIdx : leftIdx);
   if (bracer.group.parent !== whipGrip) whipGrip.add(bracer.group);
   mountGun();
@@ -287,6 +288,16 @@ function onWhip() {
   bracer.core.scale.setScalar(2.2);
 }
 
+// mano libre: agarra con fuerza para lanzar granada
+function onNade() {
+  if (!game) return;
+  const h = whipGrip || gripL;
+  h.getWorldPosition(_hp);
+  h.getWorldDirection(_hd);
+  const p = toPlayPos(_hp), d = toPlayDir(_hd);
+  if (!game.throwGrenade(p, d)) game.tryWhip(p, d);
+}
+
 // ---------------------------------------------------------------- escritorio
 const keys = new Set();
 let desktop = false;
@@ -317,6 +328,7 @@ function startDesktop() {
     keys.add(e.code);
     if (e.code === 'KeyR') onWhip();
     if (e.code === 'KeyE') onWhip();
+    if (e.code === 'KeyG') onNade();
     if (e.code === 'Space') onFire();
   });
   window.addEventListener('keyup', (e) => keys.delete(e.code));

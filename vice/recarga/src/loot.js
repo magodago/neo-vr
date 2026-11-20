@@ -7,7 +7,8 @@ const KINDS = [
   { kind: 'ammo', color: 0x49e6ff, weight: 34, label: 'MUNICIÓN' },
   { kind: 'hp', color: 0x63ff9d, weight: 24, label: 'VIDA' },
   { kind: 'score', color: 0xffc247, weight: 30, label: 'PUNTOS' },
-  { kind: 'weapon', color: 0xff4fd8, weight: 12, label: 'SOBRECARGA' }
+  { kind: 'weapon', color: 0xff4fd8, weight: 12, label: 'SOBRECARGA' },
+  { kind: 'grenade', color: 0xff7a2a, weight: 16, label: 'GRANADAS' }
 ];
 
 function crateTexture() {
@@ -132,18 +133,27 @@ export class Loot {
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const p = this.pickups[i];
       p.t += dt; p.life -= dt;
-      p.vel.y -= dt * 3.4;
-      p.root.position.addScaledVector(p.vel, dt);
-      if (p.root.position.y < 0.5) { p.root.position.y = 0.5; p.vel.y = Math.abs(p.vel.y) * 0.35; p.vel.multiplyScalar(0.9); }
-      p.root.rotation.y += dt * 2.4;
-      p.root.children[1].scale.setScalar(1 + Math.sin(this.time * 6) * 0.12);
-      // imán hacia el jugador
-      const d = p.root.position.distanceTo(playerPos);
-      if (d < 3.6) {
-        const dir = new THREE.Vector3().subVectors(playerPos, p.root.position).normalize();
-        p.root.position.addScaledVector(dir, dt * (3.0 + (3.6 - d) * 1.6));
+      p.root.children[1].scale.setScalar(1 + Math.sin(this.time * 8) * 0.16);
+      // imán: en cuanto la mejora está suelta vuela al jugador, sin gravedad
+      const dh = Math.hypot(playerPos.x - p.root.position.x, playerPos.z - p.root.position.z);
+      if (dh < 6.5) p.pulling = true;
+      if (p.pulling) {
+        const dir = new THREE.Vector3().subVectors(playerPos, p.root.position);
+        const dd = dir.length();
+        if (dd > 1e-4) {
+          dir.multiplyScalar(1 / dd);
+          p.root.position.addScaledVector(dir, dt * (5.5 + Math.max(0, 6.5 - dh) * 2.4));
+        }
+        p.root.rotation.y += dt * 11;
+        p.root.rotation.x += dt * 6;
+      } else {
+        p.vel.y -= dt * 3.4;
+        p.root.position.addScaledVector(p.vel, dt);
+        if (p.root.position.y < 0.5) { p.root.position.y = 0.5; p.vel.y = Math.abs(p.vel.y) * 0.35; p.vel.multiplyScalar(0.9); }
+        p.root.rotation.y += dt * 2.4;
       }
-      if (d < 0.55 || p.life <= 0) {
+      const d = p.root.position.distanceTo(playerPos);
+      if (d < 0.95 || p.life <= 0) {
         if (p.life > 0) evs.push({ type: 'pickup', kind: p.kind, pos: p.root.position.clone() });
         this.scene.remove(p.root);
         this.pickups.splice(i, 1);

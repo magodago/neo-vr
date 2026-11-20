@@ -220,7 +220,7 @@ export class Weapon {
   // empuñadura vertical alineada con el mando, cañón horizontal al frente
   handPose(side = 1) {
     return {
-      pos: new THREE.Vector3(0.004 * side, 0.0, -0.012),
+      pos: new THREE.Vector3(0.004 * side, -0.022, 0.052),
       rot: new THREE.Euler(0.015, -0.05 * side, 0.02 * side)
     };
   }
