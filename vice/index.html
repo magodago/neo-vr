@@ -660,14 +660,19 @@ const mesh = new SplatMesh({
     splat = m;
     cityGroup.add(m);
     // el .splat viene desplazado respecto a su propio origen (z -2.0..-0.6):
-    // lo centramos y lo apoyamos en y=0 para que la colocacion sea predecible
-    try {
-      const bb = m.getBoundingBox(true);
-      const c = bb.getCenter(new THREE.Vector3());
-      cityGroup.position.set(-c.x, -bb.min.y, -c.z);
-      cityGroup.userData.size = bb.getSize(new THREE.Vector3());
-      console.log("bbox", cityGroup.userData.size.toArray().map(n=>+n.toFixed(2)));
-    } catch (err) { console.warn("bbox", err); }
+    // lo centramos y lo apoyamos en y=0 para que la colocacion sea predecible.
+    // OJO: getBoundingBox exige la malla inicializada, por eso el await.
+    (async () => {
+      try {
+        await m.initialized;
+        const bb = m.getBoundingBox(true);
+        const c = bb.getCenter(new THREE.Vector3());
+        cityGroup.position.set(-c.x, -bb.min.y, -c.z);
+        cityGroup.userData.size = bb.getSize(new THREE.Vector3());
+        placeStage();
+        console.log("bbox", cityGroup.userData.size.toArray().map(n=>+n.toFixed(2)));
+      } catch (err) { console.warn("bbox", err); }
+    })();
     barEl.style.width = "100%";
     pctEl.textContent = "LISTO";
     loaded = true;
