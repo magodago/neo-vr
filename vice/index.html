@@ -134,7 +134,7 @@
   var headset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(UA);
   var diag = document.getElementById("diag");
   if (!diag) return;
-  var want = headset || /[?&]diag=1/.test(location.search);
+  var want = !/[?&]diag=0/.test(location.search);
   if (want) diag.classList.add("on");
   var lines = [];
   function log(m){
@@ -142,7 +142,7 @@
     if (diag) diag.textContent = lines.join("\n");
   }
   window.__dbgLog = log;
-  log("boot · xr:" + (!!navigator.xr) + " · " + UA.slice(0, 38));
+  log("boot · xr:" + (!!navigator.xr) + " · " + (headset ? "visor" : "PANTALLA PLANA") + " · " + UA.slice(0, 30));
   window.addEventListener("error", function (e) {
     log("ERROR " + (e.message || e.type) + " @ " + String(e.filename || "").split("/").pop() + ":" + (e.lineno || ""));
   });
@@ -1043,6 +1043,10 @@ btn.addEventListener("click", (e) => {
   audio();
   startReveal();
 });
+
+document.getElementById("xr").addEventListener("click", () => {
+  sparkXr.mode = "immersive-ar";
+}, true);
 
 const xrVrBtn = document.getElementById("xrvr");
 xrVrBtn.addEventListener("click", (e) => {
