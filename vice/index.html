@@ -46,6 +46,24 @@
   #enter[disabled],#xr[disabled]{ opacity:.35; pointer-events:none; }
   .row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
   #note{ font-size:10.5px; letter-spacing:.2em; color:#4e5273; text-transform:uppercase; max-width:40ch; line-height:1.8; }
+
+  /* boton MR persistente: vive fuera del velo para que no desaparezca al cargar */
+  #xrhud{
+    position:fixed; left:0; right:0; bottom:70px; z-index:30;
+    display:flex; justify-content:center; pointer-events:none;
+  }
+  #xrhud.off{ display:none; }
+  #xrhud #xr{
+    margin:0; padding:19px 46px; pointer-events:auto;
+    font-size:12.5px; letter-spacing:.30em;
+    box-shadow:0 0 0 1px rgba(255,43,214,.5), 0 0 70px -8px rgba(255,43,214,.9);
+    animation:mrpulse 2.4s ease-in-out infinite;
+  }
+  #xrhud #xr small{
+    display:block; margin-top:7px; font-size:8.5px; letter-spacing:.22em;
+    color:rgba(255,255,255,.55);
+  }
+  @keyframes mrpulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.035); } }
   #badge{
     position:fixed; top:18px; left:18px; z-index:10; font-size:9.5px; letter-spacing:.36em;
     text-transform:uppercase; color:rgba(255,255,255,.42); opacity:0; transition:opacity 1s ease .4s;
@@ -75,10 +93,13 @@
   <div id="track"><div id="bar"></div></div>
   <div id="pct">0 %</div>
   <div class="row">
-    <button id="xr" style="display:none" disabled>Entrar en el visor</button>
     <button id="enter" disabled>Ver en pantalla</button>
   </div>
   <div id="note">Quest 3 · WebXR · passthrough real</div>
+</div>
+
+<div id="xrhud" class="off">
+  <button id="xr" disabled>ENTRAR EN MR</button>
 </div>
 
 <div id="badge">SHARP · SPARK · 385K</div>
@@ -170,6 +191,7 @@ const gridMat = new THREE.ShaderMaterial({
   transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
   uniforms:{
     uT:{ value:0 },
+    uK:{ value:1 },
     uA:{ value:new THREE.Color("#ff2bd6") },
     uB:{ value:new THREE.Color("#28e6ff") }
   },
@@ -178,7 +200,7 @@ const gridMat = new THREE.ShaderMaterial({
     void main(){ vP = position.xy; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }
   `,
   fragmentShader:`
-    varying vec2 vP; uniform float uT; uniform vec3 uA; uniform vec3 uB;
+    varying vec2 vP; uniform float uT; uniform float uK; uniform vec3 uA; uniform vec3 uB;
     void main(){
       vec2 p = vP * 2.0;
       vec2 g = abs(fract(p) - 0.5) / max(fwidth(p), vec2(1e-4));
@@ -187,7 +209,7 @@ const gridMat = new THREE.ShaderMaterial({
       float fade = smoothstep(9.0, 1.5, r);
       float sw = 0.72 + 0.28 * sin(uT * 1.4 - r * 1.7);
       vec3 col = mix(uA, uB, smoothstep(0.0, 6.5, r));
-      gl_FragColor = vec4(col * line * fade * sw * 1.6, line * fade * 0.5);
+      gl_FragColor = vec4(col * line * fade * sw * 1.6 * uK, line * fade * 0.5 * uK);
     }
   `
 });
@@ -209,6 +231,19 @@ halo.rotation.x = -Math.PI / 2;
 halo.position.y = -0.42;
 halo.visible = false;
 stage.add(halo);
+
+// sombra de contacto: en MR ancla la maqueta al suelo real (sin ella el splat "flota")
+const contact = new THREE.Mesh(
+  new THREE.PlaneGeometry(3.0, 3.0),
+  new THREE.MeshBasicMaterial({
+    map: radialTexture("rgba(0,0,0,0.95)", "rgba(0,0,0,0.45)"),
+    transparent:true, opacity:0.66, depthWrite:false
+  })
+);
+contact.rotation.x = -Math.PI / 2;
+contact.position.y = -0.435;
+contact.visible = false;
+stage.add(contact);
 
 // polvo flotante
 const dustN = 620, dustPos = new Float32Array(dustN * 3), dustCol = new Float32Array(dustN * 3);
@@ -549,6 +584,7 @@ const pctEl = document.getElementById("pct");
 const veil  = document.getElementById("veil");
 const btn   = document.getElementById("enter");
 const xrBtn = document.getElementById("xr");
+const xrHud = document.getElementById("xrhud");
 const badge = document.getElementById("badge");
 const hintEl= document.getElementById("hint");
 
@@ -603,10 +639,18 @@ let placed = false;
 let placedXr = false;
 function placeStage(){
   const p = camPose();
-  stage.position.copy(p).addScaledVector(fwd, 2.4);
-  stage.position.y = Math.max(0.55, p.y - 0.55);
+  const xr = renderer.xr.isPresenting;
+  const d = xr ? 2.0 : 2.4;
+  stage.position.copy(p).addScaledVector(fwd, d);
+  // en MR la maqueta se apoya en el suelo real (local-floor y=0); en pantalla flota a la vista
+  stage.position.y = xr ? 0.02 : Math.max(0.55, p.y - 0.55);
   stage.rotation.y = Math.atan2(fwd.x, fwd.z);
   stage.userData.baseY = stage.rotation.y;
+  // el halo y la sombra siguen la base: pegados al suelo en MR, flotando en pantalla
+  halo.position.y = xr ? -0.015 : -0.42;
+  contact.position.y = xr ? -0.012 : -0.435;
+  contact.visible = xr;
+  gridMat.uniforms.uK.value = xr ? 0.55 : 1.0;
 
   prop.position.copy(p).addScaledVector(fwd, 1.05);
   prop.position.y = p.y - 0.10;
@@ -666,7 +710,9 @@ function toBurst(){
   stage.scale.setScalar(0.02);
   stage.rotation.y = stage.userData.baseY + 0.9;
   stage.userData.final = stage.position.clone();
-  stage.userData.final.y = Math.max(0.55, camera.getWorldPosition(new THREE.Vector3()).y - 0.55);
+  stage.userData.final.y = renderer.xr.isPresenting
+    ? 0.02
+    : Math.max(0.55, camera.getWorldPosition(new THREE.Vector3()).y - 0.55);
 }
 
 const CASE_FADE = { v: 1 };
@@ -732,8 +778,8 @@ function updateReveal(dt, now){
       halo.visible = true;
       sfxPad();
       hintEl.classList.add("on");
-      hintEl.innerHTML = XR_ON
-        ? "camina alrededor · gatillos para mover<br />los dos gatillos escalan · a entra dentro"
+      hintEl.innerHTML = renderer.xr.isPresenting
+        ? "la ciudad está en tu suelo · camina alrededor<br />agarra con los laterales para mover · los dos laterales escalan · gatillo = entrar dentro"
         : "arrastra para orbitar · rueda para acercarte · clic para el ritual";
     }
   }
@@ -809,17 +855,23 @@ function updateGrab(){
 const insideAnim = { active:false, t:0, from:null, to:null };
 function toggleInside(){
   if (rev.state !== "done") return;
+  const xr = renderer.xr.isPresenting;
   insideMode = !insideMode;
   const p = camera.getWorldPosition(new THREE.Vector3());
   if (insideMode){
     insideAnim.active = true; insideAnim.t = 0;
     insideAnim.from = { pos: stage.position.clone(), scale: stage.scale.x, rot: stage.rotation.y };
-    insideAnim.to = { pos: new THREE.Vector3(p.x, p.y - 1.45, p.z), scale: 4.0, rot: stage.rotation.y + Math.PI };
+    // MR: la ciudad crece desde tu suelo hasta envolver la sala -> entras dentro andando
+    insideAnim.to = xr
+      ? { pos: new THREE.Vector3(p.x, 0.02, p.z), scale: 6.0, rot: stage.rotation.y }
+      : { pos: new THREE.Vector3(p.x, p.y - 1.45, p.z), scale: 4.0, rot: stage.rotation.y + Math.PI };
   } else {
     insideAnim.active = true; insideAnim.t = 0;
     insideAnim.from = { pos: stage.position.clone(), scale: stage.scale.x, rot: stage.rotation.y };
     insideAnim.to = { pos: stage.userData.final.clone(), scale: 1, rot: stage.userData.baseY };
   }
+  // la sombra de contacto solo tiene sentido con la maqueta a escala 1 sobre el suelo
+  contact.visible = xr && !insideMode;
 }
 function updateInside(dt){
   if (!insideAnim.active) return;
@@ -840,13 +892,20 @@ const sparkXr = new SparkXr({
   referenceSpaceType: "local-floor",
   enableHands: false,
   onReady: (supported) => {
+    const headset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(navigator.userAgent || "");
     if (!supported){
-      document.getElementById("note").textContent =
-        "este dispositivo no tiene WebXR · vista previa en pantalla";
+      document.getElementById("note").textContent = headset
+        ? "este navegador no ofrece MR · abre la url https en el visor"
+        : "este dispositivo no tiene WebXR · vista previa en pantalla";
+      if (headset){
+        hintEl.classList.add("on");
+        hintEl.innerHTML = "sin WebXR en este navegador<br />abre esta misma url (https) dentro del visor";
+      }
     } else {
       btn.style.display = "none";
-      document.getElementById("note").textContent =
-        "ponte el visor · passthrough real";
+      xrHud.classList.remove("off");
+      xrBtn.innerHTML = "ENTRAR EN MR<small>visión pasante real · sin web</small>";
+      document.getElementById("note").textContent = "WebXR listo · sesión inmersiva real";
     }
     btn.disabled = !loaded;
     xrBtn.disabled = !loaded;
