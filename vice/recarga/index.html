@@ -10,8 +10,9 @@
   html,body{margin:0;height:100%;background:var(--bg);color:#e8eef7;font-family:"Helvetica Neue",Arial,sans-serif;overflow:hidden}
   #boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
         gap:18px;z-index:10;background:
-        radial-gradient(circle at 50% 38%,rgba(61,155,255,.14),transparent 58%),
-        linear-gradient(180deg,#070910,#04060a 70%)}
+        radial-gradient(ellipse at 50% 46%,rgba(4,6,10,.22) 0%,rgba(4,6,10,.58) 46%,rgba(3,4,8,.9) 80%),
+        linear-gradient(180deg,rgba(6,8,14,.38),rgba(3,5,9,.82) 74%);
+        backdrop-filter:blur(2.5px) saturate(1.15);-webkit-backdrop-filter:blur(2.5px) saturate(1.15)}
   #boot.hide{opacity:0;pointer-events:none;transition:opacity .7s ease}
   .kicker{font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:#7f93ad}
   h1{margin:0;font-size:clamp(46px,13vw,104px);line-height:.86;letter-spacing:-.02em;font-weight:800;
@@ -38,8 +39,6 @@
   #bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,var(--cy),var(--mg));transition:width .3s}
   #msg{min-height:16px;font-size:12px;color:#7f93ad;letter-spacing:.06em}
   #msg.bad{color:#ff6b81}
-  .foot{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.3em;
-        text-transform:uppercase;color:#42536a;pointer-events:none}
   canvas{display:block}
 </style>
 </head>
@@ -60,7 +59,7 @@
   </div>
   <div id="msg"></div>
 </div>
-<div class="foot">Quest 3 · WebXR · standalone</div>
+
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/jsm/" } }
 </script>

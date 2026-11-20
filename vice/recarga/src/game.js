@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { Drone, makeDebris } from './drone.js';
+import { GroundBot, LaserCam } from './enemies.js';
+import { Loot } from './loot.js';
 
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
 const _v3 = new THREE.Vector3();
 
 const ARENA = 6.35;          // media anchura jugable
+const OVER_TIME = 12;        // segundos de sobrecarga
 const AMMO = 6;
 const PLAYER_HP = 5;
 
@@ -34,6 +37,10 @@ export class Game {
     this.combo = 0;
     this.comboT = 0;
     this.kills = 0;
+    this.overT = 0;
+    this.railSpeed = 3.0;
+    this._pv = new THREE.Vector3();
+    this.loot = new Loot(this.scene, this.audio, this.shared);
 
     this._initTracers();
   }
@@ -79,6 +86,8 @@ export class Game {
 
   reset() {
     this.enemies.forEach(e => { e.dispose(); });
+    if (this.loot) this.loot.disposeAll();
+    this.overT = 0;
     this.enemies.length = 0;
     for (const p of this.projectiles) this.scene.remove(p.mesh, p.glow, p.core);
     this.projectiles.length = 0;
@@ -105,23 +114,61 @@ export class Game {
 
     if (boss) this.hud.banner(`OLEADA ${this.wave}`, 'UNIDAD PESADA DETECTADA', 3.0);
     else this.hud.banner(`OLEADA ${this.wave}`, `OBJETIVOS: ${n}`, 2.4);
+    // cajas de suministros repartidas por el corredor
+    const nc = 1 + (this.wave > 2 ? 1 : 0);
+    for (let i = 0; i < nc; i++) this.loot.spawnCrate(-23 - i * 7 - Math.random() * 3);
     if (this.audio) this.audio.waveStart();
     this.hud.setState(this.hp, this.ammo, this.wave, this.score);
   }
 
   spawnEnemy(boss) {
-    const hp = boss ? 14 + this.wave * 2 : Math.min(5, 2 + Math.floor(this.wave / 4));
-    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 1.15 });
+    const wave = this.wave;
+
+    // --- jefe de oleada: dron pesado acorazado
     if (boss) {
+      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 1.15 });
       d.root.scale.setScalar(0.02);
       d.isBoss = true;
       d.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      d.angle = (Math.random() * 2 - 1) * 0.13;
+      d.radius = 20;
+      d.railHold = 9.0;
+      d.root.position.set(-Math.sin(d.angle) * d.radius, d.baseY + 1.2, -Math.cos(d.angle) * d.radius);
+      this.enemies.push(d);
+      return;
     }
+
+    // --- reparto de tipos: androides desde la oleada 2, cámaras desde la 3
+    const r = Math.random();
+    let type = 'drone';
+    if (wave >= 2 && r < 0.36) type = 'bot';
+    else if (wave >= 3 && r < 0.55) type = 'cam';
+
+    if (type === 'bot') {
+      const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 4 + Math.floor(wave / 3) });
+      b.root.position.z = -19 - Math.random() * 7;
+      b.root.position.x = (Math.random() * 2 - 1) * 1.5;
+      b.hold = 4.6 + Math.random() * 2.4;
+      this.enemies.push(b);
+      return;
+    }
+    if (type === 'cam') {
+      const c = new LaserCam(this.scene, this.audio, this.shared, {
+        hp: 2, side: Math.random() < 0.5 ? -1 : 1, z: -21 - Math.random() * 7
+      });
+      c.kind = 'cam';
+      c.radius = 999; c.railHold = 999;
+      this.enemies.push(c);
+      return;
+    }
+
+    const hp = Math.min(6, 2 + Math.floor(wave / 3));
+    const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 1.15 });
     // modo riel: entra por el fondo del corredor y avanza hacia el jugador
-    d.angle = (Math.random() * 2 - 1) * 0.13;
-    d.radius = boss ? 20 : 15 + Math.random() * 9;
-    d.railHold = boss ? 9.0 : 4.6 + Math.random() * 1.8;
-    // recolocar en el fondo del corredor con el radio real de entrada
+    d.angle = (Math.random() * 2 - 1) * 0.22;
+    d.radius = 13 + Math.random() * 9;
+    d.railHold = 3.4 + Math.random() * 2.2;
+    d.lane = (Math.random() * 2 - 1) * 1.5;
     d.root.position.set(
       -Math.sin(d.angle) * d.radius,
       d.baseY + 1.2,
@@ -148,12 +195,28 @@ export class Game {
       this.reloadT = 1.5; // recarga automática de cortesía
     }
 
+    // cajas de suministros (antes que los enemigos: están pegadas a las paredes)
+    const crateHit = this.loot.shoot(new THREE.Ray(origin.clone(), dir.clone()));
+    if (crateHit) {
+      this.spawnTracer(origin, crateHit.pos);
+      this.spark(crateHit.pos, 0xffc06a, crateHit.destroyed ? 20 : 9, crateHit.destroyed ? 3.2 : 2.2);
+      if (crateHit.destroyed) {
+        this.score += 50;
+        this.hud.banner('SUMINISTROS', 'CAJA DESTRUIDA', 1.1);
+      }
+      this.hud.setState(this.hp, this.ammo, this.wave, this.score);
+      return true;
+    }
+
     // impacto en enemigos (rayo-esfera)
     let best = null, bestT = Infinity, bestPoint = null;
+    const hc = new THREE.Vector3();
     for (const e of this.enemies) {
       if (e.dead || e.state === 'dying') continue;
-      const r = e.isBoss ? 1.05 : 0.66;
-      _v1.copy(e.root.position).sub(origin);
+      const r = e.hitR || (e.isBoss ? 1.05 : 0.66);
+      hc.copy(e.root.position);
+      if (e.hitCenter) hc.add(e.hitCenter);
+      _v1.copy(hc).sub(origin);
       const tca = _v1.dot(dir);
       if (tca < 0) continue;
       const d2 = _v1.lengthSq() - tca * tca;
@@ -164,12 +227,15 @@ export class Game {
 
     if (best) {
       // daño real: el centro del cuerpo mata de un tiro, el borde hace 2
-      const rad = best.isBoss ? 1.05 : 0.66;
-      _v2.copy(best.root.position).sub(origin);
+      const rad = best.hitR || (best.isBoss ? 1.05 : 0.66);
+      hc.copy(best.root.position);
+      if (best.hitCenter) hc.add(best.hitCenter);
+      _v2.copy(hc).sub(origin);
       const along = _v2.dot(dir);
       const perp = Math.sqrt(Math.max(0, _v2.lengthSq() - along * along));
       const crit = perp < rad * 0.45;
-      const killed = best.hit(crit ? 3 : 2, dir);
+      const dmg = (crit ? 3 : 2) + (this.overT > 0 ? 2 : 0);
+      const killed = best.hit(dmg, dir);
       const p = bestPoint;
       this.spark(p, killed ? 0xfff0c4 : 0xffd9a0, killed ? 18 : 10, killed ? 3.4 : 2.6);
       this.hud.hit(crit || killed);
@@ -203,6 +269,28 @@ export class Game {
     this.spark(hit, 0xbfe6ff, 7, 1.8);
     if (this.audio) this.audio.impact();
     return true;
+  }
+
+  applyPickup(kind, pos) {
+    if (kind === 'ammo') {
+      this.ammo = AMMO;
+      this.weapon.setSpent(false);
+      this.hud.setAmmo(this.ammo, false);
+      this.hud.banner('MUNICIÓN', 'CARGADOR LLENO', 1.0);
+    } else if (kind === 'hp') {
+      this.hp = Math.min(PLAYER_HP, this.hp + 1);
+      this.hud.setHealth(this.hp, PLAYER_HP);
+      this.hud.banner('VIDA', '+1 INTEGRIDAD', 1.0);
+    } else if (kind === 'score') {
+      this.score += 250;
+      this.hud.banner('PUNTOS', '+250', 1.0);
+    } else if (kind === 'weapon') {
+      this.overT = OVER_TIME;
+      this.hud.banner('SOBRECARGA', 'DAÑO +2 · 12 s', 1.4);
+    }
+    this.spark(pos, 0x9fffe0, 14, 3.0);
+    if (this.audio) this.audio.reload();
+    this.hud.setState(this.hp, this.ammo, this.wave, this.score);
   }
 
   // ---------- golpe / recarga ----------
@@ -409,7 +497,8 @@ export class Game {
       const evs = e.update(dt, t, playerPos) || [];
       // candado de riel: siempre dentro del corredor y por delante del jugador
       const ex = e.root.position.x, ez = e.root.position.z;
-      e.root.position.x = Math.max(-1.75, Math.min(1.75, ex));
+      const halfW = e.kind === 'cam' ? 3.35 : 2.05;
+      e.root.position.x = Math.max(-halfW, Math.min(halfW, ex));
       const minZ = playerPos.z - 3.4;
       if (e.root.position.z > minZ) e.root.position.z = minZ;
       for (const ev of evs) {
@@ -419,6 +508,14 @@ export class Game {
       if (e.dead) {
         if (this.enemies[i] === e) this.enemies.splice(i, 1);
       }
+    }
+
+    // cajas y objetos recogibles
+    const lootEvs = this.loot.update(dt, this.railSpeed, this._pv.set(head.x, 1.15, head.z));
+    for (const ev of lootEvs) this.applyPickup(ev.kind, ev.pos);
+    if (this.overT > 0) {
+      this.overT -= dt;
+      if (this.overT <= 0) this.hud.banner('SOBRECARGA', 'ENERGÍA AGOTADA', 1.0);
     }
 
     // proyectiles

@@ -159,7 +159,7 @@ export class Drone {
     this.angle = Math.atan2(-Math.cos(this.phase) * 4, -Math.sin(this.phase) * 4);
     this.strafeDir = Math.random() < 0.5 ? 1 : -1;
     this.baseY = 1.35 + Math.random() * 0.5;
-    this.speed = 1.15 + Math.random() * 0.35;
+    this.speed = 2.45 + Math.random() * 1.05;
     this.flash = 0;
     this.dead = false;
     this.scale = 0;
@@ -224,10 +224,11 @@ export class Drone {
       this.angle += this.strafeDir * dt * 0.06;
       if (this.angle > 0.22) { this.angle = 0.22; this.strafeDir = -1; }
       if (this.angle < -0.22) { this.angle = -0.22; this.strafeDir = 1; }
-      const targetR = this.radius;
-      if (dist > targetR + 0.5) moving = this.speed;
+      // avanza siempre hacia el jugador: nunca se queda acumulado al fondo
+      const targetR = Math.min(this.radius, 3.3);
+      if (dist > targetR + 0.4) moving = this.speed;
       else if (dist < targetR - 0.9) moving = -this.speed * 0.7;
-      const tx = player.x - Math.sin(this.angle) * targetR;
+      const tx = player.x - Math.sin(this.angle) * targetR + (this.lane || 0);
       const tz = player.z - Math.cos(this.angle) * targetR;
       const mv = new THREE.Vector3(tx - pos.x, 0, tz - pos.z);
       const l = mv.length();
@@ -260,7 +261,7 @@ export class Drone {
     }
     // límites
     pos.x = THREE.MathUtils.clamp(pos.x, -6.1, 6.1);
-    pos.z = THREE.MathUtils.clamp(pos.z, -6.1, 6.1);
+    pos.z = THREE.MathUtils.clamp(pos.z, -34, 6.1);
 
     // mirar al jugador
     _v.set(player.x, pos.y - 0.05, player.z);

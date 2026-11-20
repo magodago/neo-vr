@@ -1,262 +1,577 @@
-// ---------------------------------------------------------------------------
-// rail.js — corredor infinito "en riel" (estilo Pistol Whip).
-// El jugador no se mueve: el escenario avanza hacia él. Segmentos reciclados.
-// Todo procedural, sin assets externos.
-// ---------------------------------------------------------------------------
+// Corredor futurista premium: chapa industrial, nervios estructurales, holos,
+// iluminación volumétrica y suelo pulido con reflejos falsos.
 import * as THREE from 'three';
-import { metalFloor, brushedMetal, hazard, signTexture } from './textures.js';
 
-const SEG = 16;            // largo de cada segmento (m)
-const COUNT = 6;           // segmentos vivos
-const TOTAL = SEG * COUNT; // 96 m de corredor
-const HALF_W = 3.45;       // media anchura jugable
-const H = 4.4;             // altura del techo
-const FRONT = 18;          // z en el que un segmento se recicla al fondo
+const SEG_LEN = 14;
+const SEG_COUNT = 8;
+const HALF_W = 3.55;
+const HEIGHT = 5.2;
+const TOTAL = SEG_LEN * SEG_COUNT;
 
-const ACCENTS = [0x3d9bff, 0xff4fd8, 0xff9f43];
-
-const SIGNS = [
-  ['SECTOR 07', 'MANTÉN EL RITMO'],
-  ['ANILLO EXTERIOR', 'NO TE DETENGAS'],
-  ['CÁMARA 04', 'PULSO ESTABLE'],
-  ['LÍNEA ROJA', 'FUEGO LIBRE'],
-  ['TRÁNSITO', 'SIGUE LA LUZ'],
-  ['NIVEL 12', 'RESPIRA'],
-];
-
-function rnd(a, b) { return a + Math.random() * (b - a); }
-
-export function buildRail(scene) {
-  const group = new THREE.Group();
-  group.name = 'rail';
-  scene.add(group);
-
-  // ------------------------------------------------------------- materiales
-  const floorT = metalFloor();
-  floorT.map.repeat.set(2.4, 5);
-  floorT.roughnessMap.repeat.set(2.4, 5);
-  floorT.normalMap.repeat.set(2.4, 5);
-
-  const wallT = brushedMetal();
-  wallT.map.repeat.set(3, 1);
-  wallT.roughnessMap.repeat.set(3, 1);
-
-  const hazT = hazard();
-  hazT.repeat.set(2, 2);
-
-  const matFloor = new THREE.MeshStandardMaterial({
-    map: floorT.map, roughnessMap: floorT.roughnessMap, normalMap: floorT.normalMap,
-    color: 0x8a95a6, roughness: 0.62, metalness: 0.72,
-  });
-  const matWall = new THREE.MeshStandardMaterial({
-    map: wallT.map, roughnessMap: wallT.roughnessMap,
-    color: 0x2a3140, roughness: 0.68, metalness: 0.55,
-  });
-  const matDark = new THREE.MeshStandardMaterial({ color: 0x0b0f16, roughness: 0.9, metalness: 0.3 });
-  const matTrim = new THREE.MeshStandardMaterial({ color: 0x1b2330, roughness: 0.42, metalness: 0.85 });
-  const matHaz = new THREE.MeshStandardMaterial({ map: hazT, roughness: 0.7, metalness: 0.35 });
-  const matLight = new THREE.MeshBasicMaterial({ color: 0xdff0ff });
-
-  function neon(color, opacity = 1) {
-    return new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false,
-    });
+// ---------------------------------------------------------------- texturas
+function canvasTex(w, h, draw, repeat) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  draw(ctx, w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  if (repeat) {
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(repeat[0], repeat[1]);
   }
+  return t;
+}
 
-  const geoFloor = new THREE.BoxGeometry(HALF_W * 2, 0.14, SEG);
-  const geoWall = new THREE.BoxGeometry(0.26, H, SEG);
-  const geoCeil = new THREE.BoxGeometry(HALF_W * 2 + 0.5, 0.22, SEG);
-  const geoStrip = new THREE.PlaneGeometry(0.9, SEG);
-  const geoBar = new THREE.PlaneGeometry(2.6, 0.14);
-  const geoPillar = new THREE.BoxGeometry(0.3, H, 0.3);
-  const geoCrate = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-  const geoPipe = new THREE.CylinderGeometry(0.075, 0.075, SEG, 8, 1, true);
-  const geoSign = new THREE.PlaneGeometry(2.6, 1.3);
-
-  // --------------------------------------------------------------- segmento
-  const segments = [];
-
-  function buildSegment(i) {
-    const seg = new THREE.Group();
-    seg.userData.i = i;
-
-    // suelo
-    const floor = new THREE.Mesh(geoFloor, matFloor);
-    floor.position.y = -0.07;
-    floor.receiveShadow = true;
-    seg.add(floor);
-
-    // guía luminosa central (da velocidad y dirección)
-    const accent = ACCENTS[i % ACCENTS.length];
-    const glowL = neon(accent, 0.5);
-    const guide = new THREE.Mesh(new THREE.PlaneGeometry(0.12, SEG), glowL);
-    guide.rotation.x = -Math.PI / 2;
-    guide.position.set(-1.5, 0.008, 0);
-    seg.add(guide);
-    const guide2 = guide.clone();
-    guide2.position.x = 1.5;
-    seg.add(guide2);
-
-    // paredes
-    for (const s of [-1, 1]) {
-      const wall = new THREE.Mesh(geoWall, matWall);
-      wall.position.set(s * (HALF_W + 0.13), H / 2, 0);
-      wall.receiveShadow = true;
-      seg.add(wall);
-
-      // zócalo y banda luminosa
-      const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, SEG), matTrim);
-      plinth.position.set(s * (HALF_W - 0.1), 0.25, 0);
-      seg.add(plinth);
-
-      const strip = new THREE.Mesh(geoStrip, neon(accent, 0.42));
-      strip.rotation.y = s > 0 ? -Math.PI / 2 : Math.PI / 2;
-      strip.position.set(s * (HALF_W - 0.02), 1.15, 0);
-      seg.add(strip);
-
-      const strip2 = strip.clone();
-      strip2.position.y = 2.75;
-      strip2.material = neon(0xffffff, 0.16);
-      seg.add(strip2);
-
-      // tuberías
-      for (let k = 0; k < 3; k++) {
-        const pipe = new THREE.Mesh(geoPipe, matTrim);
-        pipe.rotation.x = Math.PI / 2;
-        pipe.position.set(s * (HALF_W - 0.42), 3.05 + k * 0.22, 0);
-        seg.add(pipe);
-      }
-
-      // pilares
-      for (let k = 0; k < 4; k++) {
-        const p = new THREE.Mesh(geoPillar, matTrim);
-        p.position.set(s * (HALF_W - 0.28), H / 2, -SEG / 2 + 2 + k * 4);
-        p.castShadow = true;
-        seg.add(p);
-        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.1, 0.42), neon(accent, 0.55));
-        cap.position.set(p.position.x, 2.4, p.position.z);
-        seg.add(cap);
-      }
-    }
-
-    // techo + luminarias
-    const ceil = new THREE.Mesh(geoCeil, matDark);
-    ceil.position.y = H + 0.11;
-    seg.add(ceil);
-
-    for (let k = 0; k < 4; k++) {
-      const bar = new THREE.Mesh(geoBar, matLight);
-      bar.rotation.x = Math.PI / 2;
-      bar.position.set(0, H - 0.02, -SEG / 2 + 2 + k * 4);
-      seg.add(bar);
-      const halo = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.9), neon(0xbfe0ff, 0.1));
-      halo.rotation.x = Math.PI / 2;
-      halo.position.set(0, H - 0.03, bar.position.z);
-      seg.add(halo);
-    }
-
-    // cajas de cobertura (decorativas, junto a la pared)
-    const crates = new THREE.Group();
-    for (let k = 0; k < 3; k++) {
-      const c = new THREE.Mesh(geoCrate, matHaz);
-      c.position.set(rnd(-1, 1) * 0.2, 0.45, rnd(-SEG / 2 + 1.5, SEG / 2 - 1.5));
-      c.rotation.y = rnd(0, Math.PI);
-      c.castShadow = c.receiveShadow = true;
-      crates.add(c);
-    }
-    crates.position.x = rnd(-1, 1) > 0 ? HALF_W - 0.75 : -(HALF_W - 0.75);
-    seg.add(crates);
-
-    // cartel holográfico
-    const lines = SIGNS[i % SIGNS.length];
-    const signT = signTexture(lines, '#' + accent.toString(16).padStart(6, '0'));
-    const signMat = new THREE.MeshBasicMaterial({
-      map: signT, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false,
-    });
-    const sign = new THREE.Mesh(geoSign, signMat);
-    const side = rnd(-1, 1) > 0 ? 1 : -1;
-    sign.position.set(side * (HALF_W - 0.06), 2.0, rnd(-SEG / 2 + 3, SEG / 2 - 3));
-    sign.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2;
-    seg.add(sign);
-
-    // arco de portal en segmentos alternos
-    if (i % 2 === 0) {
-      const arch = new THREE.Group();
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.055, 8, 48), neon(accent, 0.85));
-      ring.position.y = 2.25;
-      arch.add(ring);
-      const ring2 = ring.clone();
-      ring2.scale.setScalar(0.72);
-      ring2.material = neon(0xffffff, 0.22);
-      arch.add(ring2);
-      arch.position.z = SEG / 2 - 0.6;
-      seg.add(arch);
-    }
-
-    seg.userData.accents = [glowL];
-    group.add(seg);
-    return seg;
-  }
-
-  for (let i = 0; i < COUNT; i++) {
-    const s = buildSegment(i);
-    s.position.z = -i * SEG;
-    segments.push(s);
-  }
-
-  // ------------------------------------------------------------- iluminación
-  const hemi = new THREE.HemisphereLight(0x9fc4ff, 0x080a10, 0.55);
-  group.add(hemi);
-
-  const key = new THREE.DirectionalLight(0xcfe6ff, 0.95);
-  key.position.set(2.5, 6, 4);
-  group.add(key);
-
-  const travel = new THREE.PointLight(0x66b8ff, 12, 16, 2);
-  travel.position.set(0, 2.6, -3);
-  group.add(travel);
-
-  // ------------------------------------------------------------------ update
-  let t = 0;
-  const _p = new THREE.Vector3();
-
-  function update(dt, speed) {
-    if (!isFinite(dt)) dt = 0.016;
-    if (!isFinite(speed)) speed = 2.7;
-    dt = Math.min(dt, 0.1);
-    // recuperación: si algún segmento quedó en NaN, se reordena el corredor
-    if (segments.some(s => !isFinite(s.position.z))) {
-      segments.forEach((s, i) => { s.position.z = -i * SEG; });
-      t = 0;
-    }
-    t += dt;
-    const dz = speed * dt;
-    for (const s of segments) {
-      s.position.z += dz;
-      if (s.position.z > FRONT) {
-        s.position.z -= TOTAL;
-        // variación al reciclar: cajas, cartel y lado
-        const crates = s.children.find(c => c.isGroup && c.children[0]?.material === matHaz);
-        if (crates) {
-          crates.position.x = Math.random() > 0.5 ? HALF_W - 0.75 : -(HALF_W - 0.75);
-          for (const c of crates.children) {
-            c.position.set(rnd(-1, 1) * 0.2, 0.45, rnd(-SEG / 2 + 1.5, SEG / 2 - 1.5));
-            c.rotation.y = rnd(0, Math.PI);
-          }
+function panelTexture() {
+  return canvasTex(512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#151a22';
+    ctx.fillRect(0, 0, w, h);
+    const cols = 4, rows = 4;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const px = x * w / cols, py = y * h / rows;
+        const g = ctx.createLinearGradient(px, py, px + w / cols, py + h / rows);
+        const v = 22 + Math.random() * 12;
+        g.addColorStop(0, `rgb(${v + 8},${v + 12},${v + 20})`);
+        g.addColorStop(1, `rgb(${v - 6},${v - 4},${v + 2})`);
+        ctx.fillStyle = g;
+        ctx.fillRect(px + 2, py + 2, w / cols - 4, h / rows - 4);
+        ctx.strokeStyle = 'rgba(120,175,205,0.16)';
+        ctx.lineWidth = 1.4;
+        ctx.strokeRect(px + 2.5, py + 2.5, w / cols - 5, h / rows - 5);
+        // remaches
+        ctx.fillStyle = 'rgba(190,215,235,0.22)';
+        for (const [dx, dy] of [[10, 10], [w / cols - 12, 10], [10, h / rows - 12], [w / cols - 12, h / rows - 12]]) {
+          ctx.beginPath();
+          ctx.arc(px + dx, py + dy, 2, 0, Math.PI * 2);
+          ctx.fill();
         }
       }
     }
-    // luz de avance: parpadeo suave, anclada cerca del jugador
-    travel.position.set(Math.sin(t * 0.7) * 1.2, 2.6, -3 + Math.sin(t * 1.3) * 0.6);
-    travel.intensity = 10 + Math.sin(t * 3.1) * 2.2;
-  }
+    // arañazos
+    ctx.strokeStyle = 'rgba(225,240,255,0.055)';
+    for (let i = 0; i < 70; i++) {
+      ctx.beginPath();
+      const x = Math.random() * w, y = Math.random() * h;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.random() * 46 - 23, y + Math.random() * 12 - 6);
+      ctx.lineWidth = Math.random() * 1.4;
+      ctx.stroke();
+    }
+    // manchas
+    for (let i = 0; i < 22; i++) {
+      const g = ctx.createRadialGradient(Math.random() * w, Math.random() * h, 0, 0, 0, 90);
+      ctx.fillStyle = `rgba(0,0,0,${0.05 + Math.random() * 0.1})`;
+      ctx.fillRect(Math.random() * w, Math.random() * h, 40 + Math.random() * 90, 20 + Math.random() * 60);
+    }
+  }, [3, 2]);
+}
+
+function holoTexture(kind) {
+  const palettes = [
+    { a: '#49e6ff', b: '#0b2a33', text: 'SECTOR 07' },
+    { a: '#ff9f43', b: '#2a1406', text: 'CORE BREACH' },
+    { a: '#ff4b6e', b: '#2a0710', text: 'THREAT 09' },
+    { a: '#8affc1', b: '#07251a', text: 'NEO//GRID' }
+  ];
+  const p = palettes[kind % palettes.length];
+  return canvasTex(512, 256, (ctx, w, h) => {
+    ctx.fillStyle = p.b;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    for (let x = 0; x < w; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    // barras de datos
+    for (let i = 0; i < 26; i++) {
+      ctx.fillStyle = i % 3 === 0 ? p.a : 'rgba(255,255,255,0.16)';
+      const bh = 6 + Math.random() * 46;
+      ctx.fillRect(24 + i * 17, h - 24 - bh, 9, bh);
+    }
+    // marco
+    ctx.strokeStyle = p.a;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(10, 10, w - 20, h - 20);
+    ctx.globalAlpha = 0.9;
+    ctx.font = 'bold 54px Consolas, monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(p.text, 32, 92);
+    ctx.font = '20px Consolas, monospace';
+    ctx.fillStyle = p.a;
+    ctx.fillText('// ' + (kind % 2 ? 'HOSTILE ZONE' : 'SISTEMA ACTIVO'), 34, 130);
+    ctx.globalAlpha = 1;
+    // scanlines
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 2);
+  });
+}
+
+function billboardTexture(n) {
+  const sets = [
+    { t: 'SECTOR 07', s: 'NIVEL -3  //  ACCESO RESTRINGIDO', c: '#49e6ff', b: '#04141c' },
+    { t: 'MANTENIMIENTO', s: 'UNIDADES AUTONOMAS EN PATRULLA', c: '#ff9f43', b: '#1c0d04' },
+    { t: 'NEO//GRID', s: 'SINCRONIA 99.4%  //  LATIDO 62', c: '#ff3ba0', b: '#1a0410' },
+    { t: 'ZONA HOSTIL', s: 'FUERZA LETAL AUTORIZADA', c: '#ff2f5a', b: '#1c0409' }
+  ];
+  const p = sets[n % sets.length];
+  return canvasTex(512, 256, (ctx, w, h) => {
+    ctx.fillStyle = p.b;
+    ctx.fillRect(0, 0, w, h);
+    // rejilla tenue
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    // banda lateral de color
+    ctx.fillStyle = p.c;
+    ctx.fillRect(0, 0, 12, h);
+    // marco
+    ctx.strokeStyle = p.c;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(16, 14, w - 32, h - 28);
+    // textos
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 62px Consolas, monospace';
+    ctx.fillText(p.t, 40, 108);
+    ctx.fillStyle = p.c;
+    ctx.font = '22px Consolas, monospace';
+    ctx.fillText(p.s, 42, 152);
+    // barras de datos
+    for (let i = 0; i < 18; i++) {
+      const bh = 8 + Math.random() * 42;
+      ctx.fillStyle = i % 4 === 0 ? p.c : 'rgba(255,255,255,0.18)';
+      ctx.fillRect(42 + i * 24, 210 - bh, 10, bh);
+    }
+    // scanlines
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 2);
+  });
+}
+
+function hazardTexture(n) {
+  return canvasTex(256, 256, (ctx, w, h) => {
+    ctx.fillStyle = '#0f1318';
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 150, w, 60);
+    ctx.clip();
+    for (let x = -h; x < w + h; x += 44) {
+      ctx.fillStyle = x % 88 === 0 ? '#e8b13a' : '#14181e';
+      ctx.beginPath();
+      ctx.moveTo(x, 210);
+      ctx.lineTo(x + 22, 210);
+      ctx.lineTo(x + 52, 150);
+      ctx.lineTo(x + 30, 150);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.font = 'bold 120px Consolas, monospace';
+    ctx.fillStyle = '#bcd6e6';
+    ctx.globalAlpha = 0.55;
+    ctx.fillText(String(n), 36, 130);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(73,230,255,0.5)';
+    ctx.fillRect(24, 24, 8, 108);
+  });
+}
+
+function grateTexture() {
+  return canvasTex(256, 128, (ctx, w, h) => {
+    ctx.fillStyle = '#101419';
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(180,205,225,0.22)';
+    ctx.lineWidth = 3;
+    for (let x = 0; x < w; x += 16) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(160,190,215,0.14)';
+    for (let y = 0; y < h; y += 22) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  }, [6, 1]);
+}
+
+// ---------------------------------------------------------------- materiales
+function buildMaterials() {
+  const panelMap = panelTexture();
+  const panelDark = panelMap.clone();
+  panelDark.needsUpdate = true;
+
+  const floorMap = canvasTex(512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#0b0f14';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 900; i++) {
+      ctx.fillStyle = `rgba(${40 + Math.random() * 60},${60 + Math.random() * 70},${80 + Math.random() * 70},${Math.random() * 0.1})`;
+      ctx.fillRect(Math.random() * w, Math.random() * h, Math.random() * 30, 2);
+    }
+    ctx.strokeStyle = 'rgba(120,160,190,0.14)';
+    ctx.lineWidth = 2;
+    for (let x = 0; x <= w; x += 128) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y <= h; y += 128) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  }, [4, 8]);
 
   return {
+    panel: new THREE.MeshStandardMaterial({ map: panelMap, color: 0xffffff, metalness: 0.92, roughness: 0.42 }),
+    panelDark: new THREE.MeshStandardMaterial({ map: panelDark, color: 0x8b98a6, metalness: 0.95, roughness: 0.55 }),
+    floor: new THREE.MeshStandardMaterial({ map: floorMap, color: 0xdfe9f2, metalness: 0.86, roughness: 0.26 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0x3d4a58, metalness: 1.0, roughness: 0.28 }),
+    black: new THREE.MeshStandardMaterial({ color: 0x0a0d11, metalness: 0.7, roughness: 0.7 }),
+    grate: new THREE.MeshStandardMaterial({ map: grateTexture(), color: 0xa8bccd, metalness: 1.0, roughness: 0.4 }),
+    cyan: new THREE.MeshStandardMaterial({ color: 0x0a2830, emissive: 0x49e6ff, emissiveIntensity: 2.4, roughness: 0.4, metalness: 0.2 }),
+    warm: new THREE.MeshStandardMaterial({ color: 0x2a1408, emissive: 0xff8a3d, emissiveIntensity: 2.1, roughness: 0.4, metalness: 0.2 }),
+    red: new THREE.MeshStandardMaterial({ color: 0x2a0810, emissive: 0xff2f5a, emissiveIntensity: 2.0, roughness: 0.4, metalness: 0.2 }),
+    white: new THREE.MeshStandardMaterial({ color: 0x223038, emissive: 0xd8f2ff, emissiveIntensity: 2.8, roughness: 0.3, metalness: 0.1 }),
+    magenta: new THREE.MeshStandardMaterial({ color: 0x2a0a1c, emissive: 0xff3ba0, emissiveIntensity: 2.3, roughness: 0.4, metalness: 0.2 }),
+    amber: new THREE.MeshStandardMaterial({ color: 0x2a1a04, emissive: 0xffb347, emissiveIntensity: 2.0, roughness: 0.4, metalness: 0.2 })
+  };
+}
+
+export function buildRail(world) {
+  const group = new THREE.Group();
+  group.name = 'rail';
+  world.add(group);
+
+  const M = buildMaterials();
+  const segments = [];
+  const anim = { fans: [], holos: [], arches: [], glowMats: [M.cyan, M.warm, M.white] };
+
+  // niebla de profundidad
+  let root = world;
+  while (root.parent) root = root.parent;
+  if (root.isScene) {
+    root.fog = new THREE.FogExp2(0x05080d, 0.028);
+  }
+
+  const box = (w, h, d, m, x, y, z, rx = 0, ry = 0, rz = 0) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+    mesh.position.set(x, y, z);
+    mesh.rotation.set(rx, ry, rz);
+    return mesh;
+  };
+
+  for (let i = 0; i < SEG_COUNT; i++) {
+    const seg = new THREE.Group();
+    seg.position.z = -i * SEG_LEN + 8;
+
+    // ---- suelo
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(HALF_W * 2 + 2.4, 0.24, SEG_LEN), M.floor);
+    floor.position.y = -0.12;
+    seg.add(floor);
+    // rejillas laterales
+    for (const sx of [-1, 1]) {
+      const g = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.06, SEG_LEN - 1.2), M.grate);
+      g.position.set(sx * (HALF_W - 0.55), 0.012, 0);
+      seg.add(g);
+    }
+    // guías luminosas del suelo
+    for (const sx of [-1, 1]) {
+      const strip = box(0.075, 0.035, SEG_LEN - 0.6, M.cyan, sx * (HALF_W - 1.15), 0.02, 0);
+      seg.add(strip);
+      // reflejo falso del suelo (aditivo)
+      const refl = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.5, SEG_LEN - 0.6),
+        new THREE.MeshBasicMaterial({ color: 0x49e6ff, transparent: true, opacity: 0.10, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      refl.rotation.x = -Math.PI / 2;
+      refl.position.set(sx * (HALF_W - 1.15), 0.015, 0);
+      seg.add(refl);
+    }
+    // chevrones direccionales
+    for (let c = 0; c < 5; c++) {
+      const chev = box(0.5, 0.012, 0.1, M.cyan, 0, 0.01, -SEG_LEN / 2 + 1.6 + c * 2.6);
+      chev.rotation.y = Math.PI / 4;
+      chev.scale.set(1, 1, 0.5);
+      seg.add(chev);
+    }
+    // placas de hazard junto a los muros
+    for (const sx of [-1, 1]) {
+      const hz = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshStandardMaterial({
+        map: hazardTexture(i * 2 + (sx > 0 ? 1 : 0)), emissiveMap: hazardTexture(i * 2 + (sx > 0 ? 1 : 0)),
+        emissive: 0xffffff, emissiveIntensity: 0.22, metalness: 0.6, roughness: 0.55
+      }));
+      hz.position.set(sx * (HALF_W - 1.15), 0.07, -1.5);
+      hz.rotation.x = -Math.PI / 2;
+      hz.rotation.z = sx * 0.04;
+      seg.add(hz);
+    }
+
+    // ---- muros (tres bandas)
+    for (const sx of [-1, 1]) {
+      const x = sx * HALF_W;
+      // banda inferior
+      const low = box(0.55, 2.0, SEG_LEN, M.panel, x - sx * 0.1, 1.0, 0);
+      seg.add(low);
+      // banda media rehundida con aletas
+      const mid = box(0.3, 1.5, SEG_LEN, M.panelDark, x + sx * 0.12, 2.75, 0);
+      seg.add(mid);
+      for (let f = 0; f < 7; f++) {
+        const fin = box(0.22, 0.9, 0.08, M.trim, x - sx * 0.02, 2.75, -SEG_LEN / 2 + 1.2 + f * 1.9, 0, 0, sx * 0.18);
+        seg.add(fin);
+      }
+      // banda superior inclinada
+      const top = box(0.9, 0.3, SEG_LEN, M.trim, x - sx * 0.2, 3.6, 0, 0, 0, sx * 0.28);
+      seg.add(top);
+      // zócalo luminoso
+      seg.add(box(0.06, 0.09, SEG_LEN - 0.4, M.cyan, x - sx * 0.36, 0.16, 0));
+      // franja superior
+      seg.add(box(0.05, 0.05, SEG_LEN - 1.0, M.white, x - sx * 0.34, 3.42, 0));
+      // conductos de cable
+      const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, SEG_LEN - 0.4, 8), M.black);
+      cable.rotation.x = Math.PI / 2;
+      cable.position.set(x - sx * 0.12, 2.05, 0);
+      seg.add(cable);
+      for (let k = 0; k < 3; k++) {
+        const clip = box(0.14, 0.04, 0.16, M.trim, x - sx * 0.12, 2.05, -SEG_LEN / 2 + 2 + k * 4.4);
+        seg.add(clip);
+      }
+
+      // nervio estructural cada 3.5 m
+      for (let r = 0; r < 4; r++) {
+        const z = -SEG_LEN / 2 + r * (SEG_LEN / 4) + 1.2;
+        const rib = box(0.24, 5.0, 0.42, M.trim, x - sx * 0.34, 2.5, z);
+        seg.add(rib);
+        const brace = box(0.9, 0.16, 0.16, M.panelDark, x - sx * 0.72, 3.55, z, 0, 0, sx * 0.9);
+        seg.add(brace);
+        seg.add(box(0.07, 0.07, 0.44, M.cyan, x - sx * 0.46, 4.55, z));
+        // tornillos
+        seg.add(box(0.09, 0.09, 0.05, M.black, x - sx * 0.22, 0.5, z));
+        seg.add(box(0.09, 0.09, 0.05, M.black, x - sx * 0.22, 4.3, z));
+      }
+
+      // panel holográfico alterno
+      if ((i + (sx > 0 ? 1 : 0)) % 3 === 0) {
+        const holoMap = holoTexture(i + (sx > 0 ? 2 : 0));
+        const holoMat = new THREE.MeshStandardMaterial({
+          map: holoMap, emissiveMap: holoMap, emissive: 0xffffff, emissiveIntensity: 1.15,
+          transparent: true, opacity: 0.96, metalness: 0.2, roughness: 0.6, side: THREE.DoubleSide
+        });
+        const holo = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.15), holoMat);
+        holo.position.set(x - sx * 0.4, 2.55, -1.2);
+        holo.rotation.y = -sx * Math.PI / 2;
+        seg.add(holo);
+        // marco
+        const frame = box(0.08, 1.4, 2.55, M.trim, x - sx * 0.45, 2.55, -1.2);
+        seg.add(frame);
+        // halo aditivo tras el holo
+        const halo = new THREE.Mesh(
+          new THREE.PlaneGeometry(3.2, 1.9),
+          new THREE.MeshBasicMaterial({ color: 0x49e6ff, transparent: true, opacity: 0.07, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        halo.position.copy(holo.position).add(new THREE.Vector3(-sx * 0.03, 0, 0));
+        halo.rotation.y = holo.rotation.y;
+        seg.add(halo);
+        anim.holos.push(holoMat);
+      }
+
+      // rejilla de ventilación con ventilador
+      if ((i + (sx > 0 ? 1 : 0)) % 2 === 0) {
+        const grille = box(0.1, 1.15, 1.15, M.grate, x - sx * 0.32, 3.4, 3.2);
+        seg.add(grille);
+        const fan = new THREE.Group();
+        fan.position.set(x - sx * 0.24, 3.4, 3.2);
+        fan.rotation.y = -sx * Math.PI / 2;
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.1, 12), M.trim);
+        hub.rotation.x = Math.PI / 2;
+        fan.add(hub);
+        for (let b = 0; b < 4; b++) {
+          const blade = box(0.09, 0.85, 0.03, M.trim, 0, 0, 0);
+          blade.geometry.translate(0, 0.42, 0);
+          blade.rotation.z = b * Math.PI / 2 + 0.2;
+          fan.add(blade);
+        }
+        seg.add(fan);
+        anim.fans.push(fan);
+      }
+
+      // caja de conexiones / altavoz de pared
+      if (i % 2 === 1) {
+        const bx = box(0.2, 0.5, 0.7, M.panelDark, x - sx * 0.3, 1.45, 4.6);
+        seg.add(bx);
+        seg.add(box(0.03, 0.12, 0.5, M.warm, x - sx * 0.42, 1.45, 4.6));
+      }
+    }
+
+    // ---- techo
+    const ceil = box(HALF_W * 2 + 1.2, 0.3, SEG_LEN, M.panelDark, 0, HEIGHT, 0);
+    seg.add(ceil);
+    for (let b = 0; b < 4; b++) {
+      const z = -SEG_LEN / 2 + 1.75 + b * 3.5;
+      // viga transversal
+      seg.add(box(HALF_W * 2, 0.22, 0.3, M.trim, 0, HEIGHT - 0.24, z));
+      // luminaria
+      seg.add(box(1.5, 0.09, 0.16, M.white, 0, HEIGHT - 0.4, z));
+      // cono de luz volumétrico
+      const cone = new THREE.Mesh(
+        new THREE.ConeGeometry(1.15, 2.9, 18, 1, true),
+        new THREE.MeshBasicMaterial({
+          color: 0xbfe6ff, transparent: true, opacity: 0.05,
+          blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+        })
+      );
+      cone.position.set(0, HEIGHT - 1.9, z);
+      seg.add(cone);
+      // tubos
+      for (const sx of [-1, 1]) {
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, SEG_LEN, 8), M.trim);
+        pipe.rotation.x = Math.PI / 2;
+        pipe.position.set(sx * 2.1, HEIGHT - 0.42, 0);
+        seg.add(pipe);
+      }
+    }
+    // tapa de registro
+    seg.add(box(0.9, 0.05, 0.9, M.black, 0, HEIGHT - 0.32, -5.2));
+
+    // ================= capa de detalle futurista =================
+    // arco de neón en la junta de cada segmento (alterna magenta / cian)
+    const archCol = i % 2 === 0 ? 0xff3ba0 : 0x49e6ff;
+    const archMat = new THREE.MeshStandardMaterial({
+      color: 0x140a12, emissive: archCol, emissiveIntensity: 2.6, metalness: 0.25, roughness: 0.38
+    });
+    const zA = -SEG_LEN / 2 + 0.35;
+    for (const sx of [-1, 1]) {
+      seg.add(box(0.14, 4.15, 0.24, archMat, sx * (HALF_W - 0.46), 2.08, zA));
+      seg.add(box(0.42, 0.42, 0.3, M.trim, sx * (HALF_W - 0.46), 0.21, zA));
+    }
+    seg.add(box(HALF_W * 2 - 0.85, 0.17, 0.24, archMat, 0, 4.18, zA));
+    // halo del arco
+    const archGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(HALF_W * 2 - 0.5, 4.6),
+      new THREE.MeshBasicMaterial({ color: archCol, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })
+    );
+    archGlow.position.set(0, 2.1, zA - 0.14);
+    seg.add(archGlow);
+    // reflejo del arco en el suelo
+    const archRefl = new THREE.Mesh(
+      new THREE.PlaneGeometry(HALF_W * 2 - 1.4, 3.4),
+      new THREE.MeshBasicMaterial({ color: archCol, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false })
+    );
+    archRefl.rotation.x = -Math.PI / 2;
+    archRefl.position.set(0, 0.022, zA + 2.0);
+    seg.add(archRefl);
+    anim.arches.push(archMat);
+
+    // guías de luz continuas en el techo
+    for (const sx of [-1, 1]) {
+      seg.add(box(0.12, 0.05, SEG_LEN - 0.25, M.white, sx * 1.74, HEIGHT - 0.44, 0));
+      const cl = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.45, SEG_LEN - 0.25),
+        new THREE.MeshBasicMaterial({ color: 0xbfe6ff, transparent: true, opacity: 0.055, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      cl.rotation.x = Math.PI / 2;
+      cl.position.set(sx * 1.74, HEIGHT - 0.48, 0);
+      seg.add(cl);
+    }
+
+    // barras verticales de neón + lavado de color en los nervios
+    for (let r = 0; r < 4; r++) {
+      const zr = -SEG_LEN / 2 + r * (SEG_LEN / 4) + 1.2;
+      for (const sx of [-1, 1]) {
+        const neon = sx > 0 ? M.magenta : M.cyan;
+        seg.add(box(0.06, 2.5, 0.06, neon, sx * (HALF_W - 0.64), 2.2, zr + 0.34));
+        const wash = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.7, 3.4),
+          new THREE.MeshBasicMaterial({ color: sx > 0 ? 0xff3ba0 : 0x49e6ff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        wash.position.set(sx * (HALF_W - 0.45), 2.25, zr - 1.4);
+        wash.rotation.y = -sx * Math.PI / 2;
+        seg.add(wash);
+      }
+    }
+
+    // cartel publicitario grande cada dos segmentos
+    if (i % 2 === 0) {
+      const bside = i % 4 === 0 ? -1 : 1;
+      const bbMap = billboardTexture(i);
+      const bbMat = new THREE.MeshStandardMaterial({
+        map: bbMap, emissiveMap: bbMap, emissive: 0xffffff, emissiveIntensity: 1.3,
+        transparent: true, opacity: 0.97, metalness: 0.1, roughness: 0.5, side: THREE.DoubleSide
+      });
+      const bb = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 1.5), bbMat);
+      bb.position.set(bside * (HALF_W - 0.52), 2.9, 4.3);
+      bb.rotation.y = -bside * Math.PI / 2;
+      seg.add(bb);
+      const bGlow = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.1, 2.3),
+        new THREE.MeshBasicMaterial({ color: 0x49e6ff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      bGlow.position.copy(bb.position).add(new THREE.Vector3(-bside * 0.05, 0, 0));
+      bGlow.rotation.y = bb.rotation.y;
+      seg.add(bGlow);
+      anim.holos.push(bbMat);
+    }
+
+    // mazos de cable colgando del techo
+    for (const sx of [-1, 1]) {
+      const cbl = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.5, 6), M.black);
+      cbl.position.set(sx * (HALF_W - 1.35), HEIGHT - 1.15, (i % 3) * 1.7 - 2.2);
+      cbl.rotation.z = sx * 0.22;
+      cbl.rotation.x = 0.12;
+      seg.add(cbl);
+    }
+
+    // baliza roja de advertencia
+    if (i % 3 === 2) {
+      const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), M.red);
+      beacon.position.set(0, HEIGHT - 0.58, 3.4);
+      seg.add(beacon);
+      const bg2 = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.1, 1.1),
+        new THREE.MeshBasicMaterial({ color: 0xff2f5a, transparent: true, opacity: 0.09, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      bg2.position.copy(beacon.position);
+      bg2.rotation.x = -Math.PI / 2;
+      seg.add(bg2);
+    }
+
+    group.add(seg);
+    segments.push({ group: seg, index: i });
+  }
+
+  // ---- partículas de polvo
+  const dustGeo = new THREE.BufferGeometry();
+  const N = 340;
+  const arr = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    arr[i * 3] = (Math.random() - 0.5) * 7;
+    arr[i * 3 + 1] = Math.random() * 4.6;
+    arr[i * 3 + 2] = -Math.random() * 30 + 4;
+  }
+  dustGeo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+    color: 0xaee4ff, size: 0.022, transparent: true, opacity: 0.5,
+    blending: THREE.AdditiveBlending, depthWrite: false, map: null
+  }));
+  group.add(dust);
+
+  let phase = 0;
+  return {
     group,
-    half: HALF_W,
-    height: H,
-    update,
-    // punto de aparición de enemigos (fondo del corredor, delante del jugador)
-    spawnZ: () => -TOTAL + 8,
+    segments,
+    update(dt, speed = 2.7) {
+      phase += dt;
+      const v = speed * dt;
+      for (const s of segments) {
+        s.group.position.z += v;
+        if (s.group.position.z > 16) s.group.position.z -= TOTAL;
+      }
+      // pulso de neones
+      const p = 0.75 + Math.sin(phase * 2.2) * 0.18;
+      M.cyan.emissiveIntensity = 2.3 * p;
+      M.white.emissiveIntensity = 2.5 * (0.85 + Math.sin(phase * 1.3) * 0.12);
+      M.warm.emissiveIntensity = 1.9 * (0.8 + Math.sin(phase * 3.1 + 1) * 0.2);
+      M.magenta.emissiveIntensity = 2.2 * (0.82 + Math.sin(phase * 1.7 + 2.4) * 0.18);
+      for (let i = 0; i < anim.arches.length; i++) {
+        anim.arches[i].emissiveIntensity = 2.4 * (0.85 + Math.sin(phase * 2.6 + i * 0.9) * 0.15);
+      }
+      // ventiladores
+      for (const f of anim.fans) f.rotation.z += dt * 3.4;
+      // parpadeo de holos
+      for (let i = 0; i < anim.holos.length; i++) {
+        const m = anim.holos[i];
+        m.emissiveIntensity = 1.0 + Math.sin(phase * 5 + i * 1.7) * 0.12 + (Math.random() < 0.006 ? 0.5 : 0);
+      }
+      // polvo a la deriva
+      dust.position.z = ((dust.position.z + v * 0.55 + 30) % 30) - 30;
+      dust.rotation.y = Math.sin(phase * 0.2) * 0.03;
+    }
   };
 }

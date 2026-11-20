@@ -140,7 +140,7 @@ function snapTurn(sign) {
 }
 
 // ---------------------------------------------------------------- HUD de QA (solo escritorio)
-const diagOn = params.get('diag') !== '0';
+const diagOn = params.get('diag') === '1'; // HUD técnico solo con ?diag=1
 const diag = document.createElement('div');
 diag.style.cssText = 'position:fixed;left:10px;top:10px;z-index:5;font:11px/1.45 ui-monospace,monospace;color:#8fe3ff;' +
   'background:rgba(5,7,11,.62);border:1px solid rgba(98,200,255,.22);padding:6px 9px;border-radius:3px;pointer-events:none;white-space:pre';
@@ -333,6 +333,23 @@ function desktopTick(dt) {
   if (keys.has('ArrowRight')) snapTurn(-1);
 }
 
+// ---------------------------------------------------------------- menú (corredor vivo detrás del título)
+let menuT = 0;
+function menuActive() {
+  const b = document.getElementById('boot');
+  return !!b && !b.classList.contains('hide');
+}
+function menuTick(dt) {
+  menuT += dt;
+  const sway = Math.sin(menuT * 0.11);
+  camera.position.set(sway * 1.15, 1.6 + Math.sin(menuT * 0.27) * 0.035, 2.9 + Math.cos(menuT * 0.07) * 0.55);
+  camera.quaternion.setFromEuler(new THREE.Euler(
+    -0.02 + Math.sin(menuT * 0.19) * 0.012,
+    sway * 0.07,
+    Math.sin(menuT * 0.13) * 0.006
+  ));
+}
+
 // ---------------------------------------------------------------- bucle
 const clock = new THREE.Clock();
 let acc = 0, frames = 0, fps = 0, lastDiag = 0;
@@ -344,7 +361,10 @@ function tick() {
 
   if (audio) audio.resume();
   if (arena) arena.update(dt, t);
-  if (rail) rail.update(dt, game && isFinite(game.railSpeed) ? game.railSpeed : 2.7);
+  const inMenu = menuActive();
+  if (inMenu) menuTick(dt);
+  const railV = inMenu ? 0.42 : (game && isFinite(game.railSpeed) ? game.railSpeed : 2.7);
+  if (rail) rail.update(dt, railV);
   if (game) {
     const head = toPlayPos(camera.getWorldPosition(_hp));
     game.update(dt, t, head);
