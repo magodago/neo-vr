@@ -444,7 +444,7 @@ export class Game {
     mesh.add(glow);
     this.scene.add(mesh);
     this.projectiles.push({
-      mesh, glow, core, vel: dir.clone().multiplyScalar(3.9), speed: 3.9,
+      mesh, glow, core, vel: dir.clone().multiplyScalar(6.6), speed: 6.6,
       life: 9, reflected: false, dmg: 1, target: null, dead: false
     });
   }
@@ -547,7 +547,12 @@ export class Game {
 
     // enemigos
     this.railSpeed = 2.7 + Math.min(3.4, this.wave * 0.32);
-    const playerPos = { x: this.rig.position.x, z: this.rig.position.z };
+    // OJO: aquí se usaba this.rig.position, que NO es donde está el jugador.
+    // El rig se queda en z=-2.6 y la cámara (el cuerpo real, el que recibe los
+    // impactos en `chest`) está en z=0: los enemigos apuntaban 2.6 m por detrás
+    // y sus disparos pasaban de largo (0 impactos en 20 s). Misma referencia que
+    // el hitbox: la cabeza.
+    const playerPos = { x: head.x, z: head.z };
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
       // arrastre del riel: el escenario avanza y se lleva a los enemigos con él

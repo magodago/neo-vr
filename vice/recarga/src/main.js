@@ -8,6 +8,11 @@ import { Weapon } from './weapon.js';
 import { Hud } from './hud.js';
 import { Game } from './game.js';
 import { glowSprite } from './textures.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 const boot = window.__boot;
 const Y = new THREE.Vector3(0, 1, 0);
@@ -20,7 +25,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.12;
+renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.xr.enabled = true;
@@ -35,6 +40,31 @@ scene.fog = new THREE.FogExp2(0x05070b, 0.026);
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.04, 160);
 camera.position.set(0, 1.62, 0);
 scene.add(camera);
+
+// post-proceso solo fuera de XR: el bloom real hace florecer el neón.
+// En el visor el WebXR no admite render a render-target, así que allí mandan
+// los halos aditivos y el tone mapping (mismo look, sin coste).
+let composer = null;
+// depuración de contraste: congelar la simulación y comparar con/sin bloom
+let frozenFrame = false;
+let bloomOff = false;
+function buildComposer() {
+  if (composer) return composer;
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  // umbral alto: solo florece lo que de verdad es emisivo (neón, ojos, fogonazo).
+  // con umbral bajo el pasillo se lava en blanco.
+  // bloom medido en histograma: fuerza .34 / radio .55 / umbral 1.05 metía halo en TODA
+  // la escena (0 % de píxeles oscuros, imagen gris lechosa). Con .15 / .30 / 1.6 el neón
+  // brilla y los negros siguen negros (30 % de píxeles < 40 frente a 31 % sin post).
+  const bloom = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight), 0.15, 0.30, 1.6
+  );
+  composer.addPass(bloom);
+  // cierre a sRGB; el tone mapping ACES ya lo aplica el material del RenderPass
+  composer.addPass(new ShaderPass(GammaCorrectionShader));
+  return composer;
+}
 
 // luz de casco: rim suave que hace leer los materiales cercanos
 const headLamp = new THREE.PointLight(0xdfefff, 4.2, 7.5, 2.0);
@@ -267,8 +297,17 @@ function onFire() {
   const now = performance.now();
   if (now - fireCd < 90) return;
   fireCd = now;
-  weapon.muzzleWorld(_o);
-  weapon.aimDir(_d);
+  if (desktop) {
+    // en escritorio la mira es el centro de la pantalla: el rayo sale de la cámara.
+    // (desde el cañón había 5-6° de desvío por el montaje a la derecha y no daba ni al
+    // enemigo más cercano a 10 m)
+    camera.getWorldPosition(_o);
+    camera.getWorldDirection(_d);
+    _o.addScaledVector(_d, 0.4);
+  } else {
+    weapon.muzzleWorld(_o);
+    weapon.aimDir(_d);
+  }
   game.tryFire(toPlayPos(_o), toPlayDir(_d));
   if (gunSource && gunSource.gamepad && gunSource.gamepad.hapticActuators && gunSource.gamepad.hapticActuators[0]) {
     gunSource.gamepad.hapticActuators[0].pulse(0.35, 45);
@@ -305,13 +344,15 @@ let mouseLook = false;
 
 function startDesktop() {
   desktop = true;
-  window.__recarga = { get game() { return game; }, weapon, hud, world, scene, renderer, camera, rail, arena, THREE };
+  window.__recarga = { get game() { return game; }, weapon, hud, world, scene, renderer, camera, rail, arena, THREE, onFire, onWhip, onNade, dbg: { freeze: (v) => { frozenFrame = !!v; }, noBloom: (v) => { bloomOff = !!v; }, composer: () => buildComposer() } };
   document.body.style.cursor = 'crosshair';
   boot && boot.prog(1, '');
   const el = document.getElementById('boot');
   if (el) el.classList.add('hide');
   if (game.state === 'idle' || game.state === 'dead') game.begin();
   if (audio) { audio.init(); audio.ambient(); }
+  // en escritorio el arma se cuelga de la cámara (en el visor va al mando)
+  if (weapon) weapon.mount(camera, new THREE.Vector3(0.145, -0.175, -0.30), new THREE.Euler(-0.04, 0.02, 0.02));
   renderer.domElement.addEventListener('click', () => {
     if (!mouseLook) renderer.domElement.requestPointerLock();
     else onFire();
@@ -400,7 +441,13 @@ function tick() {
       diag.textContent = `RECARGA · ${fps} fps\nestado ${st} · vida ${game ? game.hp : '-'} · balas ${game ? game.ammo : '-'}\nola ${game ? game.wave : '-'} · puntos ${game ? game.score : '-'}\nbots ${game ? game.enemies.length : '-'} · yaw ${yaw.toFixed(2)}\n[clic] bloquear/ratón · [WASD] mover · [clic] disparar · [E] golpe`;
     }
   }
-  renderer.render(scene, camera);
+  if (frozenFrame) { renderFrame(); return; }
+  renderFrame();
+}
+
+function renderFrame() {
+  if (renderer.xr.isPresenting || bloomOff) renderer.render(scene, camera);
+  else buildComposer().render();
 }
 
 // ---------------------------------------------------------------- entrada
@@ -436,7 +483,7 @@ async function enter() {
     await loadEnv();
     boot && boot.prog(0.85, 'Calibrando el pulso');
     renderer.compile(scene, camera);
-    window.__recarga = { game, weapon, hud, world, THREE, onFire, onWhip, camera };
+    window.__recarga = { game, weapon, hud, world, THREE, onFire, onWhip, camera , dbg: { freeze: (v) => { frozenFrame = !!v; }, noBloom: (v) => { bloomOff = !!v; }, composer: () => buildComposer() } };
     renderer.setAnimationLoop(tick);
     boot && boot.ready('Entrar');
     const go = document.getElementById('go');
@@ -458,4 +505,5 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  if (composer) composer.setSize(window.innerWidth, window.innerHeight);
 });

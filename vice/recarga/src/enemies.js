@@ -346,10 +346,12 @@ export class GroundBot {
       if (this.chargeT > 0.5) {
         this.chargeT = 0;
         if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.55);
-        this.fireT = 1.0 + Math.random() * 0.6;
+        this.fireT = 0.9 + Math.random() * 0.45;
         // ráfaga de 2
+        // apuntaban a pz + 1.0, es decir 1 m POR DETRÁS del pecho: el proyectil pasaba
+        // a 0.5 m y con radio de impacto 0.42 no tocaba nunca (el jugador era invencible).
         const from = _v.setFromMatrixPosition(this.muzzle.matrixWorld).clone();
-        const target = _v2.set(px + (Math.random() - 0.5) * 0.5, 1.35 + (Math.random() - 0.5) * 0.35, pz + 1.0);
+        const target = _v2.set(px + (Math.random() - 0.5) * 0.55, 1.32 + (Math.random() - 0.5) * 0.4, pz + 0.15);
         const dir = target.sub(from).normalize();
         evs.push({ type: 'shoot', from, dir });
         if (this.audio) { try { this.audio.impact(); } catch (e) {} }
@@ -490,11 +492,12 @@ export class LaserCam {
     this.fireT -= dt;
     if (this.fireT <= 0.55) this.chargeT += dt;
     if (this.fireT <= 0) {
-      this.fireT = 1.4 + Math.random() * 0.6;
+      this.fireT = 1.15 + Math.random() * 0.5;
       this.chargeT = 0;
       this.root.updateMatrixWorld(true);
       const from = new THREE.Vector3(0, 0, 0.42).applyMatrix4(this.root.matrixWorld);
-      const aim = _v2.set(playerPos.x + (Math.random() - 0.5) * 0.7, 1.3 + (Math.random() - 0.5) * 0.4, playerPos.z + 1.2);
+      // mismo error que el robot: apuntaba detrás del jugador
+      const aim = _v2.set(playerPos.x + (Math.random() - 0.5) * 0.7, 1.3 + (Math.random() - 0.5) * 0.4, playerPos.z + 0.1);
       const dir = aim.sub(from).normalize();
       evs.push({ type: 'shoot', from, dir });
       if (this.audio) { try { this.audio.impact(); } catch (e) {} }

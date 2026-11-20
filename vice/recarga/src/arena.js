@@ -31,24 +31,24 @@ export function buildArena(scene) {
   const matFloor = new THREE.MeshStandardMaterial({
     map: floorT.map, roughnessMap: floorT.roughnessMap, normalMap: floorT.normalMap,
     normalScale: new THREE.Vector2(0.55, 0.55),
-    color: 0x8e9aa8, metalness: 0.62, roughness: 1.0, envMapIntensity: 1.1
+    color: 0x4c545f, metalness: 0.62, roughness: 1.0, envMapIntensity: 0.55
   });
 
   const conT = concrete();
   conT.map.repeat.set(5, 2.2); conT.normalMap.repeat.set(5, 2.2);
   const matConcrete = new THREE.MeshStandardMaterial({
     map: conT.map, normalMap: conT.normalMap, normalScale: new THREE.Vector2(0.8, 0.8),
-    color: 0x7b8494, metalness: 0.05, roughness: 0.92, envMapIntensity: 0.7
+    color: 0x343943, metalness: 0.05, roughness: 0.92, envMapIntensity: 0.35
   });
 
   const brush = brushedMetal();
   brush.map.repeat.set(2, 2); brush.roughnessMap.repeat.set(2, 2);
   const matSteel = new THREE.MeshStandardMaterial({
-    map: brush.map, roughnessMap: brush.roughnessMap, color: 0x9aa6b6,
+    map: brush.map, roughnessMap: brush.roughnessMap, color: 0x5a6470,
     metalness: 0.95, roughness: 0.42, envMapIntensity: 1.35
   });
   const matDark = new THREE.MeshStandardMaterial({
-    map: brush.map, color: 0x2b3138, metalness: 0.9, roughness: 0.55, envMapIntensity: 0.9
+    map: brush.map, color: 0x191d23, metalness: 0.9, roughness: 0.55, envMapIntensity: 0.5
   });
   const matHaz = new THREE.MeshStandardMaterial({ map: hazard(), color: 0xbfc6d2, metalness: 0.5, roughness: 0.75 });
   const matNeonC = new THREE.MeshBasicMaterial({ color: 0xbfe8ff });
@@ -200,10 +200,10 @@ export function buildArena(scene) {
   });
 
   // luces
-  const hemi = new THREE.HemisphereLight(0x546a86, 0x0a0d12, 0.55);
+  const hemi = new THREE.HemisphereLight(0x546a86, 0x0a0d12, 0.26);
   scene.add(hemi);
 
-  const key = new THREE.SpotLight(0xbfe0ff, 90, 22, Math.PI / 4.2, 0.55, 1.6);
+  const key = new THREE.SpotLight(0xbfe0ff, 46, 22, Math.PI / 4.2, 0.55, 1.6);
   key.position.set(0.5, 5.4, -1.6);
   key.target.position.set(0, 0, -0.6);
   key.castShadow = true;
