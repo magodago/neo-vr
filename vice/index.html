@@ -217,6 +217,8 @@ scene.add(spark);
    eje +Z hacia el espectador. 1,39 m de ancho x 1,65 m de alto. */
 const DIORAMA = 1.0;
 const INSIDE  = 1.0;
+const FIT = 2.4;      // ancho real de la maqueta en MR (metros)
+let SC = 1;           // escala vigente de la maqueta
 
 const stage = new THREE.Group();      // colocacion en el mundo (lo mueve la XR)
 scene.add(stage);
@@ -657,6 +659,15 @@ const mesh = new SplatMesh({
   onLoad: (m) => {
     splat = m;
     cityGroup.add(m);
+    // el .splat viene desplazado respecto a su propio origen (z -2.0..-0.6):
+    // lo centramos y lo apoyamos en y=0 para que la colocacion sea predecible
+    try {
+      const bb = m.getBoundingBox(true);
+      const c = bb.getCenter(new THREE.Vector3());
+      cityGroup.position.set(-c.x, -bb.min.y, -c.z);
+      cityGroup.userData.size = bb.getSize(new THREE.Vector3());
+      console.log("bbox", cityGroup.userData.size.toArray().map(n=>+n.toFixed(2)));
+    } catch (err) { console.warn("bbox", err); }
     barEl.style.width = "100%";
     pctEl.textContent = "LISTO";
     loaded = true;
@@ -695,12 +706,17 @@ let placedXr = false;
 function placeStage(){
   const p = camPose();
   const xr = renderer.xr.isPresenting;
-  const d = xr ? 1.8 : 2.4;
+  const d = xr ? 2.1 : 2.4;
   stage.position.copy(p).addScaledVector(fwd, d);
   // en MR la maqueta se apoya en el suelo real (local-floor y=0); en pantalla flota a la vista
   stage.position.y = xr ? 0.02 : Math.max(0.55, p.y - 0.55);
   stage.rotation.y = Math.atan2(fwd.x, fwd.z);
   stage.userData.baseY = stage.rotation.y;
+  // tamano: la maqueta ocupa FIT metros delante del usuario; en pantalla, escala 1
+  const sz = cityGroup.userData.size;
+  const w = sz ? Math.max(sz.x, sz.z) : 1.4;
+  SC = xr ? Math.min(3.2, Math.max(0.9, FIT / w)) : 1;
+  if (rev.state === "done" && !insideMode) stage.scale.setScalar(SC);
   // el halo y la sombra siguen la base: pegados al suelo en MR, flotando en pantalla
   halo.position.y = xr ? -0.015 : -0.42;
   contact.position.y = xr ? -0.012 : -0.435;
@@ -765,7 +781,7 @@ function toBurst(){
 
   rev.from.copy(rev.discP);
   stage.position.copy(rev.from);
-  stage.scale.setScalar(0.02);
+  stage.scale.setScalar(0.02 * SC);
   stage.rotation.y = stage.userData.baseY + 0.9;
   stage.userData.final = stage.position.clone();
   stage.userData.final.y = renderer.xr.isPresenting
@@ -807,7 +823,7 @@ function updateReveal(dt, now){
     const k = clamp01(t / 1.90);
     const e = ease.outQuint(k);
     stage.position.lerpVectors(rev.from, stage.userData.final, e);
-    stage.scale.setScalar(0.02 + e * 0.98);
+    stage.scale.setScalar((0.02 + e * 0.98) * SC);
     stage.rotation.y = stage.userData.baseY + 0.9 * (1 - ease.outCubic(k));
 
     const f = clamp01(t / 0.55);
@@ -921,8 +937,8 @@ function toggleInside(){
     insideAnim.from = { pos: stage.position.clone(), scale: stage.scale.x, rot: stage.rotation.y };
     // MR: la ciudad crece desde tu suelo hasta envolver la sala -> entras dentro andando
     insideAnim.to = xr
-      ? { pos: new THREE.Vector3(p.x, 0.02, p.z), scale: 6.0, rot: stage.rotation.y }
-      : { pos: new THREE.Vector3(p.x, p.y - 1.45, p.z), scale: 4.0, rot: stage.rotation.y + Math.PI };
+      ? { pos: new THREE.Vector3(p.x, 0.02, p.z), scale: 3.4 * SC, rot: stage.rotation.y }
+      : { pos: new THREE.Vector3(p.x, p.y - 1.45, p.z), scale: 4.0 * SC, rot: stage.rotation.y + Math.PI };
   } else {
     insideAnim.active = true; insideAnim.t = 0;
     insideAnim.from = { pos: stage.position.clone(), scale: stage.scale.x, rot: stage.rotation.y };
@@ -995,6 +1011,14 @@ if (navigator.xr && navigator.xr.requestSession){
     throw lastErr || new Error("sin sesión XR");
   };
 }
+
+renderer.xr.addEventListener("sessionstart", () => {
+  placedXr = false; placed = false; insideMode = false;   // recolocar con la pose real
+});
+renderer.xr.addEventListener("sessionend", () => {
+  placedXr = false; placed = false;
+  setTimeout(() => { try { placeStage(); } catch (e) {} }, 80);
+});
 
 const sparkXr = new SparkXr({
   renderer,
