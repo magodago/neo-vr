@@ -241,13 +241,16 @@ export class Drone {
 
     // cooldown / ataque
     this.cooldown -= dt;
-    if (this.state === 'approach' && this.cooldown <= 0 && dist < 5.6) {
+    if (this.state === 'approach' && this.cooldown <= 0 && dist < 9.5) {
       this.state = 'telegraph'; this.stateT = 0;
     }
     if (this.state === 'telegraph') {
-      if (this.stateT > 1.35) {
-        events.push({ type: 'shoot', from: new THREE.Vector3(pos.x, pos.y + 0.03, pos.z), dir: new THREE.Vector3(Math.sin(toPlayer), -0.06, Math.cos(toPlayer)).normalize() });
-        this.state = 'recover'; this.stateT = 0; this.cooldown = 2.4 + Math.random() * 1.8;
+      if (this.stateT > 0.9) {
+        // el dron disparaba en horizontal (dy = -0.06) desde ~2.6 m de altura:
+        // el rayo pasaba 0.85 m POR ENCIMA del pecho y nunca acertaba.
+        const aim = new THREE.Vector3(dx, 1.40 - (pos.y + 0.03), dz).normalize();
+        events.push({ type: 'shoot', from: new THREE.Vector3(pos.x, pos.y + 0.03, pos.z), dir: aim });
+        this.state = 'recover'; this.stateT = 0; this.cooldown = 1.5 + Math.random() * 1.0;
         if (this.audio) this.audio.shot();
       }
     }
