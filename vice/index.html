@@ -893,6 +893,7 @@ const sparkXr = new SparkXr({
   elementId: "xr",
   frameBufferScaleFactor: 1.0,
   referenceSpaceType: "local-floor",
+  sessionInit: { optionalFeatures: ["local-floor", "bounded-floor"] },
   enableHands: false,
   onReady: (supported) => {
     const headset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(navigator.userAgent || "");
