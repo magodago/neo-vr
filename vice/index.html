@@ -50,7 +50,14 @@
   /* boton MR persistente: vive fuera del velo para que no desaparezca al cargar */
   #xrhud{
     position:fixed; left:0; right:0; bottom:70px; z-index:30;
-    display:flex; justify-content:center; pointer-events:none;
+    display:flex; gap:14px; flex-wrap:wrap; justify-content:center; pointer-events:none;
+    padding:0 16px;
+  }
+  #xrhud #xrvr{
+    margin:0; padding:19px 26px; pointer-events:auto;
+    font-size:11px; letter-spacing:.24em;
+    background:rgba(255,255,255,.05); color:rgba(255,255,255,.72);
+    box-shadow:0 0 0 1px rgba(255,255,255,.18) inset;
   }
   #xrhud.off{ display:none; }
   #xrhud #xr{
@@ -76,6 +83,19 @@
     opacity:0; transition:opacity .8s ease; text-align:center; pointer-events:none; line-height:2;
   }
   #hint.on{ opacity:1; }
+  #diag{
+    position:fixed; top:0; left:0; right:0; z-index:40; display:none;
+    font:11px/1.45 ui-monospace,SFMono-Regular,monospace; color:#9ff5d0;
+    background:rgba(0,18,12,.72); border-bottom:1px solid rgba(0,255,180,.25);
+    padding:6px 10px; white-space:pre-wrap; pointer-events:none;
+  }
+  #diag.on{ display:block; }
+  #wv{ position:fixed; inset:0; z-index:60; display:none; padding:8vh 7vw;
+    background:#05050a; color:#f2f2f7; font:16px/1.6 -apple-system,system-ui,sans-serif; }
+  #wv.on{ display:block; }
+  #wv h2{ font-size:26px; margin:0 0 14px; letter-spacing:-.5px; }
+  #wv code{ display:block; margin:14px 0; padding:14px; border-radius:12px;
+    background:#12121c; color:#39f0c0; font:14px/1.5 ui-monospace,monospace; word-break:break-all; }
   #err{
     position:fixed; left:16px; right:16px; bottom:16px; z-index:30; display:none;
     font:12px/1.5 ui-monospace,monospace; color:#ff8fb0; background:rgba(30,0,12,.9);
@@ -100,11 +120,19 @@
 
 <div id="xrhud" class="off">
   <button id="xr" disabled>ENTRAR EN MR</button>
+  <button id="xrvr" disabled>ENTRAR EN VR</button>
 </div>
 
 <div id="badge">SHARP · SPARK · 385K</div>
 <div id="hint"></div>
 <div id="err"></div>
+<div id="diag"></div>
+<div id="wv">
+  <h2>Estás dentro del navegador de una app, no del navegador del visor</h2>
+  <p>Desde aquí no hay WebXR: por eso pide los servicios AR de Google Play. Copia o abre esta dirección en el navegador del Quest.</p>
+  <code id="wvurl"></code>
+  <p>Abrela con A / gatillo en la barra de direcciones del navegador.</p>
+</div>
 
 <script type="importmap">
 { "imports": {
@@ -887,6 +915,59 @@ function updateInside(dt){
   if (k >= 1) insideAnim.active = false;
 }
 
+/* -------------------------------------------- diagnóstico + sesión XR robusta */
+const diagEl = document.getElementById("diag");
+const UA = navigator.userAgent || "";
+const isHeadset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(UA);
+const inWebView = /; wv\)|FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(UA);
+const dlog = [];
+function dbg(m){
+  dlog.push(m);
+  if (dlog.length > 5) dlog.shift();
+  if (diagEl) diagEl.textContent = dlog.join("\n");
+  console.log("[diag]", m);
+}
+if (isHeadset || (typeof Q !== "undefined" && Q.has("diag"))) diagEl.classList.add("on");
+
+if (inWebView){
+  document.getElementById("wvurl").textContent = location.href;
+  document.getElementById("wv").classList.add("on");
+}
+
+(async () => {
+  if (!navigator.xr){ dbg("sin navigator.xr · " + (isHeadset ? "visor" : "pantalla") + " · " + UA.slice(0, 42)); return; }
+  let ar = "?", vr = "?";
+  try { ar = await navigator.xr.isSessionSupported("immersive-ar"); } catch (e) { ar = "err"; }
+  try { vr = await navigator.xr.isSessionSupported("immersive-vr"); } catch (e) { vr = "err"; }
+  dbg(`ar:${ar} vr:${vr} · ${isHeadset ? "visor" : "pantalla"}${inWebView ? " · webview" : ""}`);
+})();
+
+/* Cadena de intentos: AR completa -> AR mínima -> VR. Nunca deja al usuario sin sesión. */
+if (navigator.xr && navigator.xr.requestSession){
+  const rawRequest = navigator.xr.requestSession.bind(navigator.xr);
+  navigator.xr.requestSession = async function (mode, init) {
+    const opt = (i) => ({ optionalFeatures: (i && i.optionalFeatures) || [] });
+    const tries = mode === "immersive-ar"
+      ? [[mode, init],
+         ["immersive-ar", opt(init)],
+         ["immersive-vr", { requiredFeatures: ["local-floor"], optionalFeatures: ["bounded-floor"] }]]
+      : [[mode, init], ["immersive-vr", { requiredFeatures: ["local-floor"] }]];
+    let lastErr = null;
+    for (const [m, cfg] of tries){
+      try {
+        const s = await rawRequest(m, cfg);
+        window.__xrMode = m;
+        dbg("sesión " + m + (m === "immersive-vr" ? " · sin passthrough" : " · passthrough"));
+        return s;
+      } catch (e){
+        lastErr = e;
+        dbg("fallo " + m + " · " + ((e && (e.name + ": " + e.message)) || e));
+      }
+    }
+    throw lastErr || new Error("sin sesión XR");
+  };
+}
+
 const sparkXr = new SparkXr({
   renderer,
   mode: "arvr",
@@ -913,6 +994,7 @@ const sparkXr = new SparkXr({
     }
     btn.disabled = !loaded;
     xrBtn.disabled = !loaded;
+    document.getElementById("xrvr").disabled = !loaded;
   },
   onEnterXr: () => {
     audio();
@@ -932,6 +1014,14 @@ btn.addEventListener("click", (e) => {
   e.preventDefault();
   audio();
   startReveal();
+});
+
+const xrVrBtn = document.getElementById("xrvr");
+xrVrBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  audio();
+  sparkXr.mode = "immersive-vr";
+  sparkXr.toggleXr();
 });
 
 /* --------------------------------------------------------- preview desktop */
