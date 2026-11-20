@@ -43,7 +43,7 @@
     backdrop-filter:blur(8px); transition:transform .18s ease, box-shadow .3s ease, opacity .3s;
   }
   #enter:hover,#xr:hover{ transform:translateY(-1px); box-shadow:0 0 0 1px rgba(40,230,255,.4), 0 22px 60px -16px rgba(40,230,255,.6); }
-  #enter[disabled],#xr[disabled]{ opacity:.35; pointer-events:none; }
+  #enter[disabled],#xr[disabled],#xrvr[disabled]{ opacity:.35; pointer-events:none; }
   .row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
   #note{ font-size:10.5px; letter-spacing:.2em; color:#4e5273; text-transform:uppercase; max-width:40ch; line-height:1.8; }
 
@@ -127,6 +127,32 @@
 <div id="hint"></div>
 <div id="err"></div>
 <div id="diag"></div>
+<script>
+/* instrumento de arranque: no depende del módulo, sobrevive a cualquier error */
+(function () {
+  var UA = navigator.userAgent || "";
+  var headset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(UA);
+  var diag = document.getElementById("diag");
+  if (!diag) return;
+  var want = headset || /[?&]diag=1/.test(location.search);
+  if (want) diag.classList.add("on");
+  var lines = [];
+  function log(m){
+    lines.push(m); if (lines.length > 6) lines.shift();
+    if (diag) diag.textContent = lines.join("\n");
+  }
+  window.__dbgLog = log;
+  log("boot · xr:" + (!!navigator.xr) + " · " + UA.slice(0, 38));
+  window.addEventListener("error", function (e) {
+    log("ERROR " + (e.message || e.type) + " @ " + String(e.filename || "").split("/").pop() + ":" + (e.lineno || ""));
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    var r = e.reason || {};
+    log("RECHAZO " + (r.name || "") + " " + String(r.message || r).slice(0, 90));
+  });
+})();
+</script>
+
 <div id="wv">
   <h2>Estás dentro del navegador de una app, no del navegador del visor</h2>
   <p>Desde aquí no hay WebXR: por eso pide los servicios AR de Google Play. Copia o abre esta dirección en el navegador del Quest.</p>
@@ -639,6 +665,7 @@ const mesh = new SplatMesh({
       veil.classList.add("gone");
       btn.disabled = false;
       xrBtn.disabled = false;
+      const vb = document.getElementById("xrvr"); if (vb) vb.disabled = false;
       if (STATIC) {
         if (AT > 0) window.__dbg.run(AT);
         return;
@@ -922,6 +949,7 @@ const isHeadset = /Quest|OculusBrowser|VisionOS|Pico|Lynx|MagicLeap/i.test(UA);
 const inWebView = /; wv\)|FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(UA);
 const dlog = [];
 function dbg(m){
+  if (typeof window.__dbgLog === "function") { window.__dbgLog(m); return; }
   dlog.push(m);
   if (dlog.length > 5) dlog.shift();
   if (diagEl) diagEl.textContent = dlog.join("\n");
