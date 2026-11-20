@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { brushedMetal, glowSprite } from './textures.js';
 
+const _aimA = new THREE.Vector3();
+const _aimB = new THREE.Vector3();
+// Centro de la empuñadura en espacio local del arma (ver geometría "grip").
+const GRIP_LOCAL = new THREE.Vector3(0, -0.105, 0.075);
+
 function bevelBox(w, h, d, b = 0.006, curve = 0.008) {
   const s = new THREE.Shape();
   const x = -w / 2, y = -h / 2;
@@ -197,10 +202,29 @@ export class Weapon {
   }
 
   muzzleWorld(out = new THREE.Vector3()) {
+    this.gun.updateWorldMatrix(true, false);
     return this.gun.localToWorld(out.set(0, -0.012, -0.34));
   }
 
+  // Dirección real del cañón (eje -Z del arma), no el +Z del grupo.
+  aimDir(out = new THREE.Vector3()) {
+    this.gun.updateWorldMatrix(true, false);
+    const near = this.gun.localToWorld(_aimA.set(0, -0.012, -0.34));
+    const far = this.gun.localToWorld(_aimB.set(0, -0.012, -3.0));
+    return out.copy(far).sub(near).normalize();
+  }
+
   // Reparenta el arma a un espacio XR (grip del mando) con offset propio
+  // Pose del arma en el grip del mando: desplaza el modelo para que el
+  // centro de la empuñadura caiga exactamente en el origen del mando.
+  handPose(side = 1) {
+    const s = this.root.scale.x;
+    return {
+      pos: new THREE.Vector3(0, -GRIP_LOCAL.y * s, -GRIP_LOCAL.z * s),
+      rot: new THREE.Euler(-0.05, side * Math.PI * 0.015, 0),
+    };
+  }
+
   mount(parent, pos, rot) {
     parent.add(this.root);
     parent.add(this.slash);

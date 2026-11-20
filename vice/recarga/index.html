@@ -27,6 +27,10 @@
      transition:.25s}
   button.enter:hover{background:rgba(61,155,255,.18);border-color:var(--cy);transform:translateY(-1px)}
   button.enter[disabled]{opacity:.4;cursor:default;transform:none}
+  button.mano{appearance:none;cursor:pointer;margin-top:-6px;padding:9px 20px;border-radius:2px;
+     border:1px solid rgba(255,159,67,.42);background:rgba(255,159,67,.05);color:#ffcf9a;
+     font-size:10px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;transition:.25s}
+  button.mano:hover{background:rgba(255,159,67,.14);border-color:var(--am);color:#ffe6c8}
   .ctrl{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:8px;font-size:11px;
         letter-spacing:.13em;text-transform:uppercase;color:#6f8299}
   .ctrl b{color:#b9cbe1;font-weight:600}
@@ -44,12 +48,13 @@
   <div class="kicker">Sector 07 · Turno de noche</div>
   <h1>RECARGA</h1>
   <div class="rule"></div>
-  <p class="sub">La pistola no tiene botón de recarga. Se recarga golpeando.</p>
+  <p class="sub">Pistola en una mano, guante de energía en la otra. Recarga golpeando o apretando el agarre.</p>
   <div id="bar"><i></i></div>
   <button class="enter" id="go" disabled>Preparando</button>
+  <button class="mano" id="mano">Arma: derecha</button>
   <div class="ctrl">
     <span><b>Gatillo</b> disparar</span>
-    <span><b>Golpe seco</b> recargar</span>
+    <span><b>Golpe / agarre</b> recargar</span>
     <span><b>Stick izq.</b> moverte</span>
     <span><b>Stick der.</b> girar</span>
   </div>

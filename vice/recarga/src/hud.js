@@ -206,15 +206,16 @@ export class Hud {
     this.reloadOn = on;
   }
 
-  hit() { this.hitT = 0.18; }
+  hit(hard = false) { this.hitT = hard ? 0.3 : 0.18; this.hitHard = hard; }
   hurt() { this.vigT = 0.55; }
 
   update(dt) {
     if (this.hitT > 0) {
       this.hitT -= dt;
-      const k = Math.max(0, this.hitT / 0.18);
+      const k = Math.max(0, this.hitT / (this.hitHard ? 0.3 : 0.18));
       this.hitMark.material.opacity = k;
-      this.hitMark.scale.setScalar(1.15 - k * 0.25);
+      this.hitMark.scale.setScalar((this.hitHard ? 1.45 : 1.15) - k * 0.25);
+      this.hitMark.material.color.setHex(this.hitHard ? 0xff5a3c : 0xe8f4ff);
     } else this.hitMark.material.opacity = 0;
 
     if (this.banDur > 0) {

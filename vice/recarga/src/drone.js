@@ -162,10 +162,11 @@ export class Drone {
     this.speed = 1.15 + Math.random() * 0.35;
     this.flash = 0;
     this.dead = false;
-    this.scale = 1;
+    this.scale = 0;
     this.spawnT = 0;
 
-    this.root.position.set(Math.sin(this.angle) * this.radius, this.baseY + 1.2, Math.cos(this.angle) * this.radius);
+    // delante del jugador (-Z es el frente del corredor)
+    this.root.position.set(-Math.sin(this.angle) * this.radius, this.baseY + 1.2, -Math.cos(this.angle) * this.radius);
     this.root.scale.setScalar(0.01);
 
     this.hum = audio ? audio.droneHum(this.id) : null;
@@ -219,7 +220,10 @@ export class Drone {
 
     let moving = 0;
     if (this.state === 'approach' || this.state === 'recover') {
-      this.angle += this.strafeDir * dt * 0.22;
+      // riel: deriva lateral acotada, nunca orbita alrededor del jugador
+      this.angle += this.strafeDir * dt * 0.06;
+      if (this.angle > 0.22) { this.angle = 0.22; this.strafeDir = -1; }
+      if (this.angle < -0.22) { this.angle = -0.22; this.strafeDir = 1; }
       const targetR = this.radius;
       if (dist > targetR + 0.5) moving = this.speed;
       else if (dist < targetR - 0.9) moving = -this.speed * 0.7;

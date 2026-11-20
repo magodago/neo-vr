@@ -110,13 +110,23 @@ export class Game {
   }
 
   spawnEnemy(boss) {
-    const hp = boss ? 12 + this.wave : 3 + Math.floor(this.wave / 2);
+    const hp = boss ? 14 + this.wave * 2 : Math.min(5, 2 + Math.floor(this.wave / 4));
     const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 1.15 });
     if (boss) {
       d.root.scale.setScalar(0.02);
       d.isBoss = true;
       d.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
     }
+    // modo riel: entra por el fondo del corredor y avanza hacia el jugador
+    d.angle = (Math.random() * 2 - 1) * 0.13;
+    d.radius = boss ? 20 : 15 + Math.random() * 9;
+    d.railHold = boss ? 9.0 : 4.6 + Math.random() * 1.8;
+    // recolocar en el fondo del corredor con el radio real de entrada
+    d.root.position.set(
+      -Math.sin(d.angle) * d.radius,
+      d.baseY + 1.2,
+      -Math.cos(d.angle) * d.radius
+    );
     this.enemies.push(d);
   }
 
@@ -135,13 +145,14 @@ export class Game {
     if (this.ammo === 0) {
       this.weapon.setSpent(true);
       this.hud.reloadHint(true);
+      this.reloadT = 1.5; // recarga automática de cortesía
     }
 
     // impacto en enemigos (rayo-esfera)
     let best = null, bestT = Infinity, bestPoint = null;
     for (const e of this.enemies) {
       if (e.dead || e.state === 'dying') continue;
-      const r = e.isBoss ? 0.82 : 0.42;
+      const r = e.isBoss ? 1.05 : 0.66;
       _v1.copy(e.root.position).sub(origin);
       const tca = _v1.dot(dir);
       if (tca < 0) continue;
@@ -152,10 +163,16 @@ export class Game {
     }
 
     if (best) {
-      const killed = best.hit(1, dir);
+      // daño real: el centro del cuerpo mata de un tiro, el borde hace 2
+      const rad = best.isBoss ? 1.05 : 0.66;
+      _v2.copy(best.root.position).sub(origin);
+      const along = _v2.dot(dir);
+      const perp = Math.sqrt(Math.max(0, _v2.lengthSq() - along * along));
+      const crit = perp < rad * 0.45;
+      const killed = best.hit(crit ? 3 : 2, dir);
       const p = bestPoint;
-      this.spark(p, 0xffd9a0, 10, 2.6);
-      this.hud.hit();
+      this.spark(p, killed ? 0xfff0c4 : 0xffd9a0, killed ? 18 : 10, killed ? 3.4 : 2.6);
+      this.hud.hit(crit || killed);
       if (!killed) {
         this.score += 10;
         this.hud.setState(this.hp, this.ammo, this.wave, this.score);
@@ -189,6 +206,17 @@ export class Game {
   }
 
   // ---------- golpe / recarga ----------
+  reload() {
+    if (this.ammo >= AMMO || this.state === 'dead') return;
+    this.reloadT = 0;
+    this.ammo = AMMO;
+    this.weapon.setSpent(false);
+    this.hud.setAmmo(this.ammo, false);
+    this.hud.reloadHint(false);
+    if (this.audio) this.audio.reload();
+    this.hud.setState(this.hp, this.ammo, this.wave, this.score);
+  }
+
   tryWhip(handPos, handDir) {
     if (this.state === 'dead') return;
     let acted = false;
@@ -327,6 +355,12 @@ export class Game {
   update(dt, t, head) {
     this.time = t;
 
+    // recarga: manual (squeeze) o automática al quedarse sin balas
+    if (this.reloadT > 0 && this.state === 'playing') {
+      this.reloadT -= dt;
+      if (this.reloadT <= 0) this.reload();
+    }
+
     // trazadoras
     for (const tr of this.tracers) {
       if (tr.life > 0) {
@@ -363,10 +397,21 @@ export class Game {
     }
 
     // enemigos
+    this.railSpeed = 2.7 + Math.min(3.4, this.wave * 0.32);
     const playerPos = { x: this.rig.position.x, z: this.rig.position.z };
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
+      // avance en riel: el enemigo se acerca hasta su distancia de combate
+      const hold = e.railHold != null ? e.railHold : 4.5;
+      if (e.radius > hold) {
+        e.radius = Math.max(hold, e.radius - dt * (this.railSpeed * 0.7 + 1.4));
+      }
       const evs = e.update(dt, t, playerPos) || [];
+      // candado de riel: siempre dentro del corredor y por delante del jugador
+      const ex = e.root.position.x, ez = e.root.position.z;
+      e.root.position.x = Math.max(-1.75, Math.min(1.75, ex));
+      const minZ = playerPos.z - 3.4;
+      if (e.root.position.z > minZ) e.root.position.z = minZ;
       for (const ev of evs) {
         if (ev.type === 'shoot') this.spawnProjectile(ev.from, ev.dir);
         else if (ev.type === 'kill') this.killEnemy(e, ev.pos);

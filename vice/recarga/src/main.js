@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { buildArena } from './arena.js';
+import { buildRail } from './rail.js';
 import { GameAudio } from './audio.js';
 import { Weapon } from './weapon.js';
 import { Hud } from './hud.js';
@@ -71,6 +72,7 @@ scene.add(rimB);
 
 // ---------------------------------------------------------------- entorno
 let arena = null;
+let rail = null;
 let audio = null;
 let weapon = null;
 let hud = null;
@@ -79,6 +81,8 @@ const shared = { glow: glowSprite() };
 
 function setup() {
   arena = buildArena(world);
+  arena.group.visible = false;   // el combate ocurre en el corredor en riel
+  rail = buildRail(world);
   audio = new GameAudio();
   weapon = new Weapon(camera, audio, shared);
   hud = new Hud(camera);
@@ -185,10 +189,30 @@ bracer.group.position.set(0, -0.01, -0.02);
 // ---------------------------------------------------------------- mando / entrada
 let gunGrip = null;
 let whipGrip = null;
+let gunSource = null;
 let rightSource = null;
 let leftSource = null;
 let rightIdx = 1;
 let leftIdx = 0;
+
+// Mano del arma: 'right' o 'left'. Se puede forzar con ?mano=izq y se recuerda.
+const HAND_KEY = 'recarga.mano';
+let gunHand = 'right';
+try {
+  const q = new URLSearchParams(location.search).get('mano');
+  const saved = q || localStorage.getItem(HAND_KEY);
+  if (saved === 'izq' || saved === 'left') gunHand = 'left';
+  else if (saved === 'der' || saved === 'right') gunHand = 'right';
+} catch (e) { /* sin almacenamiento: derecha por defecto */ }
+
+function setGunHand(h) {
+  gunHand = h === 'left' ? 'left' : 'right';
+  try { localStorage.setItem(HAND_KEY, gunHand === 'left' ? 'izq' : 'der'); } catch (e) {}
+  const b = document.getElementById('mano');
+  if (b) b.textContent = gunHand === 'left' ? 'Arma: izquierda' : 'Arma: derecha';
+  if (boundHands) { boundHands = false; bindHands(); }
+}
+{ const b = document.getElementById('mano'); if (b) b.textContent = gunHand === 'left' ? 'Arma: izquierda' : 'Arma: derecha'; }
 
 let boundHands = false;
 function bindHands() {
@@ -201,21 +225,24 @@ function bindHands() {
   sources.forEach((src, i) => {
     const grip = renderer.xr.getControllerGrip(i);
     const ray = renderer.xr.getController(i);
-    if (src.handedness === 'right') { rightIdx = i; rightSource = src; gunGrip = grip; }
-    else if (src.handedness === 'left') { leftIdx = i; leftSource = src; whipGrip = grip; }
-    ray.addEventListener('selectstart', src.handedness === 'right' ? onFire : onWhip);
-    ray.addEventListener('squeezestart', src.handedness === 'right' ? onWhip : onWhip);
-    ray.addEventListener('connected', () => { if (ray.children.length === 0) ray.add(makeRay(src.handedness === 'right' ? 0.55 : 0.45, src.handedness === 'right' ? 0x9fe0ff : 0xff9f43, 0.26)); });
+    const isGun = src.handedness === gunHand;
+    if (src.handedness === 'right') { rightIdx = i; rightSource = src; }
+    else if (src.handedness === 'left') { leftIdx = i; leftSource = src; }
+    if (isGun) { gunGrip = grip; gunSource = src; } else whipGrip = grip;
+    ray.addEventListener('selectstart', isGun ? onFire : onWhip);
+    ray.addEventListener('squeezestart', isGun ? () => game.reload() : onWhip);
+    ray.addEventListener('connected', () => { if (ray.children.length === 0) ray.add(makeRay(isGun ? 0.55 : 0.45, isGun ? 0x9fe0ff : 0xff9f43, 0.26)); });
   });
-  if (!gunGrip) gunGrip = renderer.xr.getControllerGrip(rightIdx);
-  if (!whipGrip) whipGrip = renderer.xr.getControllerGrip(leftIdx);
+  if (!gunGrip) gunGrip = renderer.xr.getControllerGrip(gunHand === 'left' ? leftIdx : rightIdx);
+  if (!whipGrip) whipGrip = renderer.xr.getControllerGrip(gunHand === 'left' ? rightIdx : leftIdx);
   if (bracer.group.parent !== whipGrip) whipGrip.add(bracer.group);
   mountGun();
 }
 
 function mountGun() {
   if (!weapon || !gunGrip) return;
-  weapon.mount(gunGrip, new THREE.Vector3(0, -0.024, -0.035), new THREE.Euler(-0.03, Math.PI * 0.02, 0));
+  const pose = weapon.handPose(gunHand === 'left' ? -1 : 1);
+  weapon.mount(gunGrip, pose.pos, pose.rot);
 }
 
 renderer.xr.addEventListener('sessionstart', () => {
@@ -233,12 +260,19 @@ renderer.xr.getController(1).addEventListener('connected', () => { if (renderer.
 // disparo
 const _o = new THREE.Vector3();
 const _d = new THREE.Vector3();
+let fireCd = 0;
 function onFire() {
   if (!game || game.state === 'dead') { if (game) { game.reset(); game.begin(); } return; }
+  const now = performance.now();
+  if (now - fireCd < 90) return;
+  fireCd = now;
   weapon.muzzleWorld(_o);
-  weapon.root.getWorldDirection(_d);
+  weapon.aimDir(_d);
   game.tryFire(toPlayPos(_o), toPlayDir(_d));
-  if (game.ammo <= 0) hud.reloadHint();
+  if (gunSource && gunSource.gamepad && gunSource.gamepad.hapticActuators && gunSource.gamepad.hapticActuators[0]) {
+    gunSource.gamepad.hapticActuators[0].pulse(0.35, 45);
+  }
+  if (game.ammo <= 0) hud.reloadHint(true);
 }
 
 const _hp = new THREE.Vector3();
@@ -260,6 +294,7 @@ let mouseLook = false;
 
 function startDesktop() {
   desktop = true;
+  window.__recarga = { get game() { return game; }, weapon, hud, world, scene, renderer, camera, rail, arena, THREE };
   document.body.style.cursor = 'crosshair';
   boot && boot.prog(1, '');
   const el = document.getElementById('boot');
@@ -309,6 +344,7 @@ function tick() {
 
   if (audio) audio.resume();
   if (arena) arena.update(dt, t);
+  if (rail) rail.update(dt, game && isFinite(game.railSpeed) ? game.railSpeed : 2.7);
   if (game) {
     const head = toPlayPos(camera.getWorldPosition(_hp));
     game.update(dt, t, head);
@@ -368,10 +404,17 @@ async function enter() {
     await loadEnv();
     boot && boot.prog(0.85, 'Calibrando el pulso');
     renderer.compile(scene, camera);
+    window.__recarga = { game, weapon, hud, world, THREE, onFire, onWhip, camera };
     renderer.setAnimationLoop(tick);
     boot && boot.ready('Entrar');
     const go = document.getElementById('go');
     if (go) go.addEventListener('click', enter);
+    const manoBtn = document.getElementById('mano');
+    if (manoBtn) manoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setGunHand(gunHand === 'left' ? 'right' : 'left');
+    });
     if (forceDesktop) startDesktop();
   } catch (e) {
     console.error(e);
