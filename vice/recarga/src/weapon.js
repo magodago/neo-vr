@@ -3,9 +3,10 @@
 // exactamente el sistema del grip del mando de Quest: al montarlo sin rotación
 // la empuñadura queda en la mano y el cañón apunta hacia delante.
 import * as THREE from 'three';
+import { brushedMetal } from './textures.js';
 
-const GUNMETAL = 0x2b313b;
-const DARK = 0x0f1218;
+const GUNMETAL = 0x8a95a3;   // gris arma claro: refleja el entorno en vez de tragarse la luz
+const DARK = 0x20262f;
 
 function mat(color, metalness, roughness, emissive) {
   const m = new THREE.MeshStandardMaterial({
@@ -23,15 +24,34 @@ export class Weapon {
     this.shared = shared || null;
     this.root = new THREE.Group();
     this.root.name = 'weapon';
+
+    // luz de modelo: el arma siempre tiene un reflejo que la separa del fondo
+    const vmLight = new THREE.PointLight(0xe6f3ff, 1.9, 1.15, 2.0);
+    vmLight.position.set(0.16, 0.30, 0.22);
+    this.root.add(vmLight);
+    const vmRim = new THREE.PointLight(0x62c8ff, 2.4, 1.0, 2.0);
+    vmRim.position.set(-0.22, 0.06, -0.28);
+    this.root.add(vmRim);
     this.spent = false;
     this.recoil = 0;
     this.flashT = 0;
     this.slideT = 0;
     this.sway = 0;
 
+    // micro-textura de metal cepillado: el arma deja de ser superficies planas
+    const brushed = brushedMetal();
+    brushed.map.repeat.set(3, 3);
+    brushed.roughnessMap.repeat.set(3, 3);
+    const metalMaps = (m) => {
+      m.map = brushed.map;
+      m.roughnessMap = brushed.roughnessMap;
+      m.roughness = 0.55;
+      m.envMapIntensity = 1.9;
+      return m;
+    };
     this.mats = {
-      body: mat(GUNMETAL, 1.0, 0.34),
-      bodyDark: mat(0x1b2028, 1.0, 0.45),
+      body: metalMaps(mat(GUNMETAL, 0.82, 0.30)),
+      bodyDark: metalMaps(mat(DARK, 0.72, 0.42)),
       polymer: mat(DARK, 0.25, 0.82),
       chrome: mat(0xc9d3e0, 1.0, 0.24),
       accent: mat(0x0d2b33, 0.6, 0.4, 0x49e6ff),
@@ -311,20 +331,44 @@ export class Weapon {
     return v.set(-m[8], -m[9], -m[10]).normalize();
   }
 
-  setSpent(spent) {
-    this.spent = !!spent;
-    const c = spent ? 0xff3b30 : 0x49e6ff;
-    if (this.cells) this.cells.forEach(mesh => mesh.material.emissive.setHex(c));
-    this.laser.material.color.setHex(spent ? 0x552222 : 0xff3b30);
-    this.laser.material.opacity = spent ? 0.08 : 0.28;
+  // ---- modo de disparo: cada uno se ve distinto (visor, láser y fogonazo) ----
+  static MODE_COL = [0xff3b30, 0x49e6ff, 0xff4fd8];   // semi · ráfaga · sobrecarga
+
+  setMode(idx) {
+    this.modeIdx = Math.max(0, Math.min(2, idx | 0));
+    const col = Weapon.MODE_COL[this.modeIdx];
+    if (this.laser) this.laser.material.color.setHex(this.spent ? 0x552222 : col);
+    if (this.flashMat) this.flashMat.color.setHex(col);
+    if (this.cells && this.modeIdx === 2) this.cells.forEach(m => m.material.emissive.setHex(0xff4fd8));
+    else if (this.cells && this.tier != null) {
+      const cols = [0x49e6ff, 0x5cff9d, 0xff9f43, 0xff4fd8];
+      this.cells.forEach(m => m.material.emissive.setHex(cols[this.tier]));
+    }
   }
 
-  fire() {
-    this.recoil = 1;
-    this.flashT = 0.075;
+  // 0 = cargador lleno · 1 = recién empezada la recarga
+  setReload(k) {
+    this.reloadK = Math.max(0, Math.min(1, k || 0));
+  }
+
+  setSpent(spent) {
+    this.spent = !!spent;
+    const col = (Weapon.MODE_COL[this.modeIdx || 0]);
+    const c = spent ? 0xff3b30 : (this.modeIdx === 2 ? 0xff4fd8 : 0x49e6ff);
+    if (this.cells) this.cells.forEach(mesh => mesh.material.emissive.setHex(c));
+    if (this.laser) {
+      this.laser.material.color.setHex(spent ? 0x552222 : col);
+      this.laser.material.opacity = spent ? 0.08 : 0.28;
+    }
+  }
+
+  fire(recoilMul = 1, modeId = '') {
+    this.recoil = 0.7 * recoilMul;
+    this.flashT = modeId === 'charge' ? 0.13 : 0.075;
     this.slideT = 0.075;
-    this.sway = 1;
-    if (this.audio) { try { this.audio.shot(); } catch (e) {} }
+    this.sway = 0.8 * recoilMul;
+    if (this.flashMat) this.flashMat.color.setHex(Weapon.MODE_COL[Math.max(0, this.modeIdx || 0)]);
+    if (this.audio) { try { this.audio.shot(modeId); } catch (e) { try { this.audio.shot(); } catch (e2) {} } }
   }
 
   dryFire() {
@@ -337,9 +381,13 @@ export class Weapon {
     this.recoil += (0 - this.recoil) * k;
     this.sway += (0 - this.sway) * Math.min(1, dt * 8);
 
+    // recarga: el arma baja y gira mientras entra el cargador nuevo
+    const rl = this.reloadK || 0;
+    const dip = Math.sin(Math.min(1, rl) * Math.PI);
+
     // retroceso: la corredera va atrás y el arma sube
     this.gun.position.z = this.recoil * 0.03;
-    this.gun.position.y = 0.058 + this.recoil * 0.006;
+    this.gun.position.y = 0.058 + this.recoil * 0.006 - dip * 0.035;
     this.gun.rotation.x = this.recoil * 0.16 + Math.sin(t * 1.7) * 0.004;
     this.gun.rotation.z = Math.sin(t * 1.1) * 0.006;
     if (this.slide) this.slide.position.z = this.recoil * 0.028;

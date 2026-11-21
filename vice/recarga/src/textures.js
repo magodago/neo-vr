@@ -98,7 +98,8 @@ export function metalFloor() {
   const rand = rng(3);
   for (let i = 0; i < S * S; i++) {
     const v = n[i];
-    const base = 16 + v * 26;
+    // albedo legible: con 16..42 el material se leía negro bajo el tone mapping
+    const base = 54 + v * 46;
     img.data[i * 4] = base * 0.92;
     img.data[i * 4 + 1] = base * 0.97;
     img.data[i * 4 + 2] = base * 1.06;
@@ -264,4 +265,67 @@ export function floorDecal(text) {
   ctx.font = '800 96px "Helvetica Neue",Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(text, S / 2, S / 2 + 6);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+// ---------- rack de servidores: albedo + emisivo ----------
+export function serverRack(seed = 3) {
+  const S = 1024, c = cv(S), ctx = c.getContext('2d');
+  const e = cv(S), ectx = e.getContext('2d');
+  const R = rng(seed);
+
+  ctx.fillStyle = '#0e1218'; ctx.fillRect(0, 0, S, S);
+  ectx.fillStyle = '#000000'; ectx.fillRect(0, 0, S, S);
+
+  // marco
+  ctx.fillStyle = '#1b222b'; ctx.fillRect(0, 0, S, 26); ctx.fillRect(0, S - 26, S, 26);
+  ctx.fillRect(0, 0, 26, S); ctx.fillRect(S - 26, 0, 26, S);
+  ctx.fillStyle = '#2a333f'; ctx.fillRect(14, 18, S - 28, 8);
+
+  const rows = 9, top = 40, rowH = (S - top * 2) / rows;
+  for (let i = 0; i < rows; i++) {
+    const y = top + i * rowH;
+    // módulo
+    const g = ctx.createLinearGradient(0, y, 0, y + rowH - 8);
+    g.addColorStop(0, '#242c36'); g.addColorStop(0.5, '#161c24'); g.addColorStop(1, '#0d1116');
+    ctx.fillStyle = g; ctx.fillRect(34, y, S - 68, rowH - 8);
+    ctx.strokeStyle = 'rgba(120,150,180,.16)'; ctx.lineWidth = 2;
+    ctx.strokeRect(34, y, S - 68, rowH - 8);
+    // rejilla de ventilación
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    for (let k = 0; k < 16; k++) ctx.fillRect(52 + k * 12, y + 14, 6, rowH - 40);
+    // asas
+    ctx.fillStyle = '#39434f';
+    ctx.fillRect(50, y + rowH - 26, 46, 8); ctx.fillRect(S - 96, y + rowH - 26, 46, 8);
+    // LEDs
+    const leds = 4 + Math.floor(R() * 4);
+    for (let k = 0; k < leds; k++) {
+      const lx = S - 210 + k * 26, ly = y + 24;
+      const on = R() > 0.32;
+      const warm = R() > 0.82;
+      ctx.fillStyle = on ? (warm ? '#ffb066' : '#7df0c0') : '#1c242c';
+      ctx.beginPath(); ctx.arc(lx, ly, 6, 0, 7); ctx.fill();
+      if (on) {
+        ectx.fillStyle = warm ? '#ff8a2a' : '#39ffb0';
+        ectx.beginPath(); ectx.arc(lx, ly, 6, 0, 7); ectx.fill();
+        const rg = ectx.createRadialGradient(lx, ly, 0, lx, ly, 18);
+        rg.addColorStop(0, warm ? 'rgba(255,150,60,.85)' : 'rgba(60,255,190,.8)');
+        rg.addColorStop(1, 'rgba(0,0,0,0)');
+        ectx.fillStyle = rg; ectx.beginPath(); ectx.arc(lx, ly, 18, 0, 7); ectx.fill();
+      }
+    }
+    // tira de estado
+    if (i % 3 === 1) {
+      ctx.fillStyle = '#123a52'; ctx.fillRect(S - 210, y + rowH - 30, 160, 6);
+      ectx.fillStyle = '#1f7fd0'; ectx.fillRect(S - 210, y + rowH - 30, 160 * (0.3 + R() * 0.6), 6);
+    }
+  }
+  // desgaste
+  ctx.globalAlpha = 0.25; ctx.fillStyle = '#000';
+  for (let i = 0; i < 900; i++) ctx.fillRect(R() * S, R() * S, 2 + R() * 5, 1 + R() * 2);
+  ctx.globalAlpha = 1;
+
+  const map = new THREE.CanvasTexture(c); map.colorSpace = THREE.SRGBColorSpace;
+  const emissive = new THREE.CanvasTexture(e); emissive.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 4; emissive.anisotropy = 2;
+  return { map, emissive };
 }

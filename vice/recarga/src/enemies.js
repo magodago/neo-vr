@@ -63,6 +63,17 @@ export class GroundBot {
     this.fireT = 0.75 + Math.random() * 0.8;
     this.chargeT = 0;
     this.lane = (Math.random() * 2 - 1) * 1.15;
+    this.kind = 'bot';          // el cerebro de escuadrón sólo reparte entre bots
+    this.order = null;          // orden del cerebro de escuadrón
+    this.aim = 0;
+    this.ai = {
+      state: 'engage', stateT: 0,
+      fireCd: 0.9 + Math.random() * 0.8,
+      meleeCd: 2.6 + Math.random() * 2.2,
+      burst: 0, burstT: 0, aimT: 0, focus: 0,
+      strafeT: Math.random() * 0.8, strafeDir: Math.random() < 0.5 ? -1 : 1, strafeAmp: 0.7,
+      gait: Math.random() * 6.28, moving: 0, velX: 0, lastPx: undefined, sparkT: 1.5
+    };
     this.hitR = 0.62;   // esfera de impacto a la altura del torso
     this.root = new THREE.Group();
     this.root.name = 'groundbot';
@@ -128,6 +139,23 @@ export class GroundBot {
       g.add(pad);
       g.add(boxMesh(0.1, 0.16, 0.22, D, sx * 0.42, 0.1, 0));
     }
+    // --- líneas de panel emisivas (brillo tenue en juntas) ---
+    const panelMat = new THREE.MeshBasicMaterial({ color: 0x49e6ff, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+    for (let i=0;i<6;i++) {
+      const line = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.008, 0.012), panelMat);
+      line.position.set(0, -0.1 + i*0.12, 0.19);
+      g.add(line);
+    }
+    // verticales
+    for (const sx of [-1,1]) {
+      const line = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.56, 0.012), panelMat);
+      line.position.set(sx*0.25, 0.02, 0.19);
+      g.add(line);
+    }
+    // luz de núcleo (punto cálido)
+    this.coreLight = new THREE.PointLight(0xff5a1e, 0.9, 1.8, 2);
+    this.coreLight.position.set(0, 0.05, 0.2);
+    g.add(this.coreLight);
 
     // --- cabeza
     const head = new THREE.Group();
@@ -184,6 +212,10 @@ export class GroundBot {
       ring.position.set(0, -0.42, 0.0 + i * 0.1);
       right.elbow.add(ring);
     }
+    // pistón hidráulico en el codo derecho
+    const pistR = cylMesh(0.018, 0.018, 0.28, C, 8);
+    pistR.position.set(0, -0.3, -0.04);
+    right.arm.add(pistR);
     this.muzzle = new THREE.Object3D();
     this.muzzle.position.set(0, -0.42, 0.32);
     right.elbow.add(this.muzzle);
@@ -191,6 +223,10 @@ export class GroundBot {
     const left = mkArm(-1);
     this.armL = left.arm;
     this.foreL = left.elbow;
+    // pistón hidráulico en el antebrazo izquierdo
+    const pistL = cylMesh(0.018, 0.018, 0.25, C, 8);
+    pistL.position.set(0, -0.32, -0.04);
+    left.arm.add(pistL);
     // garra izquierda
     for (let i = 0; i < 3; i++) {
       const claw = boxMesh(0.035, 0.16, 0.035, C, (i - 1) * 0.05, -0.44, 0.04);
@@ -259,7 +295,7 @@ export class GroundBot {
 
   whip() { return 'hit'; }
 
-  update(dt, t, playerPos) {
+  update(dt, t, playerPos, squad) {
     const evs = [];
     if (this.state === 'dying') {
       this.deathT += dt;
@@ -303,74 +339,198 @@ export class GroundBot {
       this.root.rotation.y += da * Math.min(1, dt * 3.2);
     }
 
-    // AVANCE SIN FRENO. Nunca se para: te embiste, te quita vida al cruzarse
-    // y sigue de largo hasta perderse por detrás.
-    const speed = 1.8 + (this.hp < this.maxHp ? 0.35 : 0);
-    let moving = 1;
-    if (!this.passed) {
-      const inv = 1 / Math.max(0.001, dist);
-      this.root.position.x += dx * inv * speed * dt + (this.lane - this.root.position.x) * dt * 0.5;
-      this.root.position.z += dz * inv * speed * dt;
-      // golpe al atravesarte (una vez)
-      if (!this.struck && dist < 1.15) {
-        this.struck = true;
-        evs.push({ type: 'melee', dmg: 2, pos: this.root.position.clone() });
+    // ---------------------------------------------------------- IA táctica
+    // Recibe órdenes del cerebro de escuadrón (src/ai.js): rol, carril y si
+    // el jugador está recargando. Si no hay cerebro (jefe/suelto), se comporta
+    // como asalto agresivo.
+    const ai = this.ai;
+    const ord = this.order || { role: 'assault', lane: this.lane, pressure: 0 };
+    const role = ord.role || 'assault';
+    const pressure = ord.pressure || 0;
+
+    // velocidad lateral del jugador → adelanta el punto de mira
+    if (ai.lastPx === undefined) ai.lastPx = px;
+    const pvx = (px - ai.lastPx) / Math.max(0.001, dt);
+    ai.lastPx = px;
+    ai.velX += (Math.max(-6, Math.min(6, pvx)) - ai.velX) * Math.min(1, dt * 5);
+
+    if (this.stagger > 0) this.stagger -= dt;
+    ai.fireCd -= dt; ai.meleeCd -= dt; ai.strafeT -= dt; ai.stateT -= dt; ai.sparkT -= dt;
+
+    const hpK = this.hp / this.maxHp;
+    let range = role === 'suppress' ? 9.2 : (role === 'flank' ? 5.6 : 4.2);
+    if (hpK < 0.45) range += 2.4;      // tocado: no se te echa encima
+    if (pressure) range -= 1.4;        // recargando: aprieta
+
+    let mx = 0, mz = 0, speed = 0;
+    let aiming = true;
+
+    switch (ai.state) {
+      case 'charge': {
+        // embestida: acelera en línea recta y prepara el zarpazo
+        speed = 3.5; aiming = false;
+        mx = dx / Math.max(0.001, dist); mz = dz / Math.max(0.001, dist);
+        if (dist < 2.3) { ai.state = 'windup'; ai.stateT = 0.55; }
+        break;
       }
-      // ha cruzado el plano del jugador: sigue de largo sin girarse
-      if (dz < -0.05) this.passed = true;
-    } else {
-      this.root.position.z += 2.6 * dt;
-      this.root.position.x += Math.sign(this.root.position.x - px || 1) * 0.6 * dt;
-      if (this.root.position.z > pz + 7.5) {
-        evs.push({ type: 'gone' });
-        this.dead = true;
-        this.scene.remove(this.root);
-        return evs;
+      case 'windup': {
+        // Telegrafiado: se planta, levanta el brazo y el ojo se enciende.
+        // Si te mueves de lado en ese medio segundo, FALLA.
+        speed = 0; aiming = false;
+        this.armR.rotation.x += (-2.0 - this.armR.rotation.x) * Math.min(1, dt * 9);
+        this.armL.rotation.x += (-0.7 - this.armL.rotation.x) * Math.min(1, dt * 7);
+        if (ai.stateT <= 0) {
+          const aligned = Math.abs(px - this.root.position.x) < 0.95 && dist < 2.9;
+          ai.state = 'recover'; ai.stateT = 0.85; ai.meleeCd = 3.0 + Math.random() * 1.8;
+          if (aligned) {
+            evs.push({ type: 'melee', dmg: 2, pos: this.root.position.clone() });
+            if (this.audio) { try { this.audio.impact(); } catch (e) {} }
+          } else {
+            evs.push({ type: 'fx', kind: 'whiff', pos: this.root.position.clone().setY(1.15) });
+          }
+        }
+        break;
+      }
+      case 'recover': {
+        // repliegue corto: recupera postura antes de volver a disparar
+        speed = 1.2; aiming = false;
+        mx = -dx / Math.max(0.001, dist); mz = -dz / Math.max(0.001, dist);
+        if (ai.stateT <= 0) ai.state = 'engage';
+        break;
+      }
+      case 'retreat': {
+        speed = 2.0;
+        mx = -dx / Math.max(0.001, dist); mz = -dz / Math.max(0.001, dist);
+        if (ai.stateT <= 0 || dist > 12) ai.state = 'engage';
+        break;
+      }
+      default: {
+        // engage: mantiene su distancia, strafea y busca el momento de entrar
+        const dist0 = Math.max(0.001, dist);
+        const dirX = dx / dist0, dirZ = dz / dist0;
+        const errZ = dist - range;
+        const along = Math.abs(errZ) > 0.8 ? Math.sign(errZ) * 1.9 : 0;
+        mx = dirX * along; mz = dirZ * along;
+        if (ai.strafeT <= 0) {
+          ai.strafeT = 0.6 + Math.random() * 1.1;
+          ai.strafeDir = Math.random() < 0.5 ? -1 : 1;
+          ai.strafeAmp = 0.55 + Math.random() * 0.5;
+        }
+        const laneErr = (ord.lane === undefined ? this.lane : ord.lane) - this.root.position.x;
+        mx += laneErr * 0.9 + ai.strafeDir * ai.strafeAmp;
+        speed = 1.55 + (pressure ? 0.55 : 0) + (hpK < 0.4 ? -0.25 : 0);
+        if (role === 'assault' && ai.meleeCd <= 0 && dist < 6.5 && Math.random() < dt * 1.7) {
+          ai.state = 'charge';
+        }
+        if (role === 'suppress' && hpK < 0.35 && dist < 7 && Math.random() < dt * 0.9) {
+          ai.state = 'retreat'; ai.stateT = 1.8;
+        }
       }
     }
+
+    // separación: los androides no se apilan en el mismo carril
+    if (Array.isArray(squad)) {
+      for (const o of squad) {
+        if (o === this || o.kind !== 'bot' || o.dead || o.state === 'dying') continue;
+        const ox = this.root.position.x - o.root.position.x;
+        const oz = this.root.position.z - o.root.position.z;
+        const d2 = ox * ox + oz * oz;
+        if (d2 > 0.0001 && d2 < 2.6) {
+          const d = Math.sqrt(d2), push = (1.62 - d) / 1.62;
+          mx += (ox / d) * push * 1.5;
+          mz += (oz / d) * push * 1.0;
+        }
+      }
+    }
+
+    const mlen = Math.hypot(mx, mz);
+    if (mlen > 0.001 && speed > 0) {
+      this.root.position.x += (mx / mlen) * speed * dt;
+      this.root.position.z += (mz / mlen) * speed * dt;
+      ai.gait += dt * (5.0 + speed * 1.6);
+      ai.moving += (Math.min(1, mlen) - ai.moving) * Math.min(1, dt * 8);
+    } else {
+      ai.moving += (0 - ai.moving) * Math.min(1, dt * 8);
+    }
+
+    // no se mete dentro del jugador si no está embistiendo
+    if (ai.state !== 'charge' && ai.state !== 'windup' && dist < 1.7) {
+      this.root.position.z -= 1.6 * dt;
+    }
+
     this.root.position.x = Math.max(-4.4, Math.min(4.4, this.root.position.x));
     this.root.position.y = 1.42;
 
-    // animación de marcha
-    this.phase += dt * (moving ? 5.4 : 1.6);
-    const s = Math.sin(this.phase), c = Math.cos(this.phase);
-    this.hipL.rotation.x = s * 0.46 * (moving ? 1 : 0.12);
-    this.hipR.rotation.x = -s * 0.46 * (moving ? 1 : 0.12);
-    this.kneeL.rotation.x = Math.max(0, -s) * 0.55 + 0.06;
-    this.kneeR.rotation.x = Math.max(0, s) * 0.55 + 0.06;
+    // ---- animación
+    const mv = Math.min(1, ai.moving);
+    const stride = mv * (ai.state === 'charge' ? 0.62 : 0.44);
+    const s = Math.sin(ai.gait), c = Math.cos(ai.gait);
+    this.hipL.rotation.x = s * stride;
+    this.hipR.rotation.x = -s * stride;
+    this.kneeL.rotation.x = Math.max(0, -s) * stride * 1.2 + 0.06;
+    this.kneeR.rotation.x = Math.max(0, s) * stride * 1.2 + 0.06;
     this.ankleL.rotation.x = -this.kneeL.rotation.x * 0.4;
     this.ankleR.rotation.x = -this.kneeR.rotation.x * 0.4;
-    this.armL.rotation.x = s * 0.3;
-    this.armR.rotation.x = -s * 0.14;
+    // torso: se inclina al correr, se yergue al disparar
+    this.root.rotation.x = -0.10 * (ai.state === 'charge' ? 1.6 : mv * 0.7);
+
+    // brazo-cañón: apunta al pecho del jugador (pitch real), no al aire
+    if (aiming) {
+      const pitch = Math.atan2(1.18 - 1.42, Math.max(0.8, dist));
+      this.aim += (pitch - this.aim) * Math.min(1, dt * 6);
+      this.armR.rotation.x = -0.12 + this.aim;
+      this.armR.rotation.z = -0.06;
+      this.armL.rotation.x = s * 0.22;
+    }
+
     // cabeza: escaneo + seguimiento
-    this.head.rotation.y = Math.sin(t * 1.4) * 0.12;
+    this.head.rotation.y = Math.sin(t * 1.4) * 0.10;
     this.head.rotation.x = -0.04 + Math.sin(t * 2.7) * 0.02;
 
-    // pulso del ojo y del núcleo
-    const pulse = 2.6 + Math.sin(t * 6) * 0.7;
-    this.mats.eye.emissiveIntensity = pulse;
+    // pulso del ojo y del núcleo (más vivo cuanto más tocado)
+    const hurt = 1 + (1 - hpK) * 0.8;
+    this.mats.eye.emissiveIntensity = (2.6 + Math.sin(t * 6) * 0.7) * hurt;
     this.mats.core.emissiveIntensity = 1.9 + Math.sin(t * 3.4) * 0.5;
 
-    // disparo con telegrafiado
-    this.fireT -= dt;
-    if (this.fireT <= 0 && dist < 18) {
-      this.chargeT += dt;
-      this.mats.eye.emissiveIntensity = 4 + Math.sin(t * 40) * 1.2;
-      if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.55 + this.chargeT * 1.5);
-      if (this.chargeT > 0.5) {
-        this.chargeT = 0;
-        if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.55);
-        this.fireT = 0.9 + Math.random() * 0.45;
-        // ráfaga de 2
-        // apuntaban a pz + 1.0, es decir 1 m POR DETRÁS del pecho: el proyectil pasaba
-        // a 0.5 m y con radio de impacto 0.42 no tocaba nunca (el jugador era invencible).
-        const from = _v.setFromMatrixPosition(this.muzzle.matrixWorld).clone();
-        const target = _v2.set(px + (Math.random() - 0.5) * 0.55, 1.32 + (Math.random() - 0.5) * 0.4, pz + 0.15);
-        const dir = target.sub(from).normalize();
-        evs.push({ type: 'shoot', from, dir });
-        if (this.audio) { try { this.audio.impact(); } catch (e) {} }
-      }
+    // chispas de avería cuando está malherido
+    if (hpK < 0.4 && ai.sparkT <= 0) {
+      ai.sparkT = 0.5 + Math.random() * 0.9;
+      evs.push({ type: 'fx', kind: 'damage', pos: this.root.position.clone().setY(1.25 + Math.random() * 0.4) });
     }
+
+    // ---- fuego: telegrafía → ráfaga de 3 → corrige puntería
+    if (aiming && dist < 19 && dist > 2.1) {
+      if (ai.burst > 0) {
+        ai.burstT -= dt;
+        if (ai.burstT <= 0) {
+          ai.burst--; ai.burstT = 0.15;
+          const from = _v.setFromMatrixPosition(this.muzzle.matrixWorld).clone();
+          const lead = dist / 22;
+          const spread = 0.62 * (1 - ai.focus * 0.55) + (ai.moving > 0.5 ? 0.12 : 0);
+          const target = _v2.set(
+            px + ai.velX * lead * 0.7 + (Math.random() - 0.5) * spread,
+            1.30 + (Math.random() - 0.5) * (0.34 + spread),
+            pz + 0.15
+          );
+          evs.push({ type: 'shoot', from, dir: target.sub(from).normalize() });
+          if (this.audio) { try { this.audio.impact(); } catch (e) {} }
+        }
+      } else if (ai.aimT > 0) {
+        ai.aimT -= dt;
+        this.mats.eye.emissiveIntensity = 5.5 + Math.sin(t * 45) * 1.6;
+        if (this.eyeGlow) this.eyeGlow.scale.setScalar(0.62 + (0.42 - ai.aimT) * 1.7);
+        if (ai.aimT <= 0) {
+          ai.burst = 3; ai.burstT = 0;
+          ai.fireCd = 1.5 + Math.random() * 0.9;
+          ai.focus = Math.min(1, ai.focus + 0.32 + (pressure ? 0.22 : 0));
+        }
+      } else if (ai.fireCd <= 0) {
+        ai.aimT = 0.42;   // telegrafiado: el ojo se enciende antes del primer tiro
+      }
+    } else if (this.eyeGlow) {
+      this.eyeGlow.scale.setScalar(0.62);
+    }
+
     return evs;
   }
 

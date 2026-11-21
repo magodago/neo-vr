@@ -33,6 +33,10 @@ function radialTex(inner, outer) {
 export class Hud {
   constructor(camera) {
     this.camera = camera;
+    // nivel de campaña y oleada dentro del nivel (los fija game.setLevel)
+    this.levelN = 1;
+    this.levelWave = 0;
+    this.levelTotal = 1;
     this.group = new THREE.Group();
     camera.add(this.group);
     this.group.position.set(0, 0, 0);
@@ -54,12 +58,22 @@ export class Hud {
     }
 
     // ---- munición ----
+    // placa oscura detrás del cargador: los pips se leen sobre cualquier escenario
+    this.ammoPlate = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.158, 0.042),
+      new THREE.MeshBasicMaterial({ color: 0x080d14, transparent: true, opacity: 0.55, depthWrite: false })
+    );
+    this.ammoPlate.position.set(0.154, -0.172, -0.526);
+    this.ammoPlate.visible = false;
+    this.group.add(this.ammoPlate);
+
     this.ammoPips = [];
-    for (let i = 0; i < 6; i++) {
-      const p = new THREE.Mesh(new THREE.PlaneGeometry(0.009, 0.038), new THREE.MeshBasicMaterial({ color: 0xffb066 }));
-      p.position.set(0.20 + i * 0.014, -0.185, -0.52);
-      p.rotation.z = -0.35 + i * 0.02;
-      p.visible = false;          // munición ilimitada: no hay pips que enseñar
+    this.ammoSize = 8;
+    for (let i = 0; i < 14; i++) {          // 14 = cargador máximo del arsenal
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(0.0072, 0.034), new THREE.MeshBasicMaterial({ color: 0xffb066, transparent: true }));
+      p.position.set(0.088 + i * 0.0105, -0.172, -0.52);
+      p.rotation.z = -0.35 + i * 0.012;
+      p.visible = false;
       this.group.add(p);
       this.ammoPips.push(p);
     }
@@ -93,16 +107,16 @@ export class Hud {
     const st = makeCanvas(640, 168);
     this.statCanvas = st;
     // punto 7: agrandado y acercado — entra en el campo de visión sin mover la cabeza
-    this.statPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.1155),
-      new THREE.MeshBasicMaterial({ map: st.tex, transparent: true, opacity: 0.96, depthWrite: false }));
-    this.statPlane.position.set(0, -0.235, -0.46);
+    this.statPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.30, 0.0805),
+      new THREE.MeshBasicMaterial({ map: st.tex, transparent: true, opacity: 0.95, depthWrite: false }));
+    this.statPlane.position.set(0, -0.252, -0.46);
     this.group.add(this.statPlane);
     this._statKey = '';
 
     // ---- banner ----
     const bn = makeCanvas(1024, 256);
     this.banCanvas = bn;
-    this.banPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.92, 0.23),
+    this.banPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.18),
       new THREE.MeshBasicMaterial({ map: bn.tex, transparent: true, opacity: 0, depthWrite: false }));
     this.banPlane.position.set(0, 0.055, -0.95);
     this.group.add(this.banPlane);
@@ -186,10 +200,23 @@ export class Hud {
     });
   }
 
-  setAmmo() { /* munición ilimitada: sin pips ni estado que actualizar */ }
+  // n balas dentro · reloading tiñe los pips apagados mientras se cambia el cargador
+  setAmmo(n = 0, reloading = false) {
+    this.reloadingNow = !!reloading;
+    if (this.ammoPlate) this.ammoPlate.visible = this.ammoSize > 0;
+    const low = n <= 2;
+    this.ammoPips.forEach((p, i) => {
+      const slot = i < this.ammoSize;
+      p.visible = slot;
+      if (!slot) return;
+      const on = i < n;
+      p.material.opacity = on ? 1 : 0.42;
+      p.material.color.setHex(reloading ? 0x5d7186 : on ? (low ? 0xff5a3c : 0xffb066) : 0x2a3644);
+    });
+  }
 
-  _drawStat(hp, ammo, wave, score) {
-    const key = `${hp}|${ammo}|${wave}|${score}`;
+  _drawStat(hp, ammo, wave, score, size = 8, mode = '') {
+    const key = `${hp}|${ammo}|${size}|${wave}|${score}|${mode}|${this.levelN}|${this.levelWave}|${this.levelTotal}`;
     if (key === this._statKey) return;
     this._statKey = key;
     const { ctx, tex, c } = this.statCanvas;
@@ -197,20 +224,24 @@ export class Hud {
     ctx.clearRect(0, 0, W, H);
 
     // banda con degradado: se apoya en el borde inferior y no tapa la acción
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, 'rgba(8,14,22,0)');
-    bg.addColorStop(0.45, 'rgba(8,14,22,0.42)');
-    bg.addColorStop(1, 'rgba(8,14,22,0.72)');
+    // halo tenue solo tras el texto: sin placa, no tapa la accion
+    const bg = ctx.createRadialGradient(W / 2, H * 0.58, 10, W / 2, H * 0.58, W * 0.5);
+    bg.addColorStop(0, 'rgba(6,11,18,0.55)');
+    bg.addColorStop(0.7, 'rgba(6,11,18,0.22)');
+    bg.addColorStop(1, 'rgba(6,11,18,0)');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
     // piezas tipográficas en una sola línea, centradas
     const parts = [
-      { t: 'OLEADA', font: '700 30px "Helvetica Neue",Arial,sans-serif', col: 'rgba(150,178,205,0.95)', ls: 6, gap: 8 },
-      { t: String(wave).padStart(2, '0'), font: '800 54px "Helvetica Neue",Arial,sans-serif', col: '#eaf4ff', ls: 0, gap: 30 },
+      { t: `NIVEL ${this.levelN} · OLEADA`, font: '700 30px "Helvetica Neue",Arial,sans-serif', col: 'rgba(150,178,205,0.95)', ls: 6, gap: 8 },
+      { t: String(Math.max(1, wave)).padStart(2, '0') + '/' + String(Math.max(1, this.levelTotal)).padStart(2, '0'), font: '800 54px "Helvetica Neue",Arial,sans-serif', col: '#eaf4ff', ls: 0, gap: 30 },
       { t: '·', font: '700 40px "Helvetica Neue",Arial,sans-serif', col: 'rgba(61,155,255,0.85)', ls: 0, gap: 16 },
       { t: String(score).replace(/\B(?=(\d{3})+(?!\d))/g, ' '), font: '800 54px "Helvetica Neue",Arial,sans-serif', col: '#ffd9a8', ls: 0, gap: 10 },
-      { t: 'PTS', font: '700 26px "Helvetica Neue",Arial,sans-serif', col: 'rgba(255,159,67,0.9)', ls: 5, gap: 0 }
+      { t: 'PTS', font: '700 26px "Helvetica Neue",Arial,sans-serif', col: 'rgba(255,159,67,0.9)', ls: 5, gap: 26 },
+      { t: '·', font: '700 40px "Helvetica Neue",Arial,sans-serif', col: 'rgba(61,155,255,0.85)', ls: 0, gap: 16 },
+      { t: String(ammo).padStart(2, '0') + '/' + String(size).padStart(2, '0'), font: '800 46px "Helvetica Neue",Arial,sans-serif', col: ammo <= 2 ? '#ff6b6b' : '#9fe8ff', ls: 1, gap: 14 },
+      { t: mode, font: '700 24px "Helvetica Neue",Arial,sans-serif', col: 'rgba(150,178,205,0.95)', ls: 4, gap: 0 }
     ];
     let total = 0;
     for (const p of parts) {
@@ -220,27 +251,83 @@ export class Hud {
       p.w = Math.max(0, w - p.ls);
       total += p.w + p.gap;
     }
-    let x = (W - total) / 2;
+    // la línea nunca se recorta: si no cabe, se escala entera
+    const maxW = W - 20;
+    const s = total > maxW ? maxW / total : 1;
+    ctx.save();
+    ctx.translate(W / 2, H * 0.58);
+    ctx.scale(s, s);
     ctx.textBaseline = 'middle';
-    let maxAsc = 0;
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 2;
+    let x = -total / 2;
     for (const p of parts) {
       ctx.font = p.font;
       ctx.fillStyle = p.col;
       let cx = x;
-      for (const ch of p.t) { ctx.fillText(ch, cx, H * 0.58); cx += ctx.measureText(ch).width + p.ls; }
-      maxAsc = Math.max(maxAsc, p.w);
+      for (const ch of p.t) { ctx.fillText(ch, cx, 0); cx += ctx.measureText(ch).width + p.ls; }
       x += p.w + p.gap;
     }
+    ctx.restore();
     tex.needsUpdate = true;
   }
 
-  setState(hp, ammo, wave, score) { this._drawStat(hp, ammo, wave, score); }
+  // nivel y oleada dentro del nivel; fuerza repintado de la línea de estado
+  setLevel(n, wave = this.levelWave, total = this.levelTotal) {
+    this.levelN = n;
+    this.levelWave = wave;
+    this.levelTotal = total;
+    this._statKey = '';
+  }
+
+  setState(hp, ammo, wave, score, size = this.ammoSize, mode = this.modeName || '') {
+    this.ammoSize = size;
+    this.modeName = mode;
+    this._drawStat(hp, ammo, wave, score, size, mode);
+    this.setAmmo(ammo, this.reloadingNow);
+  }
+
+  // barra fina de recarga: k = 1 al empezar, 0 al terminar
+  reloadBar(k = 0) {
+    const { ctx, tex, c } = this.reloadCanvas;
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.font = '700 34px "Helvetica Neue",Arial,sans-serif';
+    ctx.fillStyle = '#9fe8ff';
+    ctx.shadowColor = 'rgba(61,155,255,0.8)'; ctx.shadowBlur = 14;
+    ctx.fillText('RECARGANDO', W / 2, 46);
+    ctx.shadowBlur = 0;
+    const bw = 340, bx = (W - bw) / 2, by = 66;
+    ctx.fillStyle = 'rgba(10,18,28,0.8)';
+    ctx.fillRect(bx, by, bw, 12);
+    ctx.fillStyle = '#49e6ff';
+    ctx.fillRect(bx, by, bw * Math.max(0, Math.min(1, 1 - k)), 12);
+    ctx.strokeStyle = 'rgba(159,232,255,0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bx, by, bw, 12);
+    ctx.textAlign = 'left';
+    tex.needsUpdate = true;
+    this.reloadOn = true;
+    this.barOn = true;
+    this.reloadT = 1;
+  }
+
+  setFireMode(name, id) { this.modeName = name; this.modeId = id; this._statKey = ''; }
 
   banner(title, sub, dur = 2.6) {
     const { ctx, tex, c } = this.banCanvas;
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.textAlign = 'center';
-    ctx.font = '800 108px "Helvetica Neue",Arial,sans-serif';
+    // ajusta el cuerpo para que títulos largos (CAMPAÑA COMPLETADA) no se recorten
+    const maxW = c.width - 56;
+    let size = 108;
+    ctx.font = `800 ${size}px "Helvetica Neue",Arial,sans-serif`;
+    while (size > 40 && ctx.measureText(title).width > maxW) {
+      size -= 4;
+      ctx.font = `800 ${size}px "Helvetica Neue",Arial,sans-serif`;
+    }
     ctx.fillStyle = '#f2f8ff';
     ctx.shadowColor = 'rgba(61,155,255,0.85)'; ctx.shadowBlur = 28;
     ctx.fillText(title, c.width / 2, 132);
@@ -255,7 +342,11 @@ export class Hud {
   }
 
   reloadHint(on) {
-    if (on && this.reloadPlane.material.opacity < 0.05) {
+    if (!on) {
+      this.barOn = false;
+      this.reloadT = 0;
+    }
+    if (on && !this.barOn && this.reloadPlane.material.opacity < 0.05) {
       const { ctx, tex, c } = this.reloadCanvas;
       ctx.clearRect(0, 0, c.width, c.height);
       ctx.textAlign = 'center';

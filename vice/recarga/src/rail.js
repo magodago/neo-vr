@@ -1,6 +1,7 @@
 // Corredor futurista premium: chapa industrial, nervios estructurales, holos,
 // iluminación volumétrica y suelo pulido con reflejos falsos.
 import * as THREE from 'three';
+import { metalFloor, concrete } from './textures.js';
 
 const SEG_LEN = 14;
 const SEG_COUNT = 8;
@@ -67,6 +68,22 @@ function panelTexture() {
       ctx.fillRect(Math.random() * w, Math.random() * h, 40 + Math.random() * 90, 20 + Math.random() * 60);
     }
   }, [3, 2]);
+}
+
+// halo radial reutilizable para focos colgantes
+let __glowCache = null;
+function glowSprite() {
+  if (__glowCache) return __glowCache;
+  __glowCache = canvasTex(128, 128, (ctx, w, h) => {
+    const g = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.28, 'rgba(210,238,255,0.65)');
+    g.addColorStop(0.62, 'rgba(150,205,255,0.18)');
+    g.addColorStop(1, 'rgba(120,180,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  });
+  return __glowCache;
 }
 
 function holoTexture(kind) {
@@ -198,24 +215,41 @@ function buildMaterials(aniso = 1) {
   panelMap.anisotropy = aniso;
   panelDark.anisotropy = aniso;
 
-  const floorMap = canvasTex(512, 512, (ctx, w, h) => {
-    ctx.fillStyle = '#0b0f14';
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 900; i++) {
-      ctx.fillStyle = `rgba(${40 + Math.random() * 60},${60 + Math.random() * 70},${80 + Math.random() * 70},${Math.random() * 0.1})`;
-      ctx.fillRect(Math.random() * w, Math.random() * h, Math.random() * 30, 2);
-    }
-    ctx.strokeStyle = 'rgba(120,160,190,0.14)';
-    ctx.lineWidth = 2;
-    for (let x = 0; x <= w; x += 128) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-    for (let y = 0; y <= h; y += 128) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-  }, [4, 8]);
-
-  floorMap.anisotropy = aniso;
+  // Chapa de acero 1024² real: juntas fresadas, roblones, humedad, arañazos,
+  // rugosidad variable y normal map derivado de la altura. Es lo que separa
+  // un suelo "pintado" de un suelo que se lee como metal de verdad.
+  const floorTex = metalFloor();
+  for (const t of [floorTex.map, floorTex.roughnessMap, floorTex.normalMap]) {
+    if (!t) continue;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(1.6, 2.6);
+    t.anisotropy = aniso;
+    t.needsUpdate = true;
+  }
+  // paneles de pared de hormigón proyectado con normal map
+  const wallTex = concrete();
+  for (const t of [wallTex.map, wallTex.normalMap]) {
+    if (!t) continue;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(2, 1.4);
+    t.anisotropy = aniso;
+    t.needsUpdate = true;
+  }
   return {
-    panel: new THREE.MeshStandardMaterial({ map: panelMap, color: 0xffffff, metalness: 0.92, roughness: 0.42 }),
-    panelDark: new THREE.MeshStandardMaterial({ map: panelDark, color: 0x8b98a6, metalness: 0.95, roughness: 0.55 }),
-    floor: new THREE.MeshStandardMaterial({ map: floorMap, color: 0xdfe9f2, metalness: 0.86, roughness: 0.26 }),
+    panel: new THREE.MeshStandardMaterial({ map: panelMap, color: 0xffffff, metalness: 0.62, roughness: 0.48, envMapIntensity: 1.0 }),
+    panelDark: new THREE.MeshStandardMaterial({ map: panelDark, color: 0x8b98a6, metalness: 0.66, roughness: 0.58, envMapIntensity: 0.9 }),
+    // placa de acero cepillado: metalness moderado para que la difusa exista
+    // y las sombras se lean (un suelo casi espejo se come todas las sombras)
+    floor: new THREE.MeshStandardMaterial({
+      map: floorTex.map, normalMap: floorTex.normalMap, roughnessMap: floorTex.roughnessMap,
+      color: 0xcdd8e4, metalness: 0.5, roughness: 1.0,
+      normalScale: new THREE.Vector2(1.25, 1.25), envMapIntensity: 1.1
+    }),
+    wall: new THREE.MeshStandardMaterial({
+      map: wallTex.map, normalMap: wallTex.normalMap,
+      color: 0x9aa7b6, metalness: 0.28, roughness: 0.82,
+      normalScale: new THREE.Vector2(0.7, 0.7), envMapIntensity: 0.85
+    }),
     trim: new THREE.MeshStandardMaterial({ color: 0x3d4a58, metalness: 1.0, roughness: 0.28 }),
     black: new THREE.MeshStandardMaterial({ color: 0x0a0d11, metalness: 0.7, roughness: 0.7 }),
     grate: new THREE.MeshStandardMaterial({ map: grateTexture(), color: 0xa8bccd, metalness: 1.0, roughness: 0.4 }),
@@ -301,7 +335,7 @@ export function buildRail(world, opts = {}) {
     for (const sx of [-1, 1]) {
       const x = sx * HALF_W;
       // banda inferior
-      const low = box(0.55, 2.0, SEG_LEN, M.panel, x - sx * 0.1, 1.0, 0);
+      const low = box(0.55, 2.0, SEG_LEN, M.wall, x - sx * 0.1, 1.0, 0);
       seg.add(low);
       // banda media rehundida con aletas
       const mid = box(0.3, 1.5, SEG_LEN, M.panelDark, x + sx * 0.12, 2.75, 0);
@@ -599,6 +633,87 @@ export function buildRail(world, opts = {}) {
         seg.add(pud);
       }
     }
+
+
+    // ================= estructura transversal del techo =================
+    {
+      const trussZ = -SEG_LEN / 2 + (i % 2 ? 4.2 : 9.6);
+      const truss = new THREE.Group();
+      truss.position.z = trussZ;
+      // viga principal en cajón
+      const main = box(HALF_W * 2 - 0.1, 0.26, 0.3, M.trim, 0, HEIGHT - 0.42, 0);
+      truss.add(main);
+      // celosía: diagonales alternas
+      for (let d = 0; d < 14; d++) {
+        const dx = -HALF_W + 0.5 + d * 0.48;
+        const diag = box(0.055, 0.47, 0.05, M.panelDark, dx, HEIGHT - 0.16, 0, 0, 0, (d % 2 ? 1 : -1) * 0.72);
+        truss.add(diag);
+      }
+      const lower = box(HALF_W * 2 - 0.4, 0.09, 0.14, M.panelDark, 0, HEIGHT + 0.08, 0);
+      truss.add(lower);
+      // tres focos colgando de la viga
+      for (const lx of [-2.1, 0, 2.1]) {
+        const drop = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.5, 6), M.black);
+        drop.position.set(lx, HEIGHT - 0.78, 0);
+        truss.add(drop);
+        const shade = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.22, 14, 1, true), M.trim);
+        shade.position.set(lx, HEIGHT - 1.02, 0);
+        shade.rotation.x = Math.PI;
+        truss.add(shade);
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.085, 10, 8), M.white);
+        bulb.position.set(lx, HEIGHT - 1.06, 0);
+        truss.add(bulb);
+        // halo
+        const halo = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.5, 1.5),
+          new THREE.MeshBasicMaterial({ map: glowSprite(), color: 0xcfefff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        halo.position.set(lx, HEIGHT - 1.05, 0.02);
+        truss.add(halo);
+        anim.holos.push({ mesh: halo, kind: 'flicker', phase: lx });
+      }
+      // cables transversales con leve comba
+      for (let cb = 0; cb < 2; cb++) {
+        const cz = (cb ? 1.1 : -1.1);
+        const pts = [];
+        for (let k = 0; k <= 6; k++) {
+          const t = k / 6;
+          pts.push(new THREE.Vector3(
+            -HALF_W + t * HALF_W * 2,
+            HEIGHT - 0.62 - Math.sin(t * Math.PI) * 0.34,
+            cz
+          ));
+        }
+        const cbl2 = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 22, 0.017, 6, false), M.black);
+        truss.add(cbl2);
+      }
+      seg.add(truss);
+    }
+
+    // ================= contenedores junto al carril =================
+    if (i % 2 === 0) {
+      const side = (i / 2) % 2 === 0 ? -1 : 1;
+      const cx = side * (HALF_W - 1.15);
+      const cz = -SEG_LEN / 2 + 3.0;
+      const c1 = box(0.95, 0.85, 1.25, M.panelDark, cx, 0.43, cz, 0, side * 0.09, 0);
+      seg.add(c1);
+      const c2 = box(0.9, 0.78, 1.1, M.panel, cx + side * 0.05, 1.24, cz + 0.06, 0, -side * 0.13, 0);
+      seg.add(c2);
+      // cantoneras de hazard y remates
+      for (const sy of [0.06, 0.82]) {
+        seg.add(box(0.98, 0.06, 1.28, M.warm, cx, sy, cz, 0, side * 0.09, 0));
+      }
+      // cinchas
+      seg.add(box(0.04, 0.9, 0.06, M.black, cx + 0.36, 0.44, cz - 0.4, 0, 0, 0.06));
+      seg.add(box(0.04, 0.86, 0.06, M.black, cx + 0.35, 1.25, cz - 0.34, 0, 0, 0.06));
+    }
+    // sombras: props bajos proyectan, todo recibe; el techo no proyecta para
+    // que el key light siga entrando en el corredor
+    seg.traverse((o) => {
+      if (!o.isMesh) return;
+      o.receiveShadow = true;
+      if (o.position.y > 0.04 && o.position.y < 3.15) o.castShadow = true;
+    });
 
     group.add(seg);
     segments.push({ group: seg, index: i });

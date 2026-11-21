@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { Drone, makeDebris } from './drone.js';
 import { GroundBot, LaserCam } from './enemies.js';
 import { Loot } from './loot.js';
+import { SquadBrain } from './ai.js';
+import { Arsenal, MODES } from './arsenal.js';
+import { LEVELS } from './levels.js';
 
 const _v1 = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
@@ -11,7 +14,7 @@ const ARENA = 6.35;          // media anchura jugable
 const OVER_TIME = 12;        // segundos de sobrecarga
 const TIER_TIME = 26;        // segundos que dura un arma del arsenal
 const TIER_NAMES = ['PISTOLA BASE', 'RÁFAGA', 'PLASMA DOBLE', 'ANIHILADOR'];
-const AMMO = 6;
+const AMMO = 8;              // balas del cargador base (lo gestiona Arsenal)
 const PLAYER_HP = 5;
 
 export class Game {
@@ -24,6 +27,7 @@ export class Game {
     this.rig = ctx.rig;
 
     this.enemies = [];
+    this.brain = new SquadBrain();
     this.projectiles = [];
     this.debris = [];
     this.grenades = 0;
@@ -31,9 +35,16 @@ export class Game {
     this.tracers = [];
     this.state = 'idle';
     this.hp = PLAYER_HP;
-    this.ammo = AMMO;
+    // cargador real: Arsenal decide cuántas balas caben, cuándo se recarga
+    // y qué hace cada modo de disparo
+    this.arsenal = new Arsenal(0);
+    this.ammo = this.arsenal.mag;
+    this.reloading = false;
     this.score = 0;
     this.wave = 0;
+    this.levelIdx = 0;      // nivel de campaña en curso (0..LEVELS-1)
+    this.waveInLevel = 0;   // oleadas completadas dentro del nivel
+    this.nextT = 0;         // cuenta atrás del cartel de nivel
     this.waveTimer = 0;
     this.pendingSpawn = 0;
     this.spawnQueue = [];
@@ -109,15 +120,28 @@ export class Game {
   begin() {
     this.state = 'playing';
     this.hp = PLAYER_HP;
-    this.ammo = AMMO;
+    this.arsenal.reset();
+    this.ammo = this.arsenal.mag;
+    this.reloading = false;
+    this.weapon.setMode(this.arsenal.modeIdx);
     this.weapon.setSpent(false);
     this.score = 0;
     this.wave = 0;
     this.kills = 0;
     this.hud.setHealth(this.hp, PLAYER_HP);
     this.hud.setAmmo(this.ammo, false);
-    this.hud.setState(this.hp, this.ammo, 0, 0);
-    this.nextWave(1.6);
+    this.startLevel(0);
+  }
+
+  // Cargador lleno: se limpia el aviso y el arma vuelve a brillar.
+  magLoaded() {
+    this.weapon.setReload(0);
+    this.weapon.setSpent(false);
+    this.hud.reloadBar(0);
+    this.hud.reloadHint(false);
+    this.hud.setAmmo(this.arsenal.mag, false);
+    this.hud.setState(this.hp, this.arsenal.mag, this.wave, this.score, this.arsenal.size, this.arsenal.mode.name);
+    this.ammo = this.arsenal.mag;
   }
 
   reset() {
@@ -126,6 +150,10 @@ export class Game {
     this.overT = 0;
     this.weaponTier = 0;
     this.tierT = 0;
+    this.arsenal.setTier(0);
+    this.arsenal.reset();
+    this.ammo = this.arsenal.mag;
+    this.reloading = false;
     this.enemies.length = 0;
     for (const p of this.projectiles) this.scene.remove(p.mesh, p.glow, p.core);
     this.projectiles.length = 0;
@@ -140,31 +168,88 @@ export class Game {
     this.state = 'intermission';
   }
 
+  // ---------- campaña ----------
+  startLevel(i) {
+    const L = LEVELS[i];
+    this.levelIdx = i;
+    this.wave = 0;
+    this.waveInLevel = 0;
+    // respiro entre niveles: +1 de integridad y cargador lleno
+    if (i > 0) {
+      this.hp = Math.min(PLAYER_HP, this.hp + 1);
+      this.hud.setHealth(this.hp, PLAYER_HP);
+    }
+    this.arsenal.reset();
+    this.ammo = this.arsenal.mag;
+    this.reloading = false;
+    this.weapon.setSpent(false);
+    this.weapon.setReload(0);
+    this.hud.setAmmo(this.ammo, false);
+    this.hud.setLevel(i + 1, 1, L.waves.length);
+    this.hud.setState(this.hp, this.ammo, 0, this.score, this.arsenal.size, this.arsenal.mode.name);
+    this.hud.banner(`NIVEL ${i + 1} · ${L.name}`, L.tag, 3.0);
+    if (this.audio) this.audio.waveStart();
+    this.nextWave(2.6);
+  }
+
   startWave() {
+    const L = LEVELS[this.levelIdx];
+    const w = L.waves[this.waveInLevel];
     this.wave++;
+    this.waveInLevel++;
     this.state = 'playing';
-    const boss = this.wave % 3 === 0;
-    const n = Math.min(3 + Math.floor(this.wave * 1.1), 12);
     this.spawnQueue = [];
-    for (let i = 0; i < n; i++) this.spawnQueue.push({ t: i * 0.34, boss: false });
-    if (boss) this.spawnQueue.push({ t: 0.9, boss: true });
+    let t = 0;
+    const step = w.gap || 0.3;
+    for (let i = 0; i < (w.d || 0); i++, t += step) this.spawnQueue.push({ t, kind: 'drone' });
+    for (let i = 0; i < (w.b || 0); i++, t += step * 1.15) this.spawnQueue.push({ t, kind: 'bot' });
+    for (let i = 0; i < (w.boss || 0); i++) this.spawnQueue.push({ t: 1.0 + i * 1.6, kind: 'boss' });
     this.pendingSpawn = 0;
 
-    if (boss) this.hud.banner(`OLEADA ${this.wave}`, 'UNIDAD PESADA DETECTADA', 3.0);
-    else this.hud.banner(`OLEADA ${this.wave}`, `OBJETIVOS: ${n}`, 2.4);
+    const total = (w.d || 0) + (w.b || 0);
+    if (w.boss) this.hud.banner(`OLEADA ${this.waveInLevel}/${L.waves.length}`, 'UNIDAD PESADA DETECTADA', 3.0);
+    else this.hud.banner(`OLEADA ${this.waveInLevel}/${L.waves.length}`, `OBJETIVOS: ${total}`, 2.4);
+    if (this.loot) this.loot.disposeAll();
     // cajas de suministros repartidas por el corredor
-    const nc = 1 + (this.wave > 2 ? 1 : 0);
+    const nc = 1 + (this.waveInLevel > 1 ? 1 : 0);
     for (let i = 0; i < nc; i++) this.loot.spawnCrate(-23 - i * 7 - Math.random() * 3);
     if (this.audio) this.audio.waveStart();
+    this.hud.setLevel(this.levelIdx + 1, this.waveInLevel, L.waves.length);
     this.hud.setState(this.hp, this.ammo, this.wave, this.score);
   }
 
-  spawnEnemy(boss) {
-    const wave = this.wave;
+  completeLevel() {
+    const L = LEVELS[this.levelIdx];
+    const bonus = 250 * (this.levelIdx + 1);
+    this.score += bonus;
+    this.hud.setState(this.hp, this.ammo, this.wave, this.score);
+    if (this.levelIdx >= LEVELS.length - 1) {
+      this.victory();
+      return;
+    }
+    this.state = 'levelclear';
+    this.nextT = 4.2;
+    this.hud.banner(`NIVEL ${this.levelIdx + 1} COMPLETADO`, `+${bonus} PTS · PREPARANDO NIVEL ${this.levelIdx + 2}`, 4.0);
+    if (this.audio) this.audio.waveStart();
+  }
 
-    // --- jefe de oleada: dron pesado acorazado
-    if (boss) {
-      const d = new Drone(this.scene, this.audio, this.shared, { hp: 14 + wave * 2, size: 0.82 });
+  victory() {
+    this.state = 'victory';
+    this.hud.banner('CAMPAÑA COMPLETADA', `${this.score} PTS · GATILLO PARA VOLVER A EMPEZAR`, 99);
+    if (this.audio) this.audio.waveStart();
+  }
+
+  // kind: 'drone' | 'bot' | 'boss'. El nivel de campaña fija la resistencia;
+  // el reparto de tipos lo decide la oleada (levels.js), no el azar.
+  spawnEnemy(kind = 'drone') {
+    const lv = this.levelIdx + 1;
+
+    // --- unidad pesada: dron acorazado, cierra el nivel
+    if (kind === 'boss') {
+      const L = LEVELS[this.levelIdx];
+      const w = L.waves[Math.max(0, this.waveInLevel - 1)] || {};
+      const hp = Math.round((24 + lv * 5) * (w.bossHp || 1));
+      const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 0.82 });
       d.root.scale.setScalar(0.02);
       d.isBoss = true;
       d.root.traverse(o => { if (o.isMesh) o.castShadow = true; });
@@ -176,29 +261,18 @@ export class Game {
       return;
     }
 
-    // --- reparto de tipos: androides desde la oleada 2.
-    // Las cámaras fijas de los muros (LaserCam) quedan fuera: son los
-    // "enemigos plantados" que había que quitar.
-    const r = Math.random();
-    let type = 'drone';
-    if (wave >= 2 && r < 0.45) type = 'bot';
-
-    if (type === 'bot') {
-      const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 5 + Math.floor(wave * 0.35) });
+    // --- androide de suelo: aguanta más y atraviesa el pasillo
+    if (kind === 'bot') {
+      const b = new GroundBot(this.scene, this.audio, this.shared, { hp: 4 + lv });
       b.kind = 'bot';
       b.root.position.z = -19 - Math.random() * 7;
       b.root.position.x = (Math.random() * 2 - 1) * 1.5;
-      // punto 5: sin distancia de parada (atraviesa y sigue)
       this.enemies.push(b);
       return;
     }
-    if (type === 'cam') {
-      // punto 3: fuera las cámaras fijas. El reparto nunca las elige; este
-      // bloque queda como salvaguarda y deriva a dron.
-      type = 'drone';
-    }
 
-    const hp = Math.min(6, 2 + Math.floor(wave / 3));
+    // --- dron ligero: rápido, poca resistencia
+    const hp = 2 + Math.floor((lv - 1) / 2);
     const d = new Drone(this.scene, this.audio, this.shared, { hp, size: 0.46 });
     d.kind = 'drone';
     // modo riel: entra por el fondo del corredor y avanza hacia el jugador
@@ -215,12 +289,21 @@ export class Game {
   }
 
   // ---------- disparo ----------
+  // El arsenal decide (cargador, modo, recarga). Aquí sólo se aplica el daño,
+  // así que la munición ya no es infinita: cada modo gasta y la recarga cuesta.
   tryFire(origin, dir) {
     if (this.state === 'dead') return false;
-    // Munición ILIMITADA: nunca hay recarga, nunca hay golpe seco.
-    this.weapon.fire();
+    const pull = this.arsenal.pull();
+    if (!pull.ok) {
+      this.weapon.dryFire();
+      if (pull.empty) this.hud.banner('CARGADOR VACÍO', 'RECARGANDO', 0.9);
+      this.syncAmmo();
+      return false;
+    }
+    const M = this.arsenal.mode;
+    this.weapon.fire(M.recoil, M.id);
 
-    // cajas de suministros (antes que los enemigos: están pegadas a las paredes)
+    // cajas de suministros (bloquean el rayo principal)
     const crateHit = this.loot.shoot(new THREE.Ray(origin.clone(), dir.clone()));
     if (crateHit) {
       this.spawnTracer(origin, crateHit.pos);
@@ -229,12 +312,28 @@ export class Game {
         this.score += 50;
         this.hud.banner('SUMINISTROS', 'CAJA DESTRUIDA', 1.1);
       }
-      this.hud.setState(this.hp, this.ammo, this.wave, this.score);
+      this.syncAmmo();
       return true;
     }
 
-    // impacto en enemigos (rayo-esfera)
-    let best = null, bestT = Infinity, bestPoint = null;
+    // ráfaga = varios rayos con dispersión; sobrecarga = un rayo que perfora
+    for (let i = 0; i < M.shots; i++) {
+      const d = dir.clone();
+      if (M.spread && M.shots > 1) {
+        d.x += (Math.random() * 2 - 1) * M.spread;
+        d.y += (Math.random() * 2 - 1) * M.spread;
+        d.z += (Math.random() * 2 - 1) * M.spread * 0.35;
+        d.normalize();
+      }
+      this._shootRay(origin, d, M, i === 0);
+    }
+    this.syncAmmo();
+    return true;
+  }
+
+  // Un rayo. `first` sólo pinta el fogonazo de boca una vez por pulsación.
+  _shootRay(origin, dir, M, first = true) {
+    const hits = [];
     const hc = new THREE.Vector3();
     for (const e of this.enemies) {
       if (e.dead || e.state === 'dying') continue;
@@ -247,29 +346,30 @@ export class Game {
       const d2 = _v1.lengthSq() - tca * tca;
       if (d2 > r * r) continue;
       const t = tca - Math.sqrt(Math.max(0, r * r - d2));
-      if (t < bestT) { bestT = t; best = e; bestPoint = origin.clone().addScaledVector(dir, t); }
+      hits.push({ e, t, rad: r, c: hc.clone() });
     }
+    hits.sort((a, b) => a.t - b.t);
 
-    if (best) {
-      // daño real: el centro del cuerpo mata de un tiro, el borde hace 2
-      const rad = best.hitR || (best.isBoss ? 1.05 : 0.66);
-      hc.copy(best.root.position);
-      if (best.hitCenter) hc.add(best.hitCenter);
-      _v2.copy(hc).sub(origin);
+    // perforante: varios cuerpos en la misma línea, del más cercano al fondo
+    const n = Math.min(M.pierce, hits.length);
+    let last = null;
+    for (let i = 0; i < n; i++) {
+      const h = hits[i];
+      _v2.copy(h.c).sub(origin);
       const along = _v2.dot(dir);
       const perp = Math.sqrt(Math.max(0, _v2.lengthSq() - along * along));
-      const crit = perp < rad * 0.45;
-      const dmg = (crit ? 3 : 2) + (this.overT > 0 ? 2 : 0) + this.weaponTier;
-      const killed = best.hit(dmg, dir);
-      const p = bestPoint;
-      this.spark(p, killed ? 0xfff0c4 : 0xffd9a0, killed ? 18 : 10, killed ? 3.4 : 2.6);
+      const crit = perp < h.rad * 0.45;
+      const dmg = Math.round(((crit ? 3 : 2) + (this.overT > 0 ? 2 : 0) + this.weaponTier) * M.dmg);
+      const killed = h.e.hit(dmg, dir);
+      last = origin.clone().addScaledVector(dir, h.t);
+      this.spark(last, killed ? 0xfff0c4 : 0xffd9a0, killed ? 18 : 10, killed ? 3.4 : 2.6);
       this.hud.hit(crit || killed);
-      if (!killed) {
-        this.score += 10;
-        this.hud.setState(this.hp, this.ammo, this.wave, this.score);
-      }
-      this.spawnTracer(origin, bestPoint);
-      return true;
+      if (!killed) this.score += 10;
+    }
+    if (last) {
+      this.spawnTracer(origin, last);
+      if (n > 1) this.hud.banner('PERFORANTE', n + ' OBJETIVOS', 0.5);
+      return;
     }
 
     // pared
@@ -291,9 +391,41 @@ export class Game {
     }
     const hit = origin.clone().addScaledVector(dir, Math.min(t, 30));
     this.spawnTracer(origin, hit);
-    this.spark(hit, 0xbfe6ff, 7, 1.8);
+    if (first) this.spark(hit, 0xbfe6ff, 7, 1.8);
     if (this.audio) this.audio.impact();
+  }
+
+  // Pinta el estado del cargador en el HUD y avisa al arma del nivel de carga.
+  syncAmmo() {
+    this.ammo = this.arsenal.mag;
+    this.reloading = this.arsenal.reloading;
+    this.hud.setAmmo(this.ammo, this.arsenal.reloading);
+    this.hud.setState(this.hp, this.ammo, this.wave, this.score, this.arsenal.size, this.arsenal.mode.name);
+    this.weapon.setSpent(this.arsenal.mag <= this.arsenal.mode.cost || this.arsenal.reloading);
+  }
+
+  // Recarga manual (R en teclado, apretón de mano en VR). Si estás a tope, no
+  // pasa nada; si estás a medias, es más rápida que la de emergencia.
+  reloadNow() {
+    if (this.state === 'dead') return false;
+    if (!this.arsenal.reload()) return false;
+    this.hud.reloadHint(true);
+    this.hud.banner('RECARGA', this.arsenal.mag > 0 ? 'TÁCTICA' : 'SECO', 0.7);
+    this.weapon.setSpent(true);
+    if (this.audio) this.audio.reload();
     return true;
+  }
+
+  // Cambio de modo de disparo: semi (preciso), ráfaga (3), sobrecarga (perfora)
+  cycleMode() {
+    if (this.state === 'dead') return null;
+    const M = this.arsenal.cycle();
+    this.weapon.setMode(this.arsenal.modeIdx);
+    this.hud.banner(M.name, M.hint + ' · ' + M.cost + ' BALAS', 1.1);
+    this.hud.setFireMode(M.name, M.id);
+    this.syncAmmo();
+    if (this.audio && this.audio.click) this.audio.click();
+    return M;
   }
 
   throwGrenade(handPos, handDir) {
@@ -336,9 +468,11 @@ export class Game {
 
   applyPickup(kind, pos) {
     if (kind === 'ammo') {
-      // la munición ya es infinita: esta caja pasa a ser granada extra
-      this.grenades += 1;
-      this.hud.banner('GRANADA', '+1 · MANO LIBRE', 1.2);
+      // caja de munición: llena el cargador al momento (saltarse la recarga)
+      this.arsenal.mag = this.arsenal.size;
+      this.arsenal.reloadT = 0;
+      this.hud.reloadHint(false);
+      this.hud.banner('MUNICIÓN', 'CARGADOR LLENO · ' + this.arsenal.size, 1.2);
     } else if (kind === 'hp') {
       this.hp = Math.min(PLAYER_HP, this.hp + 1);
       this.hud.setHealth(this.hp, PLAYER_HP);
@@ -354,6 +488,7 @@ export class Game {
       this.weaponTier = Math.min(3, this.weaponTier + 1);
       this.tierT = TIER_TIME;
       this.weapon.setTier(this.weaponTier);
+      this.arsenal.setTier(this.weaponTier);
       this.hud.banner(TIER_NAMES[this.weaponTier], `ARMA ${this.weaponTier}/3 · ${TIER_TIME} s`, 1.5);
       this.hud.setWeapon(TIER_NAMES[this.weaponTier], this.weaponTier, TIER_TIME);
     }
@@ -363,11 +498,9 @@ export class Game {
   }
 
   // ---------- golpe / recarga ----------
+  // Alias histórico: el arma y el audio siguen llamando a reload().
   reload() {
-    // Ya no existe la recarga: la munición es infinita. Se conserva el método
-    // porque el arma y el audio lo llaman desde otros sitios.
-    this.weapon.setSpent(false);
-    this.hud.reloadHint(false);
+    return this.reloadNow();
   }
 
   tryWhip(handPos, handDir) {
@@ -473,8 +606,32 @@ export class Game {
   die() {
     this.state = 'dead';
     if (this.audio) this.audio.death();
-    this.hud.banner('SISTEMA CAÍDO', 'GATILLO PARA REINICIAR', 99);
+    this.hud.banner('SISTEMA CAÍDO', `GATILLO PARA REINTENTAR NIVEL ${this.levelIdx + 1}`, 99);
     this.weapon.setSpent(false);
+  }
+
+  // reintento desde el principio del nivel actual: no se pierde la campaña
+  retryLevel() {
+    this.enemies.forEach(e => { try { e.dispose(); } catch (err) {} });
+    this.enemies.length = 0;
+    for (const p of this.projectiles) this.scene.remove(p.mesh, p.glow, p.core);
+    this.projectiles.length = 0;
+    for (const g of this.nades) this.scene.remove(g.mesh);
+    this.nades.length = 0;
+    if (this.loot) this.loot.disposeAll();
+    this.spawnQueue.length = 0;
+    this.pendingSpawn = 0;
+    this.hp = PLAYER_HP;
+    this.combo = 0;
+    this.comboT = 0;
+    this.overT = 0;
+    this.weaponTier = 0;
+    this.tierT = 0;
+    this.weapon.setTier(0);
+    this.arsenal.setTier(0);
+    this.hud.setWeapon('', 0, 0);
+    this.hud.setHealth(this.hp, PLAYER_HP);
+    this.startLevel(this.levelIdx);
   }
 
   // ---------- chispas / restos ----------
@@ -497,6 +654,26 @@ export class Game {
   // ---------- bucle ----------
   update(dt, t, head) {
     this.time = t;
+
+    // ---- arsenal: cargador, recarga y modos de disparo ----
+    const wasReloading = this.reloading;
+    const magEv = this.arsenal.update(dt);
+    if (magEv === 'reloaded') {
+      this.magLoaded();
+    } else if (this.arsenal.reloading) {
+      this.weapon.setReload(this.arsenal.reloadProgress);
+      this.hud.reloadBar(1 - this.arsenal.reloadProgress);
+      if (!wasReloading) {
+        // la recarga acaba de arrancar: aviso audible y visual inmediato
+        this.hud.reloadHint(true);
+        this.weapon.setSpent(true);
+        if (this.audio) this.audio.reload();
+      }
+    } else if (wasReloading) {
+      this.magLoaded();
+    }
+    this.reloading = this.arsenal.reloading;
+    this.ammo = this.arsenal.mag;
 
 
     // trazadoras: se desvanecen y adelgazan a la vez
@@ -560,13 +737,22 @@ export class Game {
     }
 
     // enemigos
-    this.railSpeed = 2.7 + Math.min(3.4, this.wave * 0.32);
+    // el corredor acelera con la campaña; suave dentro del nivel
+    this.railSpeed = 2.8 + this.levelIdx * 0.3 + Math.min(0.9, this.waveInLevel * 0.12);
     // OJO: aquí se usaba this.rig.position, que NO es donde está el jugador.
     // El rig se queda en z=-2.6 y la cámara (el cuerpo real, el que recibe los
     // impactos en `chest`) está en z=0: los enemigos apuntaban 2.6 m por detrás
     // y sus disparos pasaban de largo (0 impactos en 20 s). Misma referencia que
     // el hitbox: la cabeza.
     const playerPos = { x: head.x, z: head.z };
+
+    // la escuadra piensa en grupo: roles, carriles y si el jugador recarga
+    this.brain.update(dt, t, this.enemies, {
+      player: playerPos,
+      ammo: this.ammo,
+      reloading: this.reloading
+    });
+
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i];
       // arrastre del riel: el escenario avanza y se lleva a los enemigos con él
@@ -583,7 +769,7 @@ export class Game {
         // los de tierra cabalgan el corredor además de caminar
         e.root.position.z += scroll;
       }
-      const evs = e.update(dt, t, playerPos) || [];
+      const evs = e.update(dt, t, playerPos, this.enemies) || [];
       // candado de riel: dentro del corredor. Los androides SÍ pueden pasarse
       // de largo (nos atraviesan); drones y cámaras no.
       const ex = e.root.position.x, ez = e.root.position.z;
@@ -598,6 +784,10 @@ export class Game {
         else if (ev.type === 'kill') this.killEnemy(e, ev.pos);
         else if (ev.type === 'melee') this.hitPlayer(ev.dmg);
         else if (ev.type === 'gone') this.killEnemy(e, ev.pos, true);
+        else if (ev.type === 'fx') {
+          if (ev.kind === 'whiff') this.spark(ev.pos, 0x8fa4b8, 5, 1.4);
+          else this.spark(ev.pos, 0xffc27a, 4, 1.3);
+        }
       }
       if (e.dead) {
         if (this.enemies[i] === e) this.enemies.splice(i, 1);
@@ -661,28 +851,35 @@ export class Game {
       }
     }
 
-    // oleadas
+    // oleadas y progresión de la campaña
     if (this.state === 'intermission') {
       this.waveTimer -= dt;
       if (this.waveTimer <= 0) this.startWave();
+    } else if (this.state === 'levelclear') {
+      this.nextT -= dt;
+      if (this.nextT <= 0) this.startLevel(this.levelIdx + 1);
     } else if (this.state === 'playing') {
       // spawns escalonados
       this.pendingSpawn += dt;
       while (this.spawnQueue.length && this.spawnQueue[0].t <= this.pendingSpawn) {
         const s = this.spawnQueue.shift();
-        this.spawnEnemy(s.boss);
+        this.spawnEnemy(s.kind);
       }
       if (!this.spawnQueue.length && !this.enemies.length) {
-        const bonus = 100 * this.wave;
-        this.score += bonus;
-        this.hud.setState(this.hp, this.ammo, this.wave, this.score);
-        this.hud.banner(`OLEADA ${this.wave} LIMPIA`, `+${bonus} PUNTOS`, 2.2);
-        this.nextWave(3.4);
+        const L = LEVELS[this.levelIdx];
+        if (this.waveInLevel >= L.waves.length) {
+          // último cartel del nivel: bonus y salto al siguiente
+          this.completeLevel();
+        } else {
+          const bonus = 100 * this.waveInLevel;
+          this.score += bonus;
+          this.hud.setState(this.hp, this.ammo, this.wave, this.score);
+          this.hud.banner(`OLEADA ${this.waveInLevel}/${L.waves.length} LIMPIA`, `+${bonus} PUNTOS`, 2.2);
+          this.nextWave(3.4);
+        }
       }
     }
 
-    // aviso de recarga
-    this.hud.reloadHint(false);
     this.hud.update(dt);
   }
 

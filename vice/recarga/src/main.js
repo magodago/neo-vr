@@ -64,7 +64,66 @@ function buildComposer() {
   composer.addPass(bloom);
   // cierre a sRGB; el tone mapping ACES ya lo aplica el material del RenderPass
   composer.addPass(new ShaderPass(GammaCorrectionShader));
+
+  // Acabado fotográfico: aberración cromática radial mínima, viñeta y grano.
+  // Sin esto la imagen se lee "motor 3D"; con esto se lee "cámara".
+  const finish = new ShaderPass({
+    uniforms: {
+      tDiffuse: { value: null }, uTime: { value: 0 },
+      uVig: { value: 0.55 }, uGrain: { value: 0.05 }, uCA: { value: 0.0018 }
+    },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform sampler2D tDiffuse; uniform float uTime, uVig, uGrain, uCA;
+      varying vec2 vUv;
+      float h21(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      void main(){
+        vec2 d = vUv - 0.5;
+        float r2 = dot(d, d);
+        float k = uCA * r2;
+        vec3 c;
+        c.r = texture2D(tDiffuse, vUv + d * k).r;
+        c.g = texture2D(tDiffuse, vUv).g;
+        c.b = texture2D(tDiffuse, vUv - d * k).b;
+        float v = smoothstep(1.05, 0.18, r2 * 2.3);
+        c *= mix(1.0, v, uVig);
+        float g = h21(vUv * vec2(1920.0, 1080.0) + fract(uTime * 7.13));
+        c += (g - 0.5) * uGrain;
+        gl_FragColor = vec4(c, 1.0);
+      }`
+  });
+  finish.material.onBeforeRender = () => {
+    finish.uniforms.uTime.value = performance.now() * 0.001;
+  };
+  composer.addPass(finish);
   return composer;
+}
+
+// Polvo en suspensión: 1400 motas aditivas a lo largo del corredor.
+// Da profundidad y paralaje; cuesta prácticamente nada.
+function addMotes(parent) {
+  const N = 1400;
+  const pos = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 13;
+    pos[i * 3 + 1] = Math.random() * 5.4;
+    pos[i * 3 + 2] = Math.random() * 96 - 26;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({
+    size: 0.028, color: 0xd6ecff, transparent: true, opacity: 0.42,
+    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+  });
+  const p = new THREE.Points(g, m);
+  p.frustumCulled = false;
+  p.onBeforeRender = () => {
+    const t = performance.now() * 0.001;
+    p.position.y = Math.sin(t * 0.33) * 0.14;
+    p.position.x = Math.sin(t * 0.19) * 0.22;
+    m.opacity = 0.34 + Math.sin(t * 0.7) * 0.1;
+  };
+  parent.add(p);
 }
 
 // luz de casco: rim suave que hace leer los materiales cercanos
@@ -77,29 +136,11 @@ const world = new THREE.Group();
 scene.add(world);
 
 // ---------------------------------------------------------------- luces
-const hemi = new THREE.HemisphereLight(0x9ec9ff, 0x0a0d14, 0.55);
+// La iluminación vive en arena.js (una sola fuente de verdad).
+// Aquí solo dejamos un relleno hemisférico mínimo y la lámpara del visor.
+const hemi = new THREE.HemisphereLight(0x9ec9ff, 0x080a10, 0.22);
 scene.add(hemi);
 
-const key = new THREE.DirectionalLight(0xdff0ff, 2.1);
-key.position.set(3.4, 7.2, 2.6);
-key.castShadow = true;
-key.shadow.mapSize.set(1024, 1024);
-key.shadow.camera.near = 0.5;
-key.shadow.camera.far = 24;
-key.shadow.camera.left = -8;
-key.shadow.camera.right = 8;
-key.shadow.camera.top = 8;
-key.shadow.camera.bottom = -8;
-key.shadow.bias = -0.0012;
-key.shadow.normalBias = 0.02;
-scene.add(key);
-
-const rimA = new THREE.PointLight(0x62c8ff, 26, 14, 2);
-rimA.position.set(-4.6, 3.1, -3.4);
-scene.add(rimA);
-const rimB = new THREE.PointLight(0xff9f43, 18, 12, 2);
-rimB.position.set(4.4, 2.4, 3.8);
-scene.add(rimB);
 
 // ---------------------------------------------------------------- entorno
 let arena = null;
@@ -114,6 +155,7 @@ function setup() {
   arena = buildArena(world);
   arena.group.visible = false;   // el combate ocurre en el corredor en riel
   rail = buildRail(world, { aniso: renderer.capabilities.getMaxAnisotropy() });
+  addMotes(world);
   audio = new GameAudio();
   weapon = new Weapon(camera, audio, shared);
   hud = new Hud(camera);
@@ -263,8 +305,8 @@ function bindHands() {
     // el arma va en el espacio de puntería (ray): el cañón queda alineado con el rayo
     if (isGun) { gunGrip = ray; gunSource = src; } else whipGrip = grip;
     ray.addEventListener('selectstart', isGun ? onFire : onWhip);
-    // gatillo: el arma dispara infinito (sin recarga); la mano libre lanza granada
-    ray.addEventListener('squeezestart', isGun ? () => {} : onNade);
+    // apretón (squeeze): en el arma cambia el cargador, en la mano libre lanza granada
+    ray.addEventListener('squeezestart', isGun ? () => { if (game) game.reloadNow(); } : onNade);
     ray.addEventListener('connected', () => { if (ray.children.length === 0) ray.add(makeRay(isGun ? 0.55 : 0.45, isGun ? 0x9fe0ff : 0xff9f43, 0.26)); });
   });
   if (!gunGrip) gunGrip = renderer.xr.getController(gunHand === 'left' ? leftIdx : rightIdx);
@@ -283,7 +325,8 @@ function mountGun() {
 renderer.xr.addEventListener('sessionstart', () => {
   bindHands();
   applyWorld();
-  if (game.state === 'idle' || game.state === 'dead') game.begin();
+  if (game.state === 'idle') game.begin();
+  else if (game.state === 'dead') game.retryLevel();
 });
 renderer.xr.addEventListener('sessionend', () => {
   boundHands = false;
@@ -297,7 +340,10 @@ const _o = new THREE.Vector3();
 const _d = new THREE.Vector3();
 let fireCd = 0;
 function onFire() {
-  if (!game || game.state === 'dead') { if (game) { game.reset(); game.begin(); } return; }
+  if (!game) return;
+  // fin de partida: el gatillo reintenta el nivel; tras la campaña, reinicia
+  if (game.state === 'dead') { game.retryLevel(); return; }
+  if (game.state === 'victory') { game.reset(); game.begin(); return; }
   const now = performance.now();
   // cadencia: sube con el arsenal temporal (arma de nivel 3 dispara ~2x)
   const cd = 96 / (1 + (game.weaponTier || 0) * 0.34);
@@ -356,7 +402,8 @@ function startDesktop() {
   boot && boot.prog(1, '');
   const el = document.getElementById('boot');
   if (el) el.classList.add('hide');
-  if (game.state === 'idle' || game.state === 'dead') game.begin();
+  if (game.state === 'idle') game.begin();
+  else if (game.state === 'dead') game.retryLevel();
   if (audio) { audio.init(); audio.ambient(); }
   // en escritorio el arma se cuelga de la cámara (en el visor va al mando)
   if (weapon) weapon.mount(camera, new THREE.Vector3(0.145, -0.175, -0.30), new THREE.Euler(-0.04, 0.02, 0.02));
@@ -372,10 +419,17 @@ function startDesktop() {
   });
   document.addEventListener('contextmenu', (e) => e.preventDefault());
   document.addEventListener('mousedown', (e) => { if (mouseLook && e.button === 2) onWhip(); });
+  // rueda del ratón: cambia de modo de disparo sin soltar el apuntado
+  renderer.domElement.addEventListener('wheel', (e) => {
+    if (!mouseLook || !game) return;
+    e.preventDefault();
+    game.cycleMode();
+  }, { passive: false });
   window.addEventListener('keydown', (e) => {
     keys.add(e.code);
-    if (e.code === 'KeyR') onWhip();
+    if (e.code === 'KeyR') { if (game) game.reloadNow(); }
     if (e.code === 'KeyE') onWhip();
+    if (e.code === 'KeyQ' || e.code === 'KeyF') { if (game) game.cycleMode(); }
     if (e.code === 'KeyG') onNade();
     if (e.code === 'Space') onFire();
   });

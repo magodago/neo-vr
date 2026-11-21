@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { metalFloor, concrete, brushedMetal, hazard, glowSprite, hazeSprite, signTexture, floorDecal } from './textures.js';
+import { metalFloor, concrete, brushedMetal, hazard, glowSprite, hazeSprite, signTexture, floorDecal, serverRack } from './textures.js';
 
 const CY = 0x62c8ff;
 const AM = 0xff9f43;
@@ -200,23 +200,28 @@ export function buildArena(scene) {
   });
 
   // luces
-  const hemi = new THREE.HemisphereLight(0x546a86, 0x0a0d12, 0.26);
+  const hemi = new THREE.HemisphereLight(0x546a86, 0x0a0d12, 0.30);
   scene.add(hemi);
 
-  const key = new THREE.SpotLight(0xbfe0ff, 46, 22, Math.PI / 4.2, 0.55, 1.6);
+  // clave cenital: única luz que proyecta sombra y la que define el volumen
+  const key = new THREE.SpotLight(0xbfe0ff, 42, 22, Math.PI / 4.6, 0.42, 1.6);
   key.position.set(0.5, 5.4, -1.6);
   key.target.position.set(0, 0, -0.6);
   key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.bias = -0.0009;
-  key.shadow.camera.near = 0.5; key.shadow.camera.far = 16;
+  key.shadow.mapSize.set(1536, 1536);
+  key.shadow.bias = -0.0005;
+  key.shadow.normalBias = 0.02;
+  key.shadow.radius = 2;
+  key.shadow.camera.near = 0.5; key.shadow.camera.far = 18;
+  key.shadow.camera.fov = 62;
   scene.add(key); scene.add(key.target);
 
-  const warm = new THREE.PointLight(0xff8f3c, 26, 12, 2.0);
+  // relleno de color: bajo, solo para teñir los bordes (no debe borrar la sombra)
+  const warm = new THREE.PointLight(0xff8f3c, 9, 12, 2.0);
   warm.position.set(4.4, 4.4, -1.8); scene.add(warm);
-  const cool = new THREE.PointLight(0x3d9bff, 22, 14, 2.0);
+  const cool = new THREE.PointLight(0x3d9bff, 7.5, 14, 2.0);
   cool.position.set(-4.4, 3.4, 2.0); scene.add(cool);
-  const back = new THREE.PointLight(0xff4fd8, 12, 10, 2.0);
+  const back = new THREE.PointLight(0xff4fd8, 5, 10, 2.0);
   back.position.set(0, 2.6, 6.6); scene.add(back);
 
   // ---------- cartel ----------
@@ -273,6 +278,295 @@ export function buildArena(scene) {
     }
     a.needsUpdate = true;
   });
+
+
+  // ---------- racks de servidores ----------
+  const rackSpots = [
+    { p: [-7.34, 2.55, -3.2], r: Math.PI / 2 },
+    { p: [-7.34, 2.55, 3.3], r: Math.PI / 2 },
+    { p: [7.34, 2.55, -3.0], r: -Math.PI / 2 },
+    { p: [7.34, 2.55, 3.5], r: -Math.PI / 2 },
+    { p: [-3.2, 2.55, -7.34], r: 0 },
+    { p: [3.5, 2.55, -7.34], r: 0 }
+  ];
+  const rackMats = [];
+  rackSpots.forEach((s, i) => {
+    const rack = serverRack(11 + i * 7);
+    const mat = new THREE.MeshStandardMaterial({
+      map: rack.map, emissiveMap: rack.emissive, emissive: 0xffffff, emissiveIntensity: 1.1,
+      metalness: 0.5, roughness: 0.66, envMapIntensity: 0.5
+    });
+    rackMats.push(mat);
+    const frame = new THREE.Mesh(bevelBox(2.94, 2.74, 0.12, 0.02), matDark);
+    frame.position.set(s.p[0] - Math.sin(s.r) * 0.06, s.p[1], s.p[2] - Math.cos(s.r) * 0.06);
+    frame.rotation.y = s.r;
+    frame.castShadow = true;
+    group.add(frame);
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 2.5), mat);
+    panel.position.set(s.p[0], s.p[1], s.p[2]);
+    panel.rotation.y = s.r;
+    group.add(panel);
+    // cableado que baja del rack
+    const cbl = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+      new THREE.Vector3(s.p[0] - Math.sin(s.r) * 0.1, 1.28, s.p[2] - Math.cos(s.r) * 0.1),
+      new THREE.Vector3(s.p[0] - Math.sin(s.r) * 0.3, 0.9, s.p[2] - Math.cos(s.r) * 0.3),
+      new THREE.Vector3(s.p[0] - Math.sin(s.r) * 0.22, 0.12, s.p[2] - Math.cos(s.r) * 0.22)
+    ]), 16, 0.022, 5, false), new THREE.MeshStandardMaterial({ color: 0x12161b, roughness: 0.8, metalness: 0.3 }));
+    group.add(cbl);
+  });
+  updaters.push((dt, t) => {
+    for (let i = 0; i < rackMats.length; i++) {
+      rackMats[i].emissiveIntensity = 0.95 + Math.sin(t * 1.7 + i * 1.3) * 0.14 + (Math.random() < 0.015 ? 0.4 : 0);
+    }
+  });
+
+  // ---------- columna de energia ----------
+  const reactor = new THREE.Group();
+  reactor.position.set(0, 0, -4.7);
+  group.add(reactor);
+
+  const coreMat = new THREE.MeshStandardMaterial({
+    color: 0x9fdcff, emissive: 0x54c6ff, emissiveIntensity: 2.0, metalness: 0.3, roughness: 0.22
+  });
+  const core = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 4.3, 20), coreMat);
+  core.position.y = 2.15;
+  reactor.add(core);
+  const coreCap = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.22, 0.3, 24), matSteel);
+  coreCap.position.y = 4.32; reactor.add(coreCap);
+  const coreBase = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 0.34, 24), matHaz);
+  coreBase.position.y = 0.17; reactor.add(coreBase);
+
+  const rings = [];
+  for (let i = 0; i < 4; i++) {
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.46 + i * 0.17, 0.026, 8, 56),
+      i % 2 ? matNeonA : matSteel
+    );
+    ring.position.y = 0.85 + i * 1.02;
+    ring.rotation.x = Math.PI / 2;
+    reactor.add(ring);
+    rings.push(ring);
+  }
+  const coreGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTex, color: 0x63c8ff, transparent: true, opacity: 0.34,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  coreGlow.scale.set(4.6, 4.6, 1); coreGlow.position.y = 2.15;
+  reactor.add(coreGlow);
+
+  const reactorLight = new THREE.PointLight(0x63c8ff, 16, 13, 2.0);
+  reactorLight.position.set(0, 2.3, -4.7);
+  scene.add(reactorLight);
+
+  updaters.push((dt, t) => {
+    for (let i = 0; i < rings.length; i++) {
+      rings[i].rotation.z += dt * (0.55 + i * 0.24) * (i % 2 ? -1 : 1);
+    }
+    const puls = 1.85 + Math.sin(t * 3.1) * 0.3;
+    coreMat.emissiveIntensity = puls;
+    reactorLight.intensity = 12 + puls * 2.5;
+    coreGlow.material.opacity = 0.3 + Math.sin(t * 3.1) * 0.07;
+  });
+
+  // ---------- marcas de suelo ----------
+  [[-2.2, 1.9], [2.4, -2.6]].forEach(([x, z], i) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.16),
+      new THREE.MeshBasicMaterial({ map: hazard(), transparent: true, opacity: 0.22, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.set(x, 0.014, z); m.rotation.z = i ? 0.32 : -0.28;
+    group.add(m);
+  });
+
+
+  // ---------- tuberias y conductos ----------
+  const pipeMat = new THREE.MeshStandardMaterial({ color: 0x3a4450, metalness: 0.92, roughness: 0.38, envMapIntensity: 0.9 });
+  const pipeMat2 = new THREE.MeshStandardMaterial({ color: 0x2a3138, metalness: 0.85, roughness: 0.45 });
+  const mkPipe = (r, len, mat) => new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 14, 1, false), mat);
+  [-1, 1].forEach((side) => {
+    const x = side * 6.9;
+    [2.42, 2.74].forEach((y, i) => {
+      const pipe = mkPipe(i ? 0.055 : 0.095, 15.6, i ? pipeMat2 : pipeMat);
+      pipe.rotation.x = Math.PI / 2;
+      pipe.position.set(x + side * (i ? 0.16 : 0), y, 0);
+      pipe.castShadow = true;
+      group.add(pipe);
+      // bridas y soportes
+      for (let z = -7; z <= 7; z += 1.75) {
+        const clamp = new THREE.Mesh(new THREE.TorusGeometry(i ? 0.07 : 0.115, 0.018, 6, 18), pipeMat2);
+        clamp.rotation.y = Math.PI / 2;
+        clamp.position.set(pipe.position.x, y, z);
+        group.add(clamp);
+        const bracket = new THREE.Mesh(bevelBox(0.05, 0.05, 0.12, 0.008), matDark);
+        bracket.position.set(pipe.position.x - side * 0.12, y, z);
+        group.add(bracket);
+      }
+    });
+    // valvula grande
+    const valve = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.045, 8, 24), pipeMat);
+    valve.position.set(x + side * 0.05, 2.55, -1.4);
+    valve.rotation.y = Math.PI / 2;
+    group.add(valve);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.34, 10), pipeMat2);
+    stem.position.set(x + side * 0.0, 2.36, -1.4);
+    group.add(stem);
+    // codo que baja hacia el rack
+    const drop = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+      new THREE.Vector3(x, 2.42, 1.6),
+      new THREE.Vector3(x - side * 0.18, 2.15, 1.6),
+      new THREE.Vector3(x - side * 0.34, 2.4, 1.6),
+      new THREE.Vector3(x - side * 0.34, 1.1, 1.6)
+    ]), 20, 0.075, 10, false), pipeMat);
+    drop.castShadow = true;
+    group.add(drop);
+  });
+
+  // ---------- cajas de carga ----------
+  const crateTex = brushedMetal(7);
+  const crateMat = new THREE.MeshStandardMaterial({ map: crateTex, color: 0x4a5560, metalness: 0.75, roughness: 0.55, envMapIntensity: 0.7 });
+  const crateDecal = new THREE.MeshStandardMaterial({ map: hazard(5), metalness: 0.4, roughness: 0.7 });
+  const stacks = [
+    [-2.95, 0, -4.7, 1.1, 0.9, 1.0, 0.12],
+    [-3.0, 0.9, -4.75, 0.95, 0.8, 0.9, -0.22],
+    [3.0, 0, -5.6, 1.2, 0.85, 1.1, -0.15],
+    [3.15, 0, -7.0, 1.0, 0.95, 1.15, 0.3],
+    [-3.1, 0, -6.9, 1.15, 0.8, 0.95, -0.3],
+    [-3.15, 0.8, -6.85, 0.9, 0.7, 0.85, 0.1]
+  ];
+  stacks.forEach(([x, y, z, w, h, d, rot], i) => {
+    const box = new THREE.Mesh(bevelBox(w, h, d, 0.02), i % 2 ? crateMat : crateDecal);
+    box.position.set(x, y + h / 2, z);
+    box.rotation.y = rot;
+    box.castShadow = true; box.receiveShadow = true;
+    group.add(box);
+    // remaches / asas
+    const handle = new THREE.Mesh(bevelBox(w * 0.5, 0.05, 0.06, 0.01), matSteel);
+    handle.position.set(x, y + h * 0.72, z + Math.cos(rot) * (d / 2 + 0.02));
+    handle.rotation.y = rot;
+    group.add(handle);
+  });
+
+  // ---------- humedad en el suelo ----------
+  const wetMat = new THREE.MeshStandardMaterial({
+    color: 0x0a1420, metalness: 0.95, roughness: 0.08, transparent: true, opacity: 0.55,
+    envMapIntensity: 1.2, depthWrite: false
+  });
+  [[-2.6, 3.4, 1.5], [3.1, -2.2, 1.9], [0.4, 6.2, 1.1], [-4.2, -6.4, 1.3]].forEach(([x, z, r]) => {
+    const puddle = new THREE.Mesh(new THREE.CircleGeometry(r, 22), wetMat);
+    puddle.rotation.x = -Math.PI / 2;
+    puddle.position.set(x, 0.012, z);
+    group.add(puddle);
+  });
+
+
+  // ---------- paneles de pared con relieve ----------
+  const panelMat = new THREE.MeshStandardMaterial({
+    map: brushedMetal(13).map, color: 0x39424d, metalness: 0.9, roughness: 0.5, envMapIntensity: 1.0
+  });
+  const seamMat = new THREE.MeshStandardMaterial({ color: 0x0d1116, metalness: 0.6, roughness: 0.7 });
+  const ribMat = new THREE.MeshStandardMaterial({ color: 0x141a21, metalness: 0.85, roughness: 0.5 });
+  [-1, 1].forEach((side) => {
+    const x = side * 7.36;
+    for (let row = 0; row < 2; row++) {
+      for (let i = 0; i < 6; i++) {
+        const z = -6.15 + i * 2.46 + (row ? 0.9 : 0);
+        if (row === 1 && z > 6.4) continue;
+        const y = row ? 4.32 : 1.62;
+        const pnl = new THREE.Mesh(bevelBox(0.9, 2.24, 0.14, 0.02), ribMat);
+        pnl.position.set(x - side * 0.02, y, z);
+        pnl.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2;
+        pnl.castShadow = true; pnl.receiveShadow = true;
+        group.add(pnl);
+        const face = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 2.08), panelMat);
+        face.position.set(x - side * 0.12, y, z);
+        face.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2;
+        group.add(face);
+        // tornillos en las cuatro esquinas
+        for (const [dy, dz] of [[1.02, 0.33], [1.02, -0.33], [-1.02, 0.33], [-1.02, -0.33]]) {
+          const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 0.012, 8), matSteel);
+          sc.rotation.z = Math.PI / 2;
+          sc.position.set(x - side * 0.13, y + dy, z + dz);
+          group.add(sc);
+        }
+      }
+    }
+  });
+
+  // ---------- perfiles de esquina ----------
+  [-7.34, 7.34].forEach((x) => {
+    [5.34, 0.66].forEach((y) => {
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 14.9, 10), matSteel);
+      rail.rotation.x = Math.PI / 2;
+      rail.position.set(x, y, 0);
+      group.add(rail);
+    });
+  });
+  // junta de suelo
+  [-7.3, 7.3].forEach((x) => {
+    const sill = new THREE.Mesh(bevelBox(0.16, 0.1, 14.9, 0.012), seamMat);
+    sill.position.set(x, 0.05, 0);
+    group.add(sill);
+  });
+
+
+  // ---------- conductos de ventilacion en el techo ----------
+  const ductMat = new THREE.MeshStandardMaterial({
+    map: brushedMetal(21).map, color: 0x333a44, metalness: 0.88, roughness: 0.46, envMapIntensity: 1.1
+  });
+  [-1.75, 1.75].forEach((dx) => {
+    const duct = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 15.2, 18, 1, false), ductMat);
+    duct.rotation.x = Math.PI / 2;
+    duct.position.set(dx, 4.55, 0);
+    duct.castShadow = true;
+    group.add(duct);
+    for (let z = -6.8; z <= 6.8; z += 1.9) {
+      const band = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.028, 6, 20), matDark);
+      band.rotation.y = Math.PI / 2;
+      band.position.set(dx, 4.55, z);
+      group.add(band);
+      const hanger = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.05, 8), matSteel);
+      hanger.position.set(dx + (dx > 0 ? 0.3 : -0.3), 5.1, z);
+      group.add(hanger);
+    }
+  });
+
+  // ---------- cables colgando entre conductos ----------
+  const cableMat = new THREE.MeshStandardMaterial({ color: 0x0b0e12, roughness: 0.9, metalness: 0.1 });
+  for (let i = 0; i < 5; i++) {
+    const z = -5.6 + i * 2.6;
+    const sag = 0.35 + (i % 3) * 0.16;
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-1.75, 4.32, z),
+      new THREE.Vector3(-0.85, 4.32 - sag, z + 0.14),
+      new THREE.Vector3(0, 4.32 - sag * 1.35, z - 0.06),
+      new THREE.Vector3(0.85, 4.32 - sag, z + 0.1),
+      new THREE.Vector3(1.75, 4.32, z)
+    ]);
+    const cable = new THREE.Mesh(new THREE.TubeGeometry(curve, 26, 0.026, 6, false), cableMat);
+    group.add(cable);
+  }
+
+  // ---------- pasarela elevada al fondo ----------
+  const catMat = new THREE.MeshStandardMaterial({
+    map: brushedMetal(33).map, color: 0x2c333c, metalness: 0.85, roughness: 0.52
+  });
+  const walkway = new THREE.Mesh(bevelBox(15.0, 0.16, 1.5, 0.02), catMat);
+  walkway.position.set(0, 4.05, -6.85);
+  group.add(walkway);
+  // barandilla: dos tubos y montantes
+  [4.5, 5.05].forEach((y) => {
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 15.0, 10), matSteel);
+    bar.rotation.z = Math.PI / 2;
+    bar.position.set(0, y, -6.1);
+    group.add(bar);
+  });
+  for (let x = -7.0; x <= 7.0; x += 1.4) {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 1.0, 10), matSteel);
+    post.position.set(x, 4.55, -6.1);
+    group.add(post);
+  }
+  // rejilla bajo la pasarela
+  const meshTop = new THREE.Mesh(bevelBox(14.4, 0.06, 1.3, 0.01), seamMat);
+  meshTop.position.set(0, 3.96, -6.85);
+  group.add(meshTop);
 
   return {
     group, floor,
